@@ -4,7 +4,7 @@ on:
     branchs: 
       - [dev]
 jobs:
-  test_and_build:
+  test:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout ✔
@@ -19,7 +19,7 @@ jobs:
           
   deploy:
     runs-on: ubuntu-18.04
-    needs: test_and_build
+    needs: test
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
