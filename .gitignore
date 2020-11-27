@@ -1,0 +1,8 @@
+node_modules/
+vendor/
+.env*
+!.env.example
+src/controllers/
+src/middlewares/
+src/routes/
+docs/

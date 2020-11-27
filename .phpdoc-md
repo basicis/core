@@ -1,0 +1,53 @@
+<?php
+
+return (object) [
+    'rootNamespace' => 'Basicis | Core', 
+    'destDirectory' => 'docs',
+    'format' => 'github',
+    'classes' => [
+        /* Basicis\ */
+        '\Basicis\Basicis',
+
+        /* Basicis\Core\ */
+        '\Basicis\Core\Log',
+        '\Basicis\Core\Validator',
+
+        /* Basicis\View\ */
+        '\Basicis\View\View',
+
+        /* Basicis\Router\ */
+        '\Basicis\Router\Router',
+        '\Basicis\Router\Route',
+        '\Basicis\Router\RouterFactory',
+
+        /* Basicis\Model\ */
+        '\Basicis\Model\DataBase',
+        '\Basicis\Model\Model',
+        '\Basicis\Model\ExampleModel',
+        '\Basicis\Model\ModelInterface',
+
+        /* Basicis\Http\Client */
+        '\Basicis\Http\Client\Client',
+        '\Basicis\Http\Client\ClientException',
+        '\Basicis\Http\Client\NetworkException',
+        '\Basicis\Http\Client\RequestException',
+
+        /* Basicis\Http\Server */
+        '\Basicis\Http\Server\Middleware',
+        '\Basicis\Http\Server\RequestHandler',
+
+        /* Basicis\Http\Message */
+        '\Basicis\Http\Message\Message',
+        '\Basicis\Http\Message\Request',
+        '\Basicis\Http\Message\RequestFactory',
+        '\Basicis\Http\Message\Response',
+        '\Basicis\Http\Message\ResponseFactory',
+        '\Basicis\Http\Message\ServerRequest',
+        '\Basicis\Http\Message\ServerRequestFactory',
+        '\Basicis\Http\Message\Stream',
+        '\Basicis\Http\Message\StreamFactory',
+        '\Basicis\Http\Message\UploadedFile',
+        '\Basicis\Http\Message\UploadedFileFactory',
+        '\Basicis\Http\Message\Uri',
+    ],
+];

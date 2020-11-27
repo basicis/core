@@ -1,0 +1,8 @@
+
+theme: jekyll-theme-minimal
+title: "Basicis | Core"
+description: "As the name says, it is made to be basic and direct."
+logo: https://github.com/basicis/core/blob/master/public/img/logo.png
+show_downloads: true
+staticman:
+  branch: "gh-pages"

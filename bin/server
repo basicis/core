@@ -1,0 +1,18 @@
+#!/bin/bash
+if [ -z $1 ]; then
+    echo "Warning: Enter argument start | stop for Basicis Dev Server"
+else
+    if [ $1 = "start" ] ; then
+       echo "Starting Basicis Dev Server on http://localhost:8081"
+       php -S 0.0.0.0:8081 -t public/
+    fi
+
+    if [ $1 = "stop" ]; then
+        pid=$(pgrep -f "php -S 0.0.0.0:8081 -t public/")
+        if [ ! -z $pid ]; then
+            kill $pid
+            echo "Stoping Basicis Dev Server..."
+        fi    
+    fi    
+
+fi
