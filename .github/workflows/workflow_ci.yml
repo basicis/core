@@ -13,10 +13,6 @@ jobs:
       - name: PHPUnit Tests 🧪
         run: |
           bash $GITHUB_WORKSPACE/.github/scripts/test.sh
-
-      - name: Run Documentation Build 🛠️
-        run: |
-          bash $GITHUB_WORKSPACE/.github/scripts/deploy.sh
           
   deploy:
     runs-on: ubuntu-18.04
