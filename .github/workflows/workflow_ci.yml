@@ -10,9 +10,6 @@ jobs:
       - name: Checkout ✔
         uses: actions/checkout@v2
 
-      - name: Composer 🔧
-        uses: php-actions/composer@v1
-
       - name: PHPUnit Tests 🧪
         run: |
           bash $GITHUB_WORKSPACE/.github/scripts/test.sh
@@ -27,6 +24,13 @@ jobs:
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
+
+      - name: Composer 🔧
+        uses: php-actions/composer@v1
+
+      - name: Run Documentation Build 🛠️
+        run: |
+          bash $GITHUB_WORKSPACE/.github/scripts/deploy.sh
 
       - name: Deploy Documentation on Github Pages  🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
