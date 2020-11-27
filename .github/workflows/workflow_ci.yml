@@ -6,7 +6,6 @@ on:
 jobs:
   test_and_build:
     runs-on: ubuntu-18.04
-    needs: test
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
