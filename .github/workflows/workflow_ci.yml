@@ -4,7 +4,17 @@ on:
     branchs: 
       - [dev]
 jobs:
-  test_and_build:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout ✔
+        uses: actions/checkout@v2
+
+      - name: PHPUnit Tests 🧪
+        run: |
+          bash $GITHUB_WORKSPACE/.github/scripts/test.sh
+          
+  deploy:
     runs-on: ubuntu-18.04
     needs: test
     steps:
@@ -14,25 +24,14 @@ jobs:
       - name: Composer 🔧
         uses: php-actions/composer@v1
 
-      - name: PHPUnit Tests 🧪
-        run: |
-          bash $GITHUB_WORKSPACE/.github/scripts/test.sh
-
       - name: Run Documentation Build 🛠️
         run: |
           bash $GITHUB_WORKSPACE/.github/scripts/deploy.sh
-          
-  deploy:
-    runs-on: ubuntu-18.04
-    needs: test_and_build
-    steps:
-      - name: Checkout ✔
-        uses: actions/checkout@v2
 
       - name: Deploy Documentation on Github Pages  🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: docs/ 
+          FOLDER: docs/
           CLEAN: true
