@@ -31,12 +31,8 @@ class BasicisTest extends TestCase
         $this->appArguments = [
             'uri' => '/',
             'method' =>'GET',
-            'data' => [],
-            'cookie' => [],
-            'session' => [],
-            'files' => [],
             'env' => [
-                "APP_ENV" =>"dev",
+                "APP_ENV" => "dev",
                 "APP_TIMEZONE" =>  "America/Recife",
                 "APP_PATH" => null
             ]

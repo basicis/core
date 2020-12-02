@@ -70,7 +70,7 @@ class Router
     public function __construct(ServerRequestInterface $request, string $path = ".")
     {
         $this->path = $path;
-        $this->url = $request->getRequestTarget();
+        $this->url = $request->getUri()->getPath();
         $this->method = strtoupper($request->getMethod());
         $this->routes = [];
         $this->loadFiles();
@@ -85,7 +85,7 @@ class Router
     * @param string|array $url = "/"
     * @param string|\Clousure $callback = null
     * @param string|array $middlewares = null
-    * @return boolean
+    * @return Router
     */
     public function setRoute(string $method = "GET", $url = "/", $callback = null, $middlewares = null) : Router
     {
@@ -359,83 +359,7 @@ class Router
         }
         return;
     }
-
-
-
-    /**
-     * Function get
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function get(string $url = "/", $callback = null, $middlewares = null)
-    {
-        $this->setRoute('GET', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function post
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function post(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('POST', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function put
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function put(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('PUT', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function path
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function path(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('PATCH', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function detete
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function delete(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('DELETE', $url, $callback, $middlewares);
-    }
-
-
+    
 
     /**
      * group function alias for routerGroup

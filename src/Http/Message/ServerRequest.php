@@ -96,7 +96,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function __construct($uri = "/", string $method = 'GET', array $serverParams = [])
     {
         parent::__construct($uri, $method);
-        $this->withQueryParams($serverParams);
+        //$this->withQueryParams($serverParams);
     }
 
     /**
@@ -175,7 +175,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getQueryParams() : array
     {
-        return $this->queryParams;
+        return array_merge($this->queryParams ?? [], $this->getQueryParamsByUri());
     }
 
     /**
@@ -222,7 +222,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function withQueryParams(array $query) : ServerRequest
     {
-        $this->queryParams = $query;
+        $this->queryParams = array_merge($query, $this->getQueryParamsByUri());
         return $this;
     }
 

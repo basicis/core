@@ -4,6 +4,7 @@ namespace Basicis;
 use Basicis\Core\Log;
 use Basicis\Core\Validator;
 use Basicis\Router\RouterFactory;
+use Basicis\Router\Router;
 use Basicis\Router\Route;
 use Basicis\View\View;
 use Basicis\Http\Message\ServerRequest;
@@ -21,7 +22,6 @@ use Psr\Http\Message\UploadedFileInterface;
 use \Twig\TwigFunction;
 use \Dotenv\Dotenv;
 
-
 /**
  * Basicis - App
  *
@@ -37,75 +37,80 @@ class Basicis extends RequestHandler
 {
     
     /**
-     * $args variable
+     * const DEFAULT_ENV = [
+     *   "APP_ENV" => "dev",
+     *   "APP_TIMEZONE" =>  "America/Recife",
+     *   "APP_PATH" => null
+     *  ];
      *
-     * @var array
+     * Default app enviroments variables values
      */
-    private $args = [
-        'uri' => '/',
-        'method' =>'GET',
-        'data' => [],
-        'cookie' => [],
-        'session' => [],
-        'files' => [],
-        'env' => [
-            "APP_PATH" => null,
-            "APP_ENV" => "dev",
-            "APP_TIMEZONE" =>  "America/Recife",
-        ]
+    const DEFAULT_ENV = [
+        "APP_ENV" => "dev",
+        "APP_TIMEZONE" =>  "America/Recife",
+        "APP_PATH" => null
     ];
-
 
     /**
      * $route variable
      *
      * @var Route
      */
-     private $route;
-
-
-     /**
-      * $request variable
-      *
-      * @var ServerRequest
-      */
-     private $request;
-
-
-     /**
-      * $response variable
-      *
-      * @var Response
-      */
-     private $response;
-
-
-     /**
-      * $response variable
-      *
-      * @var String
-      */
-      private $view = "";
-
-     /**
-      * $controllers variable
-      *
-      * @var array
-      */
-     private $controllers = [];
+    private $route;
 
 
     /**
-    * $middlewares variable
+     * $router variable
+     *
+     * @var Router
+     */
+    private $router;
+
+
+
+    /**
+     * $request variable
+     *
+     * @var ServerRequest
+     */
+    private $request;
+
+
+    /**
+     * $response variable
+     *
+     * @var Response
+     */
+    private $response;
+
+
+    /**
+    * $response variable
     *
-    * @var array
+    * @var String
     */
+    private $view = "";
+
+    /**
+     * $controllers variable
+     *
+     * @var array
+     */
+    private $controllers = [];
+
+
+    /**
+     * $middlewares variable
+     *
+     * @var array
+     */
     private $middlewares = [
         "before" => [],
         "route" => [],
         "after" => [],
     ];
 
+    
     /**
     * $viewFilters variable
     *
@@ -117,20 +122,16 @@ class Basicis extends RequestHandler
     /**
      * Function __construct
      *
+     * @param ServerRequestInterface $request
      * @param array $args
      * @return Basicis
      */
-    public function __construct(array $args = null)
+    public function __construct(ServerRequestInterface $request, array ...$options)
     {
-
-        if ($args !== null) {
-            $this->setArgs($args);
-        }
-
-        if($this->getArgs()->env['APP_ENV'] === "dev") {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-        }
+        self::loadEnv();
+        $this->setMode($options['mode']);
+        $this->setTimezone($options['timezone']);
+        $this->setRequest($request);
     }
 
 
@@ -138,45 +139,16 @@ class Basicis extends RequestHandler
     /**
      * Function createApp Factory
      *
+     * @param ServerRequestInterface $request
      * @param array $args
      * @return Basicis
      */
-    public static function createApp(array $args = null) : Basicis
+    public static function createApp(ServerRequestInterface $request = null) : Basicis
     {
-        Basicis::loadEnv();
-        return new Basicis($args);
+        return new Basicis($request ?? ServerRequestFactory::create('GET', '/'));
     }
 
-    
-    /**
-     * Function setArgs
-     *
-     * @param array $args => [uri|method|data|env|files|cookies|sessions]
-     * @return Basicis
-     */
-    public function setArgs(array $args = []) : Basicis
-    {
-        foreach ($this->args as $key => $arg) {
-            if (array_key_exists($key, $args)) {
-                $this->args[$key] = $args[$key];
-            }
-        }
-        return $this;
-    }
-
-
-
-    /**
-     * Function getArgs
-     *
-     * @return object with [uri|method|data|env|files|cookies|sessions]
-     */
-    public function getArgs() : object
-    {
-        return (object) $this->args;
-    }
-
-
+   
 
     /**
      * Function setControllers
@@ -328,7 +300,7 @@ class Basicis extends RequestHandler
             $i++;
         }
 
-        if(!preg_match("/\/$/", $path)) {
+        if (!preg_match("/\/$/", $path)) {
             $path .= "/";
         }
 
@@ -398,6 +370,60 @@ class Basicis extends RequestHandler
     }
 
 
+    /**
+     * Function setMode
+     * Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"]
+     *
+     * @param string $mode = ["dev"|"production"|"prod"|null]
+     * Default value "dev" == Development Mode
+     *
+     * @return Basicis
+     */
+    public function setMode(string $mode = "dev") : Basicis
+    {
+        if (in_array($mode, ["production", "prod"])) {
+            putenv("APP_ENV=production");
+            ini_set('display_errors', 0);
+            $this->mode = "production";
+            return $this;
+        }
+
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        putenv("APP_ENV=dev");
+        $this->mode = "dev";
+        return $this;
+    }
+
+
+    /**
+     * Function setTimezone
+     *
+     * @param string $timezone
+     *
+     * @return Basicis
+     */
+    public function setTimezone(string $timezone = null) : Basicis
+    {
+        date_default_timezone_set(isset($timezone) ? $timezone : "America/Recife");
+        return $this;
+    }
+
+
+    /**
+     * Function setRequest
+     *
+     * @param ServerRequestinterface $request
+     *
+     * @return Basicis
+     */
+    public function setRequest(ServerRequestinterface $request) : Basicis
+    {
+        $this->router = RouterFactory::create($request, self::path()."src/");
+        $this->request = $request;
+        return $this;
+    }
+
 
     /**
      * Function getRequest
@@ -406,8 +432,9 @@ class Basicis extends RequestHandler
      */
     public function getRequest() : ServerRequestInterface
     {
-        return $this->request ?? ServerRequestFactory::create($this->getArgs()->method, $this->getArgs()->uri);
+        return $this->request;
     }
+
 
     /**
      * Function request
@@ -430,9 +457,13 @@ class Basicis extends RequestHandler
      */
     public function getResponse(int $code = null) : ResponseInterface
     {
-        return $this->response ? ($code !== null ? $this->response->withStatus($code) : $this->response ) :
-               ResponseFactory::create($code ?? 200);
+        if ($this->response instanceof ResponseInterface) {
+            return ($code !== null) ? $this->response->withStatus($code) : $this->response;
+        }
+        
+        return $this->response = ResponseFactory::create(($code !== null) ? $code : 200);
     }
+
 
     /**
      * Function response
@@ -447,6 +478,17 @@ class Basicis extends RequestHandler
 
 
     /**
+     * Function getRouter
+     *
+     * @return \Basicis\Router\Router
+     */
+    public function getRouter() : Router
+    {
+        return $this->router;
+    }
+
+
+    /**
      * Function getRoute
      *
      * @return \Basicis\Router\Route|null
@@ -455,6 +497,89 @@ class Basicis extends RequestHandler
     {
         return $this->route;
     }
+
+
+
+    /**
+     * Function get
+     *
+     * @param string $url
+     * @param string|\Closure $callback
+     * @param string|array $middlewares
+     * @return void
+     */
+    public function get(string $url = "/", $callback = null, $middlewares = null)
+    {
+        $this->router->setRoute("GET", $url, $callback, $middlewares);
+        return $this;
+    }
+
+
+
+    /**
+     * Function post
+     *
+     * @param string $url
+     * @param string|\Closure $callback
+     * @param string|array $middlewares
+     * @return void
+     */
+    public function post(string $url, $callback = null, $middlewares = null)
+    {
+        $this->router->setRoute("POST", $url, $callback, $middlewares);
+        return $this;
+    }
+
+
+
+    /**
+     * Function put
+     *
+     * @param string $url
+     * @param string|\Closure $callback
+     * @param string|array $middlewares
+     * @return void
+     */
+    public function put(string $url, $callback = null, $middlewares = null)
+    {
+        $this->router->setRoute("GET", $url, $callback, $middlewares);
+        return $this;
+    }
+
+
+
+    /**
+     * Function patch
+     *
+     * @param string $url
+     * @param string|\Closure $callback
+     * @param string|array $middlewares
+     * @return void
+     */
+    public function patch(string $url, $callback = null, $middlewares = null)
+    {
+        $this->router->setRoute("PATCH", $url, $callback, $middlewares);
+        return $this;
+    }
+
+
+
+    /**
+     * Function detete
+     *
+     * @param string $url
+     * @param string|\Closure $callback
+     * @param string|array $middlewares
+     * @return void
+     */
+    public function delete(string $url, $callback = null, $middlewares = null)
+    {
+        $this->router->setRoute("DELETE", $url, $callback, $middlewares);
+        return $this;
+    }
+
+
+
 
 
     /**
@@ -664,7 +789,7 @@ class Basicis extends RequestHandler
      * @param string $resourceFileName = "php://output"
      * @return void
      */
-    public function input(string $resourceFileName = "php://input"): string
+    public static function input(string $resourceFileName = "php://input"): string
     {
         //Opening output stream
         $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'r');
@@ -683,8 +808,11 @@ class Basicis extends RequestHandler
      *
      * @return int
      */
-    public function output(string $body = '', string $resourceFileName = "php://output") : int
-    {
+    public static function output(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $resourceFileName = "php://output"
+    ) : int {
         //Opening output stream
         $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
         $size = 0;
@@ -693,18 +821,19 @@ class Basicis extends RequestHandler
             @header(
                 sprintf(
                     '%s/%s %s %s',
-                    strtoupper($this->request->getUri()->getScheme()),
-                    $this->request->getProtocolVersion(),
-                    $this->response->getStatusCode(),
-                    $this->response->getReasonPhrase()
+                    strtoupper($request->getUri()->getScheme()),
+                    $response->getProtocolVersion(),
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase()
                 ),
                 true
             );
  
-            foreach ($this->response->getHeaders() as $name => $value) {
-                @header($this->response->getHeaderLine($name), true);
+            foreach ($response->getHeaders() as $name => $value) {
+                @header($response->getHeaderLine($name), true);
             }
-            $size = $stream->write($body);
+            $size = $stream->write($response->getBody());
+            $response->getBody()->close();
         }
 
         $stream->close();
@@ -725,7 +854,7 @@ class Basicis extends RequestHandler
         //Mergin Route arguments and ServerRequest data, files, cookies...
         $args = (object) array_merge(
             $this->route !== null ? (array) ($this->route->getArguments() ?? []) : [],
-            (array) $this->getArgs() ?? [],
+            [],
             $request->getServerParams()
         );
 
@@ -758,18 +887,9 @@ class Basicis extends RequestHandler
      *
      * @return void
      */
-    public function run()
+    public function run() : ResponseInterface
     {
-        //Creating Route, Request and Response
-        $this->request = $this->request()
-                                ->withUploadedFiles($this->getArgs()->files)
-                                ->withParsedBody($this->input());
-
-        $this->response = $this->response()
-                                ->withHeader(
-                                    "X-Powered-By",
-                                    $this->getArgs()->env['APP_DESCRIPTION'] ?? ["Basicis Framework | By: Messias Dias"]
-                                );
+        $this->response = $this->response()->withHeader("X-Powered-By", "Basicis Framework");
 
         //Before middlewares here
         foreach ($this->middlewares['before'] as $key => $before) {
@@ -797,8 +917,7 @@ class Basicis extends RequestHandler
                 if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
                     $this->response = $this->handle($this->request);
                 }
-            } 
-
+            }
         } else {
             $this->response = $router->getResponse();
         }
@@ -811,6 +930,7 @@ class Basicis extends RequestHandler
         }
         
         //Sending body to client
-        return $this->output($this->view);
+        //return $this->output($this->view);
+        return $this->response;
     }
 }
