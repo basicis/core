@@ -45,6 +45,27 @@ class Validator
         $this->class = (!is_null($class) && class_exists($class) )? $class : false;
     }
 
+
+    /**
+     * Function validate
+     *
+     * @param string|array $data
+     * @param string|array $validations
+     * @param string $class
+     * @return boolean
+     */
+    public static function validate($data, $validations, $class = '') : bool
+    {
+        $validator = new Validator($class);
+        if (is_array($data) && is_array($validations)) {
+            return $validator->validArray($data, $validations);
+        } elseif (is_string((string) $data) && is_string((string) $validations)) {
+            return $validator->validString($data, $validations);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Function validString
      * @param string $data        - Given to be validated

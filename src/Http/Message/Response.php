@@ -111,7 +111,7 @@ class Response extends Message implements ResponseInterface
         "100" => "Continue",
         "101" => "Switching Protocols",
         //20X
-        "200" => "OK",
+        "200" => "Ok, working as expected!", // default "OK"
         "201" => "Created",
         "202" => "Accepted",
         "203" => "Non-Authoritative Information",
@@ -212,9 +212,10 @@ class Response extends Message implements ResponseInterface
             } else {
                 $this->reasonPhrase = $reasonPhrase;
             }
-        } else {
-            throw new InvalidArgumentException("Invalid Http status code $code argument inputed.");
+            return $this;
         }
+        
+        throw new InvalidArgumentException("Invalid Http status code $code argument inputed.");
         return $this;
     }
 

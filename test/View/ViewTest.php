@@ -15,11 +15,17 @@ class ViewTest extends TestCase
      *
      * @var View
      */
-    private static $view;
+    private $view;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->view = new View("./");
+    }
 
     public function testConstruct()
     {
-        self::$view =  new View("./");
-        $this->assertInstanceOf(View::Class, self::$view);
+        $this->assertInstanceOf(View::Class, $this->view);
     }
 }

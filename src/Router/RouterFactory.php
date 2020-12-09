@@ -23,9 +23,9 @@ class RouterFactory
      * @param ServerRequestInterface $request
      * @return Router
      */
-    public static function create(ServerRequestInterface $request, string $filesPath) : Router
+    public static function create(ServerRequestInterface $request) : Router
     {
         //Starting Router Pool, Loading files and get Route Object
-        return new Router($request, $filesPath);
+        return new Router($request);
     }
 }
