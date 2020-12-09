@@ -50,7 +50,7 @@ class ResponseTest extends TestCase
     public function testGetReasonPhrase()
     {
         $this->response->withStatus(200);
-        $this->assertEquals('OK', $this->response->getReasonPhrase());
+        $this->assertEquals('Ok, working as expected!', $this->response->getReasonPhrase());
         $this->response->withStatus(100, "Continue custom reason");
         $this->assertEquals("Continue custom reason", $this->response->getReasonPhrase());
     }

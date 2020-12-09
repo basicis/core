@@ -35,7 +35,10 @@ class RouterTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-        $this->router = new Router(ServerRequestFactory::create("GET", "/"), __DIR__);
+
+        $this->router = new Router(ServerRequestFactory::create("GET", "/"));
+        $this->router->setRoute("GET", "/", function() { return true;});
+        $this->router->setRoute("GET", "/test", function() { return true;});
         $this->route = $this->router->getRoute();
     }
 
@@ -51,16 +54,16 @@ class RouterTest extends TestCase
     }
 
 
-     /**
-     * Function testGetRoute
-     *
-     * @return void
-     */
+    /**
+    * Function testGetRoute
+    *
+    * @return void
+    */
     public function testGetRoute()
     {
-        $this->route = $this->router->getRoute();
         $this->assertInstanceOf(Route::class, $this->route);
     }
+
 
 
     /**
@@ -84,5 +87,15 @@ class RouterTest extends TestCase
         $this->assertEquals("GET",  $this->route->getMethod());
     }
 
+    /**
+     * Function testHasRoute
+     *
+     * @return void
+     */
+    public function testHasRoute()
+    {
+        $this->assertEquals(true, $this->router->hasRoute("/", "GET"));
+        $this->assertEquals(true, $this->router->hasRoute("/test", "GET"));
+    }
 
 }
