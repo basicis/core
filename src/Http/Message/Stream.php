@@ -311,19 +311,22 @@ class Stream implements StreamInterface
     public function write($string): int
     {
         if (!isset($this->resource)) {
-            throw new RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached.');
         }
         if (!$this->writable) {
-            throw new RuntimeException('Cannot write to a non-writable stream');
+            throw new RuntimeException('Cannot write to a non-writable stream.');
         }
 
         // We can't know the size after writing anything
-        $this->size = 0;
-        $result = fwrite($this->resource, $string);
-        if ($result === false) {
-            throw new RuntimeException('Unable to write to stream');
+        if ($this->writable) {
+            $this->size = fwrite($this->resource, $string);
         }
-        return $this->size = $result;
+    
+        if ($this->size === false) {
+            throw new RuntimeException('Unable to write to stream.');
+            return 0;
+        }
+        return $this->size;
     }
 
 
@@ -389,9 +392,14 @@ class Stream implements StreamInterface
             throw new RuntimeException('Stream is detached');
         }
 
-        $contents = @stream_get_contents($this->resource);
-        if ($contents === false) {
-            throw new RuntimeException('Unable to read stream contents');
+        $contents = null;
+        try {
+            $contents = @stream_get_contents($this->resource);
+        } catch (Exception $e) {
+            //throw $e;
+            if ($contents === false) {
+                throw new RuntimeException('Unable to read stream contents', 0, $e);
+            }
         }
         return $contents;
     }

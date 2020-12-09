@@ -30,7 +30,7 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStream(string $content = ''): StreamInterface
     {
-        $stream = new Stream(@fopen(@tempnam("/tmp", "tmpf"), 'w+', false), ['mode' => 'w+']);
+        $stream = new Stream(fopen(tempnam("/tmp", "tmpf"), 'w+', false), ['mode' => 'w+']);
         $stream->write($content);
         return $stream;
     }
@@ -53,13 +53,16 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStreamFromFile(string $filename, string $mode = 'w+'): StreamInterface
     {
-        $resource = @fopen($filename, $mode, false);
-        if (is_resource($resource)) {
-            return new Stream($resource, ['mode' => $mode]);
+        try {
+            $resource = fopen($filename, $mode, false);
+            if (is_resource($resource)) {
+                return new Stream($resource, ['mode' => $mode]);
+            }
+        } catch(Exception $e) {
+            throw new RuntimeException("The file $filename cannot be opened.", 0, $e);
+            return $this->createStream("");
         }
-  
-        throw new RuntimeException("The file $filename cannot be opened.");
-        return $this->createStream("");
+
     }
 
     /**

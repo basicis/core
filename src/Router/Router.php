@@ -1,7 +1,7 @@
 <?php
 namespace Basicis\Router;
 
-use Basicis\Basicis as App;
+use Basicis\Core\Validator;
 use Basicis\Http\Message\ResponseFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -52,28 +52,18 @@ class Router
     private $response;
 
 
-    /**
-     * $filesIsLoaded variable
-     *
-     * @var bool
-     */
-    private $filesIsLoaded = false;
-    
 
     /**
      * Function __constructs
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string $path
      * @return void
      */
-    public function __construct(ServerRequestInterface $request, string $path = ".")
+    public function __construct(ServerRequestInterface $request)
     {
-        $this->path = $path;
-        $this->url = $request->getRequestTarget();
+        $this->url = $request->getUri()->getPath();
         $this->method = strtoupper($request->getMethod());
         $this->routes = [];
-        $this->loadFiles();
     }
 
 
@@ -85,7 +75,7 @@ class Router
     * @param string|array $url = "/"
     * @param string|\Clousure $callback = null
     * @param string|array $middlewares = null
-    * @return boolean
+    * @return Router
     */
     public function setRoute(string $method = "GET", $url = "/", $callback = null, $middlewares = null) : Router
     {
@@ -99,6 +89,23 @@ class Router
         return $this;
     }
 
+
+    /**
+     * Function setRouteByAnnotation
+     * Receives a class as an argument, and works with the comment blocks as @Route
+     *
+     * @param string $annotation
+     * @param string $callback
+     * @return void
+     */
+    public function setRouteByAnnotation(string $annotation, string $callback)
+    {
+        $route_array = explode(",", str_replace(array('\'', '"', " ", "@Route(", ")"), '', $annotation));
+            
+        //url [string|array], method [string|array], callback [string|Closure], middlewares [string|array]
+        $this->setRoute($route_array[1], $route_array[0], $callback, $route_array[3] ?? null);
+        return $this;
+    }
 
 
     /**
@@ -124,20 +131,13 @@ class Router
                 count($routes),
                 $this->url
             ));
-
             return null;
         }
 
-        if ($this->filesIsLoaded) {
-            $this->response = ResponseFactory::create(404, "Page or end-point not Found.");
-            return null;
-        }
-
-        if ($this->response === null && !$this->filesIsLoaded) {
-            $this->response = ResponseFactory::create(500, "Route files no is loaded!");
-        }
+        $this->response = ResponseFactory::create(404, "Page or end-point not Found!");
         return null;
     }
+
 
 
     /**
@@ -147,7 +147,26 @@ class Router
      */
     public function getRoutes() : array
     {
-        return $this->routes();
+        return $this->routes;
+    }
+
+
+
+   /**
+    * Function hasRoute
+    *
+    * @param string $name
+    * @param string $method
+    * @return boolean
+    */
+    public function hasRoute(string $name, string $method = "GET" ) : bool
+    {
+        foreach ($this->routes as $route) {
+            if (($route->getName() === $name) && ($route->getMethod() === strtoupper($method))) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -171,79 +190,52 @@ class Router
     public function findByRegex(string $url = null) : ?array
     {
         $url = is_null($url) ? $this->url : $url;
-        $url_exp = array_filter(explode('/', $url)) ;
-        $routes=null;
+        $urlExplode = array_filter(explode('/', $url)) ;
+        $routes = null;
         $i = 0;
-        $data=[];
+        $data = [];
         $continue = false;
-        $url_start_with = '';
+        $urlStartWith = '';
 
         foreach ($this->findByMethod($url, $this->findByCount()) as $route_key => $route) {
-            $route_name_exp =  array_filter(explode("/", $route->getName()));
+            $routeNameExplode =  array_filter(explode("/", $route->getName()));
 
-            foreach ($route_name_exp as $route_name_exp_key => $route_name_exp_value) {
-                if (($route_name_exp_value === $url_exp[$route_name_exp_key])) {
-                    $url_start_with .= '/'.$route_name_exp_value;
+            foreach ($routeNameExplode as $routeNameExplode_key => $routeNameExplodeValue) {
+                if (($routeNameExplodeValue === $urlExplode[$routeNameExplode_key])) {
+                    $urlStartWith .= '/'.$routeNameExplodeValue;
 
-                    if (($route_name_exp_key === count($url_exp)) && ($url === $url_start_with)) {
+                    if (($routeNameExplode_key === count($urlExplode)) && ($url === $urlStartWith)) {
                         return [$route];
                     }
                     $continue = true;
                 }
 
                 if ($continue) {
-                    $arg_regex = $this->extractArgRegex($route_name_exp_value);
-                    $arg_id = $this->extractArgId($route_name_exp_value);
+                    $arg_regex = $this->extractArgRegex($routeNameExplodeValue);
+                    $arg_id = $this->extractArgId($routeNameExplodeValue);
 
                     if ((($arg_id !== null) && ($arg_regex !== null)) &&
-                        App::validate($url_exp[$route_name_exp_key], $arg_regex)) {
-                        $url_start_with .= '/'.$url_exp[$route_name_exp_key];
-                        $route->setArgument($arg_id, $url_exp[$route_name_exp_key]);
+                        Validator::validate($urlExplode[$routeNameExplode_key], $arg_regex)) {
+                        $urlStartWith .= '/'.$urlExplode[$routeNameExplode_key];
+                        $route->setArgument($arg_id, $urlExplode[$routeNameExplode_key]);
                         
-                        if (($route_name_exp_key === count($url_exp)) && ($url === $url_start_with)) {
+                        if (($routeNameExplode_key === count($urlExplode)) && ($url === $urlStartWith)) {
                             return  [$route];
                         }
                     }
                     continue;
                 }
 
-                if (($route_name_exp_key === count($url_exp)) && ($url !== $url_start_with)) {
+                if (($routeNameExplode_key === count($urlExplode)) && ($url !== $urlStartWith)) {
                     return null;
                 }
             }
 
-            $url_start_with = '';
+            $urlStartWith = '';
             $i++;
         }
         
         return null;
-    }
-
-
-    /**
-     * Function extractArgRegex
-     *
-     * @param string $route_name_part
-     *
-     * @return string|null
-     */
-    public function extractArgRegex(string $route_name_part = null) : ?string
-    {
-        $explode = explode('}', $route_name_part);
-        return (count($explode) > 1) ? substr($explode[1], 1) : null;
-    }
-
-    /**
-     * function extractArgId
-     *
-     * @param string $route_name_part
-     *
-     * @return string|null
-     */
-    public function extractArgId(string $route_name_part = null) : ?string
-    {
-        $explode = explode('}', $route_name_part);
-        return (count($explode) > 1)? str_replace(['{', ':'], '', $explode[0]) : null;
     }
 
 
@@ -314,14 +306,14 @@ class Router
     {
         $url = preg_replace('/^\/\s*/', '', is_null($url) ? $this->url : $url);
         $routes = is_null($routes) ? $this->routes : $routes;
-        $i=0;
+        $i = 0;
         $return = [];
 
         if ($routes) {
             foreach ($routes as $route) {
-                $route_name_explode = explode('/', $route->getName());
-                $url_explode = explode('/', $url);
-                if ((count(array_filter($route_name_explode)) === count(array_filter($url_explode)))) {
+                $routeNameExplode = explode('/', $route->getName());
+                $urlExplode = explode('/', $url);
+                if ((count(array_filter($routeNameExplode)) === count(array_filter($urlExplode)))) {
                     $return[$i] = $route;
                 }
                 $i++;
@@ -334,105 +326,31 @@ class Router
 
 
     /**
-     * Funtion loadFiles
+     * Function extractArgRegex
      *
-     * @return void
+     * @param string $routeNamePart
+     *
+     * @return string|null
      */
-    public function loadFiles() : void
+    public function extractArgRegex(string $routeNamePart = null) : ?string
     {
-        foreach (glob($this->path.'/[R,r][oute]*s/*.php') as $route_file) {
-            if (file_exists($route_file)) {
-                try {
-                    include $route_file;
-                } catch (BasicisException $exception) {
-                    $this->filesIsLoaded = false;
-                    $msg = splitf("Erro while load file %s.", $route_file);
-                    $this->response = ResponseFactory::create(500, $msg);
-                    throw new BasicisException($msg, 0, $exception);
-                    break;
-                }
-            }
-        }
-
-        if (count($this->routes) >= 1) {
-            $this->filesIsLoaded = true;
-        }
-        return;
+        $explode = explode('}', $routeNamePart);
+        return (count($explode) > 1) ? substr($explode[1], 1) : null;
     }
 
 
 
     /**
-     * Function get
+     * function extractArgId
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function get(string $url = "/", $callback = null, $middlewares = null)
-    {
-        $this->setRoute('GET', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function post
+     * @param string $routeNamePart
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
+     * @return string|null
      */
-    public function post(string $url, $callback = null, $middlewares = null)
+    public function extractArgId(string $routeNamePart = null) : ?string
     {
-        $this->setRoute('POST', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function put
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function put(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('PUT', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function path
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function path(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('PATCH', $url, $callback, $middlewares);
-    }
-
-
-
-    /**
-     * Function detete
-     *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function delete(string $url, $callback = null, $middlewares = null)
-    {
-        $this->setRoute('DELETE', $url, $callback, $middlewares);
+        $explode = explode('}', $routeNamePart);
+        return (count($explode) > 1)? str_replace(['{', ':'], '', $explode[0]) : null;
     }
 
 
@@ -466,29 +384,30 @@ class Router
             return $this;
         }
 
-        foreach ($url as $url_key => $url_value) {
-            if (isset($url_value['url'])) {
-                if (is_array($url_value['url'])) {
-                    foreach ($url_value['url'] as $url_value_item) {
+        foreach ($url as $urlKey => $urlValue) {
+            if (isset($urlValue['url'])) {
+                if (is_array($urlValue['url'])) {
+                    foreach ($urlValue['url'] as $urlValue_item) {
                         $this->setRoute(
-                            $url_value_item,
-                            isset($url_value['callback']) ? $url_value['callback'] : $callback,
-                            isset($url_value['middlewares']) ? $url_value['middlewares'] : $middlewares,
-                            isset($url_value['method']) ?  $url_value['method'] : 'GET'
+                            $urlValue_item,
+                            isset($urlValue['callback']) ? $urlValue['callback'] : $callback,
+                            isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares,
+                            isset($urlValue['method']) ?  $urlValue['method'] : 'GET'
                         );
                     }
                 } else {
                     $this->setRoute(
-                        $url_value['url'],
-                        isset($url_value['callback']) ? $url_value['callback'] : $callback,
-                        isset($url_value['middlewares']) ? $url_value['middlewares'] : $middlewares,
-                        isset($url_value['method']) ?  $url_value['method'] : 'GET'
+                        $urlValue['url'],
+                        isset($urlValue['callback']) ? $urlValue['callback'] : $callback,
+                        isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares,
+                        isset($urlValue['method']) ?  $urlValue['method'] : 'GET'
                     );
                 }
-            } elseif (is_string($url_value)) {
-                $this->setRoute($url_value, $callback, $middlewares, 'GET');
+            } elseif (is_string($urlValue)) {
+                $this->setRoute($urlValue, $callback, $middlewares, 'GET');
             }
         }
+
         return $this;
     }
 }
