@@ -2,7 +2,7 @@
 theme: jekyll-theme-minimal
 title: "Basicis | Core"
 description: "As the name says, it is made to be basic and direct."
-logo: https://raw.githubusercontent.com/basicis/core/master/public/img/logo.png
+logo: "https://raw.githubusercontent.com/basicis/core/master/public/img/logo.png"
 show_downloads: true
 staticman:
   branch: "gh-pages"
