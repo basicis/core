@@ -143,10 +143,11 @@ class Basicis extends RequestHandler
      */
     public function __construct(ServerRequestInterface $request, array ...$options)
     {
+        $this->router  = 
         $this->setMode($options['mode'] ?? 'dev');
         $this->setTimezone($options['timezone'] ?? 'America/Recife');
         $this->setRequest($request);
-        $this->response = (ResponseFactory::create(201))->withHeader("X-Powered-By", $options['appDescription'] ?? "Basicis Framework!");
+        $this->response = (ResponseFactory::create())->withHeader("X-Powered-By", $options['appDescription'] ?? "Basicis Framework!");
     }
 
 
@@ -183,7 +184,7 @@ class Basicis extends RequestHandler
             } 
 
             if (class_exists($class)) {
-                $this->setRouteByAnnotations($class);
+                $this->setRoutesByAnnotations($class);
             }
 
             if (!is_string($key) || !class_exists($class) | !(new $value() instanceof Controller)) {
@@ -191,8 +192,8 @@ class Basicis extends RequestHandler
                 unset($controllers[$key]);
             }
         }
-
-        $this->controllers = $controllers;
+        
+        $this->setRoutesByControllers($this->controllers = $controllers);
         return $this;
     }
 
@@ -477,8 +478,7 @@ class Basicis extends RequestHandler
      */
     public function setRequest(ServerRequestinterface $request) : Basicis
     {
-        $this->router = RouterFactory::create($request);
-        $this->request = $request;
+        $this->router = RouterFactory::create($this->request = $request);
         return $this;
     }
 
@@ -594,13 +594,13 @@ class Basicis extends RequestHandler
 
 
     /**
-     * Function setRouteByAnnotations
+     * Function setRoutesByAnnotations
      * Receives a class as an argument, and works with the comment blocks as @Route
      * 
      * @param string $class
      * @return Basicis
      */
-    public function setRouteByAnnotations(string $class) : Basicis
+    public function setRoutesByAnnotations(string $class) : Basicis
     {
         if (new $class() instanceof Controller) {
             $annotations = new Annotations($class);
@@ -616,18 +616,17 @@ class Basicis extends RequestHandler
 
 
     /**
-     * Function setRoutesByAnnotations
+     * Function setRoutesByControllers
      * Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'
      * 
-     * @param string $class
+     * @param array|Controller[] $controllers
      * @return Basicis
      */
-    public function setRoutesByAnnotations(array $classes) : Basicis
+    public function setRoutesByControllers(array $controllers) : Basicis
     {
-       // $this->router = 
-        foreach ($classes as $class) {
-            if (new $class() instanceof Controller) {
-                $this->setRouteByAnnotations($class);
+        foreach ($controllers as $controller) {
+            if (new $controller() instanceof Controller) {
+                $this->setRoutesByAnnotations($controller);
             }
         }
         return $this;
@@ -800,7 +799,7 @@ class Basicis extends RequestHandler
                 $mimes = new MimeTypes();
                 return $this->response->withHeaders(
                         [
-                            "Content-Type" => $mimes->getMymeType(pathinfo($filename, PATHINFO_EXTENSION)),
+                            "Content-Type" => \MimeType\MimeType::getType(pathinfo($filename, PATHINFO_EXTENSION)),
                             "Content-disposition" => ["attachment", "filename=".basename($filename)]
                         ]
                     )

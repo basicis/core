@@ -61,9 +61,8 @@ class Router
      */
     public function __construct(ServerRequestInterface $request)
     {
-        $this->url = $request->getUri()->getPath();
-        $this->method = strtoupper($request->getMethod());
         $this->routes = [];
+        return $this->setRequest($request);
     }
 
 
@@ -81,10 +80,14 @@ class Router
     {
         if (is_array($url)) {
             foreach ($url as $url_as) {
-                array_push($this->routes, new Route($url_as, $method, $callback, $middlewares));
+                if (!$this->hasRoute($url_as, $method)) {
+                    array_push($this->routes, new Route($url_as, $method, $callback, $middlewares));
+                }
             }
         } elseif (is_string($url)) {
-            array_push($this->routes, new Route($url, $method, $callback, $middlewares));
+            if (!$this->hasRoute($url, $method)) {
+                array_push($this->routes, new Route($url, $method, $callback, $middlewares));
+            }
         }
         return $this;
     }
@@ -179,6 +182,19 @@ class Router
     {
         return ($this->response instanceof ResponseInterface) ? $this->response : ResponseFactory::create(404);
     }
+
+    /**
+     * Function getResponse
+     *
+     * @return \Psr\Http\Message\ServerRequestInterface
+     */
+    public function setRequest(ServerRequestInterface $request) : Router
+    {
+        $this->url = $request->getUri()->getPath();
+        $this->method = strtoupper($request->getMethod());
+        return $this;
+    }
+
 
     
     /**
