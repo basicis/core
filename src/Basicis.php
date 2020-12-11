@@ -467,18 +467,7 @@ class Basicis extends RequestHandler
         return $this;
     }
 
-    /**
-     * Function getTimezone
-     * Getting App Timezone, default "America/Recife"
-     *
-     * @return String
-     */
-    public function getTimezone() : String
-    {
-        return $this->timezone;
-    }
-
-
+    
     /**
      * Function setRequest
      *
@@ -532,20 +521,7 @@ class Basicis extends RequestHandler
     }
 
 
-    /**
-     * Function setRequest
-     *
-     * @param ServerRequestinterface $request
-     *
-     * @return Basicis
-     */
-    public function setRequest(ServerRequestinterface $request) : Basicis
-    {
-        $this->router = RouterFactory::create($request);
-        $this->request = $request;
-        return $this;
-    }
-
+   
 
     /**
      * Function getRequest
@@ -1093,4 +1069,5 @@ class Basicis extends RequestHandler
 
         return $this->output($outputResource, $this->request, $this->response);
     }
+    
 }
