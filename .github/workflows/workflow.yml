@@ -2,7 +2,10 @@ name: Basicis | CI Workflow
 on:
   pull_request:
     branchs: 
-      - [dev]
+      - [master]
+  push:
+    branchs: 
+      - [master]
 jobs:
   test:
     runs-on: ubuntu-18.04
