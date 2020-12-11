@@ -60,6 +60,8 @@ Setting App operation Mode, development ["dev"|null] ou production ["production"
 |[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setMiddlewares|
 |[setRoutesByAnnotations](#basicissetroutesbyannotations)|Function setRoutesByAnnotations
 Receives a class as an argument, and works with the comment blocks as @Route|
+|[setRoutesByControllers](#basicissetroutesbycontrollers)|Function setRoutesByControllers
+Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'|
 |[setTimezone](#basicissettimezone)|Function setTimezone
 Setting app timezone, default America/Recife|
 |[setViewFilters](#basicissetviewfilters)|Function setViewFilters|
@@ -1033,6 +1035,33 @@ Receives a class as an argument, and works with the comment blocks as @Route
 **Parameters**
 
 * `(string) $class`
+
+**Return Values**
+
+`\Basicis`
+
+
+
+
+<hr />
+
+
+### Basicis::setRoutesByControllers  
+
+**Description**
+
+```php
+public setRoutesByControllers (array|\Controller[] $controllers)
+```
+
+Function setRoutesByControllers
+Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]' 
+
+ 
+
+**Parameters**
+
+* `(array|\Controller[]) $controllers`
 
 **Return Values**
 
