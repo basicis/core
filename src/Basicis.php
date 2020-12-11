@@ -183,7 +183,7 @@ class Basicis extends RequestHandler
             } 
 
             if (class_exists($class)) {
-                $this->setRoutesByAnnotations($class);
+                $this->setRouteByAnnotations($class);
             }
 
             if (!is_string($key) || !class_exists($class) | !(new $value() instanceof Controller)) {
@@ -594,13 +594,13 @@ class Basicis extends RequestHandler
 
 
     /**
-     * Function setRoutesByAnnotations
+     * Function setRouteByAnnotations
      * Receives a class as an argument, and works with the comment blocks as @Route
      * 
      * @param string $class
      * @return Basicis
      */
-    public function setRoutesByAnnotations(string $class) : Basicis
+    public function setRouteByAnnotations(string $class) : Basicis
     {
         if (new $class() instanceof Controller) {
             $annotations = new Annotations($class);
@@ -609,6 +609,25 @@ class Basicis extends RequestHandler
                 if ($comment !== null) {
                     $this->router->setRouteByAnnotation($comment, $class.'@'.$method->name);
                 }
+            }
+        }
+        return $this;
+    }
+
+
+    /**
+     * Function setRoutesByAnnotations
+     * Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'
+     * 
+     * @param string $class
+     * @return Basicis
+     */
+    public function setRoutesByAnnotations(array $classes) : Basicis
+    {
+       // $this->router = 
+        foreach ($classes as $class) {
+            if (new $class() instanceof Controller) {
+                $this->setRouteByAnnotations($class);
             }
         }
         return $this;
