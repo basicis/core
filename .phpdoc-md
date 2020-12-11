@@ -11,6 +11,7 @@ return (object) [
         /* Basicis\Core\ */
         '\Basicis\Core\Log',
         '\Basicis\Core\Validator',
+        '\Basicis\Core\Annotations',
 
         /* Basicis\View\ */
         '\Basicis\View\View',
