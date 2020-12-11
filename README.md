@@ -3,6 +3,7 @@
 * [Basicis\Basicis](Basicis/Basicis.md) 
 * [Basicis\Core\Log](Basicis/Core/Log.md) 
 * [Basicis\Core\Validator](Basicis/Core/Validator.md) 
+* [Basicis\Core\Annotations](Basicis/Core/Annotations.md) 
 * [Basicis\View\View](Basicis/View/View.md) 
 * [Basicis\Router\Router](Basicis/Router/Router.md) 
 * [Basicis\Router\Route](Basicis/Router/Route.md) 
