@@ -20,8 +20,9 @@ use Basicis\Exceptions\InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
-use \Twig\TwigFunction;
-use \Dotenv\Dotenv;
+use Twig\TwigFunction;
+use Dotenv\Dotenv;
+use \Mimey\MimeTypes;
 
 /**
  * Basicis - App
@@ -776,12 +777,12 @@ class Basicis extends RequestHandler
     {
         //If file exists, this no is null
         if ($filename !== null) {
-            $file = StreamFactory::createStreamFromFile($filename, "r+");
-
+            $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
+                $mimes = new MimeTypes();
                 return $this->response->withHeaders(
                         [
-                            "Content-Type" => [mime_content_type($filename)],
+                            "Content-Type" => $mimes->getMymeType(pathinfo($filename, PATHINFO_EXTENSION)),
                             "Content-disposition" => ["attachment", "filename=".basename($filename)]
                         ]
                     )
