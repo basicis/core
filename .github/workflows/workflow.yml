@@ -9,6 +9,9 @@ jobs:
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
+      
+      - name: Composer 🔧	
+        uses: php-actions/composer@v1
 
       - name: PHPUnit Tests 🧪
         run: |
