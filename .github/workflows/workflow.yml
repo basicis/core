@@ -2,13 +2,19 @@ name: Basicis | CI Workflow
 on:
   pull_request:
     branchs: 
-      - [dev]
+      - [master]
+  push:
+    branchs: 
+      - [master]
 jobs:
   test:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
+      
+      - name: Composer 🔧	
+        uses: php-actions/composer@v1
 
       - name: PHPUnit Tests 🧪
         run: |

@@ -20,8 +20,9 @@ use Basicis\Exceptions\InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
-use \Twig\TwigFunction;
-use \Dotenv\Dotenv;
+use Twig\TwigFunction;
+use Dotenv\Dotenv;
+use \Mimey\MimeTypes;
 
 /**
  * Basicis - App
@@ -466,6 +467,20 @@ class Basicis extends RequestHandler
         return $this;
     }
 
+    
+    /**
+     * Function setRequest
+     *
+     * @param ServerRequestinterface $request
+     *
+     * @return Basicis
+     */
+    public function setRequest(ServerRequestinterface $request) : Basicis
+    {
+        $this->router = RouterFactory::create($request);
+        $this->request = $request;
+        return $this;
+    }
 
     /**
      * Function getMode
@@ -505,6 +520,17 @@ class Basicis extends RequestHandler
         return $this->timezone;
     }
 
+    /**
+     * Function getTimezone
+     * Getting App Timezone, default "America/Recife"
+     *
+     * @return String
+     */
+    public function getTimezone() : String
+    {
+        return $this->timezone;
+    }
+
 
     /**
      * Function setRequest
@@ -520,6 +546,7 @@ class Basicis extends RequestHandler
         return $this;
     }
 
+   
 
     /**
      * Function getRequest
@@ -776,12 +803,12 @@ class Basicis extends RequestHandler
     {
         //If file exists, this no is null
         if ($filename !== null) {
-            $file = StreamFactory::createStreamFromFile($filename, "r+");
-
+            $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
+                $mimes = new MimeTypes();
                 return $this->response->withHeaders(
                         [
-                            "Content-Type" => [mime_content_type($filename)],
+                            "Content-Type" => $mimes->getMymeType(pathinfo($filename, PATHINFO_EXTENSION)),
                             "Content-disposition" => ["attachment", "filename=".basename($filename)]
                         ]
                     )
@@ -1067,4 +1094,5 @@ class Basicis extends RequestHandler
 
         return $this->output($outputResource, $this->request, $this->response);
     }
+    
 }

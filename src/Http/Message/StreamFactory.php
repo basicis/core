@@ -54,15 +54,14 @@ class StreamFactory implements StreamFactoryInterface
     public function createStreamFromFile(string $filename, string $mode = 'w+'): StreamInterface
     {
         try {
-            $resource = fopen($filename, $mode, false);
+            $resource = @fopen($filename, $mode, false);
             if (is_resource($resource)) {
                 return new Stream($resource, ['mode' => $mode]);
             }
         } catch(Exception $e) {
             throw new RuntimeException("The file $filename cannot be opened.", 0, $e);
-            return $this->createStream("");
         }
-
+        return $this->createStream("");
     }
 
     /**
