@@ -14,21 +14,22 @@ class View
     private $view;
    
     /**
-     * @var string $path
+     * @var array $paths
      */
-    private $path;
+    private $paths;
 
-    public function __construct(string $path = null)
+    public function __construct(array $paths = [])
     {
-        if ($path !== null) {
-            $this->path = $path;
-            $this->view = new \Twig\Environment(new \Twig\Loader\FilesystemLoader($path));
+        if ($paths !== []) {
+            $this->paths = $paths;
+            $this->view = new \Twig\Environment(new \Twig\Loader\FilesystemLoader($paths));
         }
     }
 
 
     private function extractTemplate(string $name, string &$path, &$data = []) : string
     {
+        $template = "";
         if (strpos($name, '.') |   strpos($name, ':') | strpos($name, ',')) {
             $delimiter=null;
             if (strpos($name, '.')) {
@@ -96,13 +97,22 @@ class View
     }
 
 
-    public function getView(string $name, $data = []) : string
+    public function getView(string $name, $data = []) : ?string
     {
-        $template = $this->extractTemplate($name, $this->path, $data);
-        if (file_exists($this->path . $template)) {
-            return $this->view->render($template, $data);
+        foreach ($this->paths as $path) {
+            $template = $this->extractTemplate($name, $path, $data);
+            if (file_exists($path . $template) && !is_dir($path . $template)) {
+                return $this->view->render($template, $data);
+            }
         }
 
-        return "";
+        foreach ($this->paths as $path) {
+            $errorTemplate = $path . "error.html";
+            if(file_exists($errorTemplate) && !is_dir($errorTemplate)) {
+                return $this->view->render("error.html", ["errorMessage" => "Template file '$name' not found!"]);
+            }
+        }   
+
+        return null;
     }
 }

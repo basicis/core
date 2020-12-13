@@ -736,8 +736,8 @@ class Basicis extends RequestHandler
     /**
      * Function json
      *
-     * @param array $data
-     * @param int $statusCode default=200
+     * @param array $data = []
+     * @param int $statusCode = 200
      *
      * @return ResponseInterface
      */
@@ -765,12 +765,18 @@ class Basicis extends RequestHandler
      * @param string $name
      * @param array $data
      * @param int $statusCode default=200
+     * @param string $customPath
      *
      * @return ResponseInterface
      */
-    public function view(string $name, array $data = [], int $statusCode = 200) : ResponseInterface
+    public function view(string $name, array $data = [], int $statusCode = 200, $customPath = "") : ResponseInterface
     {
-        $view = new View(self::path() . "src/views/");
+        $view = new View(
+                [
+                    self::path() . "storage/templates/",
+                    self::path() . $customPath,
+                ]
+            );
         $view->setFilters($this->viewFilters);
         $this->response->withHeader("Content-Type", ["text/html", "charset=UTF-8"])
                          ->withStatus($statusCode);
@@ -779,7 +785,8 @@ class Basicis extends RequestHandler
         if ($content !== null) {
             return $this->write($content);
         }
-        return $this->write("Not Found!", 404); //temp
+
+        return $this->write("Template file '$name' not found!", 404); //temp
     }
 
 
@@ -796,10 +803,9 @@ class Basicis extends RequestHandler
         if ($filename !== null) {
             $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
-                $mimes = new MimeTypes();
                 return $this->response->withHeaders(
                         [
-                            "Content-Type" => \MimeType\MimeType::getType(pathinfo($filename, PATHINFO_EXTENSION)),
+                            "Content-Type" => \MimeType\MimeType::getType($filename),
                             "Content-disposition" => ["attachment", "filename=".basename($filename)]
                         ]
                     )
@@ -1081,6 +1087,19 @@ class Basicis extends RequestHandler
                 $response = (new $after())->handle($this->request);
                 $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
             }
+        }
+
+        if ($this->response->getStatusCode() > 206 && $this->response->getBody()->getSize() === null) {
+            //todo after middlweare default
+            $this->view(
+                "error", 
+                [
+                    "errorMessage" => sprintf("%s | %s",   
+                        $this->router->getResponse()->getStatusCode(),
+                        $this->router->getResponse()->getReasonPhrase()
+                    )
+                ]
+            );
         }
 
         return $this->output($outputResource, $this->request, $this->response);

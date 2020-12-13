@@ -128,16 +128,7 @@ class Router
             return $routes[0];
         }
 
-        if ($routes && (count($routes) > 1)) {
-            $this->response = ResponseFactory::create(500, sprintf(
-                'Replicate routes, %s Routes with the same name or signature for %s.',
-                count($routes),
-                $this->url
-            ));
-            return null;
-        }
-
-        $this->response = ResponseFactory::create(404, "Page or end-point not Found!");
+        $this->response = ResponseFactory::create(404, "Page or end-point not found!");
         return null;
     }
 
@@ -205,18 +196,19 @@ class Router
      */
     public function findByRegex(string $url = null) : ?array
     {
-        $url = is_null($url) ? $this->url : $url;
-        $urlExplode = array_filter(explode('/', $url)) ;
-        $routes = null;
         $i = 0;
         $data = [];
+        $routes = null;
         $continue = false;
         $urlStartWith = '';
+        $url = is_null($url) ? $this->url : $url;
+        $urlExplode = array_filter(explode('/', $url)) ;
 
         foreach ($this->findByMethod($url, $this->findByCount()) as $route_key => $route) {
             $routeNameExplode =  array_filter(explode("/", $route->getName()));
 
             foreach ($routeNameExplode as $routeNameExplode_key => $routeNameExplodeValue) {
+                
                 if (($routeNameExplodeValue === $urlExplode[$routeNameExplode_key])) {
                     $urlStartWith .= '/'.$routeNameExplodeValue;
 
@@ -225,7 +217,7 @@ class Router
                     }
                     $continue = true;
                 }
-
+            
                 if ($continue) {
                     $arg_regex = $this->extractArgRegex($routeNameExplodeValue);
                     $arg_id = $this->extractArgId($routeNameExplodeValue);
@@ -236,7 +228,7 @@ class Router
                         $route->setArgument($arg_id, $urlExplode[$routeNameExplode_key]);
                         
                         if (($routeNameExplode_key === count($urlExplode)) && ($url === $urlStartWith)) {
-                            return  [$route];
+                            return [$route];
                         }
                     }
                     continue;
@@ -245,6 +237,7 @@ class Router
                 if (($routeNameExplode_key === count($urlExplode)) && ($url !== $urlStartWith)) {
                     return null;
                 }
+                $continue = true;
             }
 
             $urlStartWith = '';
