@@ -194,8 +194,8 @@ class Stream implements StreamInterface
         if ($this->uri) {
             clearstatcache(true, $this->uri);
         }
-
-        return $this->isValidResource() ?  $this->size = fstat($this->resource)['size'] : null;
+        
+        return $this->isValidResource() && fstat($this->resource) ?  $this->size = fstat($this->resource)['size'] : null;
     }
 
     /**

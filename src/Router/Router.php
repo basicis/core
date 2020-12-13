@@ -61,9 +61,8 @@ class Router
      */
     public function __construct(ServerRequestInterface $request)
     {
-        $this->url = $request->getUri()->getPath();
-        $this->method = strtoupper($request->getMethod());
         $this->routes = [];
+        return $this->setRequest($request);
     }
 
 
@@ -81,10 +80,14 @@ class Router
     {
         if (is_array($url)) {
             foreach ($url as $url_as) {
-                array_push($this->routes, new Route($url_as, $method, $callback, $middlewares));
+                if (!$this->hasRoute($url_as, $method)) {
+                    array_push($this->routes, new Route($url_as, $method, $callback, $middlewares));
+                }
             }
         } elseif (is_string($url)) {
-            array_push($this->routes, new Route($url, $method, $callback, $middlewares));
+            if (!$this->hasRoute($url, $method)) {
+                array_push($this->routes, new Route($url, $method, $callback, $middlewares));
+            }
         }
         return $this;
     }
@@ -125,16 +128,7 @@ class Router
             return $routes[0];
         }
 
-        if ($routes && (count($routes) > 1)) {
-            $this->response = ResponseFactory::create(500, sprintf(
-                'Replicate routes, %s Routes with the same name or signature for %s.',
-                count($routes),
-                $this->url
-            ));
-            return null;
-        }
-
-        $this->response = ResponseFactory::create(404, "Page or end-point not Found!");
+        $this->response = ResponseFactory::create(404, "Page or end-point not found!");
         return null;
     }
 
@@ -180,6 +174,19 @@ class Router
         return ($this->response instanceof ResponseInterface) ? $this->response : ResponseFactory::create(404);
     }
 
+    /**
+     * Function getResponse
+     *
+     * @return \Psr\Http\Message\ServerRequestInterface
+     */
+    public function setRequest(ServerRequestInterface $request) : Router
+    {
+        $this->url = $request->getUri()->getPath();
+        $this->method = strtoupper($request->getMethod());
+        return $this;
+    }
+
+
     
     /**
      * Function findByRegex
@@ -189,18 +196,19 @@ class Router
      */
     public function findByRegex(string $url = null) : ?array
     {
-        $url = is_null($url) ? $this->url : $url;
-        $urlExplode = array_filter(explode('/', $url)) ;
-        $routes = null;
         $i = 0;
         $data = [];
+        $routes = null;
         $continue = false;
         $urlStartWith = '';
+        $url = is_null($url) ? $this->url : $url;
+        $urlExplode = array_filter(explode('/', $url)) ;
 
         foreach ($this->findByMethod($url, $this->findByCount()) as $route_key => $route) {
             $routeNameExplode =  array_filter(explode("/", $route->getName()));
 
             foreach ($routeNameExplode as $routeNameExplode_key => $routeNameExplodeValue) {
+                
                 if (($routeNameExplodeValue === $urlExplode[$routeNameExplode_key])) {
                     $urlStartWith .= '/'.$routeNameExplodeValue;
 
@@ -209,7 +217,7 @@ class Router
                     }
                     $continue = true;
                 }
-
+            
                 if ($continue) {
                     $arg_regex = $this->extractArgRegex($routeNameExplodeValue);
                     $arg_id = $this->extractArgId($routeNameExplodeValue);
@@ -220,7 +228,7 @@ class Router
                         $route->setArgument($arg_id, $urlExplode[$routeNameExplode_key]);
                         
                         if (($routeNameExplode_key === count($urlExplode)) && ($url === $urlStartWith)) {
-                            return  [$route];
+                            return [$route];
                         }
                     }
                     continue;
@@ -229,6 +237,7 @@ class Router
                 if (($routeNameExplode_key === count($urlExplode)) && ($url !== $urlStartWith)) {
                     return null;
                 }
+                $continue = true;
             }
 
             $urlStartWith = '';

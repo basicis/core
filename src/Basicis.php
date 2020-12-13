@@ -143,10 +143,11 @@ class Basicis extends RequestHandler
      */
     public function __construct(ServerRequestInterface $request, array ...$options)
     {
+        $this->router  = 
         $this->setMode($options['mode'] ?? 'dev');
         $this->setTimezone($options['timezone'] ?? 'America/Recife');
         $this->setRequest($request);
-        $this->response = (ResponseFactory::create(201))->withHeader("X-Powered-By", $options['appDescription'] ?? "Basicis Framework!");
+        $this->response = (ResponseFactory::create())->withHeader("X-Powered-By", $options['appDescription'] ?? "Basicis Framework!");
     }
 
 
@@ -191,8 +192,8 @@ class Basicis extends RequestHandler
                 unset($controllers[$key]);
             }
         }
-
-        $this->controllers = $controllers;
+        
+        $this->setRoutesByControllers($this->controllers = $controllers);
         return $this;
     }
 
@@ -477,8 +478,7 @@ class Basicis extends RequestHandler
      */
     public function setRequest(ServerRequestinterface $request) : Basicis
     {
-        $this->router = RouterFactory::create($request);
-        $this->request = $request;
+        $this->router = RouterFactory::create($this->request = $request);
         return $this;
     }
 
@@ -615,6 +615,24 @@ class Basicis extends RequestHandler
     }
 
 
+    /**
+     * Function setRoutesByControllers
+     * Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'
+     * 
+     * @param array|Controller[] $controllers
+     * @return Basicis
+     */
+    public function setRoutesByControllers(array $controllers) : Basicis
+    {
+        foreach ($controllers as $controller) {
+            if (new $controller() instanceof Controller) {
+                $this->setRoutesByAnnotations($controller);
+            }
+        }
+        return $this;
+    }
+
+
 
     /**
      * Function get
@@ -718,8 +736,8 @@ class Basicis extends RequestHandler
     /**
      * Function json
      *
-     * @param array $data
-     * @param int $statusCode default=200
+     * @param array $data = []
+     * @param int $statusCode = 200
      *
      * @return ResponseInterface
      */
@@ -747,12 +765,18 @@ class Basicis extends RequestHandler
      * @param string $name
      * @param array $data
      * @param int $statusCode default=200
+     * @param string $customPath
      *
      * @return ResponseInterface
      */
-    public function view(string $name, array $data = [], int $statusCode = 200) : ResponseInterface
+    public function view(string $name, array $data = [], int $statusCode = 200, $customPath = "") : ResponseInterface
     {
-        $view = new View(self::path() . "src/views/");
+        $view = new View(
+                [
+                    self::path() . "storage/templates/",
+                    self::path() . $customPath,
+                ]
+            );
         $view->setFilters($this->viewFilters);
         $this->response->withHeader("Content-Type", ["text/html", "charset=UTF-8"])
                          ->withStatus($statusCode);
@@ -761,7 +785,8 @@ class Basicis extends RequestHandler
         if ($content !== null) {
             return $this->write($content);
         }
-        return $this->write("Not Found!", 404); //temp
+
+        return $this->write("Template file '$name' not found!", 404); //temp
     }
 
 
@@ -778,10 +803,9 @@ class Basicis extends RequestHandler
         if ($filename !== null) {
             $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
-                $mimes = new MimeTypes();
                 return $this->response->withHeaders(
                         [
-                            "Content-Type" => $mimes->getMymeType(pathinfo($filename, PATHINFO_EXTENSION)),
+                            "Content-Type" => \MimeType\MimeType::getType($filename),
                             "Content-disposition" => ["attachment", "filename=".basename($filename)]
                         ]
                     )
@@ -1063,6 +1087,19 @@ class Basicis extends RequestHandler
                 $response = (new $after())->handle($this->request);
                 $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
             }
+        }
+
+        if ($this->response->getStatusCode() > 206 && $this->response->getBody()->getSize() === null) {
+            //todo after middlweare default
+            $this->view(
+                "error", 
+                [
+                    "errorMessage" => sprintf("%s | %s",   
+                        $this->router->getResponse()->getStatusCode(),
+                        $this->router->getResponse()->getReasonPhrase()
+                    )
+                ]
+            );
         }
 
         return $this->output($outputResource, $this->request, $this->response);
