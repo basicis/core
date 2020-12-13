@@ -60,8 +60,6 @@ Setting App operation Mode, development ["dev"|null] ou production ["production"
 |[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setMiddlewares|
 |[setRoutesByAnnotations](#basicissetroutesbyannotations)|Function setRoutesByAnnotations
 Receives a class as an argument, and works with the comment blocks as @Route|
-|[setRoutesByControllers](#basicissetroutesbycontrollers)|Function setRoutesByControllers
-Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'|
 |[setTimezone](#basicissettimezone)|Function setTimezone
 Setting app timezone, default America/Recife|
 |[setViewFilters](#basicissetviewfilters)|Function setViewFilters|
@@ -574,9 +572,8 @@ Function json
 **Parameters**
 
 * `(array) $data`
-: = []  
 * `(int) $statusCode`
-: = 200  
+: default=200  
 
 **Return Values**
 
@@ -1047,33 +1044,6 @@ Receives a class as an argument, and works with the comment blocks as @Route
 <hr />
 
 
-### Basicis::setRoutesByControllers  
-
-**Description**
-
-```php
-public setRoutesByControllers (array|\Controller[] $controllers)
-```
-
-Function setRoutesByControllers
-Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]' 
-
- 
-
-**Parameters**
-
-* `(array|\Controller[]) $controllers`
-
-**Return Values**
-
-`\Basicis`
-
-
-
-
-<hr />
-
-
 ### Basicis::setTimezone  
 
 **Description**
@@ -1160,7 +1130,7 @@ Function validate
 **Description**
 
 ```php
-public view (string $name, array $data, int $statusCode, string $customPath)
+public view (string $name, array $data, int $statusCode)
 ```
 
 Function view 
@@ -1173,7 +1143,6 @@ Function view
 * `(array) $data`
 * `(int) $statusCode`
 : default=200  
-* `(string) $customPath`
 
 **Return Values**
 

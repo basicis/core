@@ -22,7 +22,6 @@ Router Class
 |[getRoutes](#routergetroutes)|Function getRoutes|
 |[group](#routergroup)|group function alias for routerGroup|
 |[hasRoute](#routerhasroute)|Function hasRoute|
-|[setRequest](#routersetrequest)|Function getResponse|
 |[setRoute](#routersetroute)|Function setRoute|
 |[setRouteByAnnotation](#routersetroutebyannotation)|Function setRouteByAnnotation
 Receives a class as an argument, and works with the comment blocks as @Route|
@@ -342,32 +341,6 @@ Function hasRoute
 **Return Values**
 
 `bool`
-
-
-
-
-<hr />
-
-
-### Router::setRequest  
-
-**Description**
-
-```php
-public setRequest (void)
-```
-
-Function getResponse 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
-
-**Return Values**
-
-`\Psr\Http\Message\ServerRequestInterface`
 
 
 
