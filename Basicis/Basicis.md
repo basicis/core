@@ -574,8 +574,9 @@ Function json
 **Parameters**
 
 * `(array) $data`
+: = []  
 * `(int) $statusCode`
-: default=200  
+: = 200  
 
 **Return Values**
 
@@ -1159,7 +1160,7 @@ Function validate
 **Description**
 
 ```php
-public view (string $name, array $data, int $statusCode)
+public view (string $name, array $data, int $statusCode, string $customPath)
 ```
 
 Function view 
@@ -1172,6 +1173,7 @@ Function view
 * `(array) $data`
 * `(int) $statusCode`
 : default=200  
+* `(string) $customPath`
 
 **Return Values**
 
