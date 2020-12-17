@@ -400,14 +400,18 @@ class Basicis extends RequestHandler
     /**
      * Function env
      *
-     * @param string $name
-     * @return void
+     * @return boolean
      */
     // To-do remove
-    public static function loadEnv()
+    public static function loadEnv() : bool
     {
-        $env = Dotenv::createImmutable(self::path());
-        $env->load();
+        try {
+            $env = Dotenv::createImmutable(self::path());
+            $env->load();
+            return true;
+        } catch(\Exception $e) {
+            return false;
+        }
     }
 
      /**
@@ -454,17 +458,20 @@ class Basicis extends RequestHandler
      */
     public function setMode(string $mode = "dev") : Basicis
     {
+        $displayErrors = 1;
+        $appEnv = "APP_ENV=dev";
+        $errorReporting = E_ALL; 
+
         if (in_array($mode, ["production", "prod"])) {
-            putenv("APP_ENV=production");
-            ini_set('display_errors', 0);
-            $this->mode = "production";
-            return $this;
+            $appEnv = "APP_ENV=production";
+            $displayErrors = 0;
+            $mode = "production";
         }
 
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
-        putenv("APP_ENV=dev");
-        $this->mode = "dev";
+        error_reporting($errorReporting);
+        ini_set('display_errors', $displayErrors);
+        putenv($appEnv);
+        $this->mode = in_array($mode, ["production", "prod"]) ?  "production" : "dev";
         return $this;
     }
 

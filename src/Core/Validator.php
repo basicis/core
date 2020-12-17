@@ -99,7 +99,7 @@ class Validator
                 $regex_val = explode(':', $regex)[1] ?? null;
                 $datav[$key][$regex_key] = $this->execMethod(
                     $regex_key,
-                    [$data[$key],$regex_val, $key]
+                    [$data[$key], $regex_val, $key]
                 );
             }
         }

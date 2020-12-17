@@ -37,12 +37,20 @@ abstract class Model implements ModelInterface
      * */
     protected $updated;
 
-
     /**
-     * Function __construct
+     * $protecteds variable
      *
-     * @return void
+     * @var array
      */
+    protected $protecteds = [];
+
+
+
+     /**
+      * Function function
+      *
+      * @param array|int|null $data
+      */
     public function __construct($data = null)
     {
         if (($data !== null) && is_array($data)) {
@@ -69,8 +77,20 @@ abstract class Model implements ModelInterface
 
 
     /**
+     * Function getId
+     * Return entity ID (unique on system identification)
+     * @return int|null
+     */
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+
+
+
+    /**
      * Function setCreated.
-     *
+     * Set entity creation timestamp
      * @param string $created
      *
      * @return Model
@@ -88,7 +108,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function getCreated
-     *
+     * Return entity created timestamp
      * @return \DateTime
      */
     public function getCreated() : \DateTime
@@ -99,7 +119,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function setUpdated
-     *
+     * Return entity updated timestamp
      * @param string $updated
      *
      * @return User
@@ -135,25 +155,22 @@ abstract class Model implements ModelInterface
     public static function getManager() : ?EntityManager
     {
         $dataBase = new DataBase();
-        $dataBase->setORMConfig(
+        return $dataBase->setORMConfig(
             [
                 App::path()."src/",
                 App::path()."src/models/",
                 App::path()."src/model/"
             ],
-            App::getEnv("APP_ENV") ?? true
+            $_ENV["APP_ENV"] ?? true
         )->setDBConfig(
-            App::getEnv("DB_USER") ?? 'basicis',
-            App::getEnv("DB_PASS") ?? 'basicis',
-            App::getEnv("DB_NAME") ?? 'basicis',
-            App::getEnv("DB_HOST") ?? 'localhost',
-            (int) App::getEnv("DB_PORT") ?? 3306,
-            App::getEnv("DB_DRIVER") ?? "pdo_mysql",
-            App::getEnv("DB_PATH") ?? null //For sqlite
-        );
-        
-
-        return $dataBase->getManager();
+            $_ENV["DB_USER"] ?? 'basicis',
+            $_ENV["DB_PASS"] ?? 'basicis',
+            $_ENV["DB_NAME"] ?? 'basicis',
+            $_ENV["DB_HOST"] ?? 'localhost',
+            (int) $_ENV["DB_PORT"] ?? 3306,
+            $_ENV["DB_DRIVER"] ?? "pdo_mysql",
+            $_ENV["DB_PATH"] ?? null //For sqlite
+        )->getManager();
     }
     
 
@@ -204,7 +221,11 @@ abstract class Model implements ModelInterface
      */
     public static function findBy(array $findBy = []) : ?Model
     {
-        return self::getManager()->getRepository(get_called_class())->findBy($findBy);
+        $entity = self::getManager()->getRepository(get_called_class())->findBy($findBy);
+        if ($entity) {
+            return $entity->getData();
+        }
+        return null;
     }
 
 
@@ -214,9 +235,13 @@ abstract class Model implements ModelInterface
      * @param array $findOneBy
      * @return Model|null
      */
-    public static function findOneBy(array $findOneBy = []) :? Model
+    public static function findOneBy(array $findOneBy = []) : ?Model
     {
-        return self::getManager()->getRepository(get_called_class())->findOneBy($findOneBy);
+        $entity = self::getManager()->getRepository(get_called_class())->findOneBy($findOneBy);
+        if ($entity) { 
+            return $entity->getData();
+        }
+        return null;
     }
 
 
@@ -228,7 +253,11 @@ abstract class Model implements ModelInterface
      */
     public static function find(int $id) : ?Model
     {
-        return self::getManager()->find(get_called_class(), $id);
+        $entity = self::getManager()->find(get_called_class(), $id);
+        if ($entity) {
+            return $entity->getData();
+        }
+        return null;
     }
 
 
@@ -239,6 +268,33 @@ abstract class Model implements ModelInterface
      */
     public static function all() : ?array
     {
-        return self::getManager()->getRepository(get_called_class())->findAll();
+        $entities = self::getManager()->getRepository(\get_called_class())->findAll();
+        if ($entities) { 
+            $data = [];
+            foreach ($entities as $key => $entity) {
+                $data[$key] = $entity->getData();
+            }
+            return $data;
+        }
+        return null;
+    }
+
+
+    /**
+     * Function function
+     *
+     * @return array
+     */
+    public function getData() : array
+    {
+        $data = [];
+        $props = \array_keys(\get_object_vars($this));
+        foreach ($props as  $prop) {
+            $method = "get".ucfirst($prop);
+            if (method_exists($this, $method) && !in_array($prop, $this->protecteds)) {
+                $data[$prop] = $this->$method();
+            }
+        }
+        return $data;
     }
 }
