@@ -29,6 +29,7 @@ use Basicis\Basicis as App;
  *   - public function log() : void
  *
  *  }
+ *
  * @category Exceptions
  * @package  Basicis/Exceptions
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -39,6 +40,7 @@ class BasicisException extends \Exception
 {
     /**
      * $levels variable
+     *
      * @var array
      */
     private $levels = [
@@ -66,9 +68,9 @@ class BasicisException extends \Exception
      * - info
      * - debug
      *
-     * @param string $level="error"
-     * @param string $message=null
-     * @param  array $context
+     * @param  string $level="error"
+     * @param  string $message=null
+     * @param  array  $context
      * @return BasicisException
      */
     public function log(string $level = null, $message = null, array $context = []) : BasicisException

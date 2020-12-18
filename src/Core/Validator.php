@@ -3,9 +3,10 @@ namespace Basicis\Core;
 
 /**
  * Validator Class
+ *
  * @category Core
  * @package  Basicis/Core
-  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
+ * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Core/Validator.php
  */
@@ -13,30 +14,35 @@ class Validator
 {
     /**
      * $valid variable
+     *
      * @var bool
      */
     public $valid;
 
     /**
      * $data variable
+     *
      * @var mixed
      */
      public $data;
 
     /**
      * $class variable
+     *
      * @var string
      */
     public $class;
 
     /**
      * $valid variable
+     *
      * @var array
      */
     public $errors=[];
 
     /**
      * Function __construct
+     *
      * @param string $class - Classe name with namespace
      */
     public function __construct(string $class = null)
@@ -49,9 +55,9 @@ class Validator
     /**
      * Function validate
      *
-     * @param string|array $data
-     * @param string|array $validations
-     * @param string $class
+     * @param  string|array $data
+     * @param  string|array $validations
+     * @param  string       $class
      * @return boolean
      */
     public static function validate($data, $validations, $class = '') : bool
@@ -68,8 +74,9 @@ class Validator
 
     /**
      * Function validString
-     * @param string $data        - Given to be validated
-     * @param string $validations - All validations
+     *
+     * @param  string $data        - Given to be validated
+     * @param  string $validations - All validations
      * @return void
      */
     public function validString(string $data, string $validations)
@@ -83,8 +90,9 @@ class Validator
 
     /**
      * Function validArray
-     * @param array $data
-     * @param array $validations
+     *
+     * @param  array $data
+     * @param  array $validations
      * @return object
      */
     public function validArray(array $data, array $validations) : object
@@ -118,8 +126,9 @@ class Validator
 
     /**
      * Function execMethod
-     * @param string $method - Method name
-     * @param mixed  $arg    -  Validation argument, array or string
+     *
+     * @param  string $method - Method name
+     * @param  mixed  $arg    -  Validation argument, array or string
      * @return bool
      */
     public function execMethod(string $method, $arg) : ?object
@@ -142,7 +151,8 @@ class Validator
 
     /**
      * Function integer
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function integer($arg) : object
@@ -159,7 +169,8 @@ class Validator
     /**
      * Function int
      * Another alternative to the *integer* function
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function int($arg) : object
@@ -169,7 +180,8 @@ class Validator
 
     /**
      * Function float
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function float($arg) : object
@@ -186,7 +198,8 @@ class Validator
     /**
      * Function flt
      * Another alternative to the *float* function
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function flt($arg) : object
@@ -196,7 +209,8 @@ class Validator
 
     /**
      * Function string
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function string($arg) : object
@@ -211,7 +225,8 @@ class Validator
     /**
      * Function str
      * Another alternative to the *string* function
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function str($arg) : object
@@ -221,7 +236,8 @@ class Validator
 
     /**
      * Function url
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function url($arg) : object
@@ -234,7 +250,8 @@ class Validator
 
     /**
      * Function email
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function email($arg) : object
@@ -251,7 +268,8 @@ class Validator
 
     /**
      * Function exists
-     * @param array $arg - Validation argument, array [0=> value, 1=> class, 2=> key]
+     *
+     * @param  array $arg - Validation argument, array [0=> value, 1=> class, 2=> key]
      * @return object
      */
     public function exists(array $arg) : object
@@ -270,7 +288,8 @@ class Validator
 
     /**
      * Function noexists
-     * @param array $arg - Validation argument, array [0=> value, 1=> class, 2=> key]
+     *
+     * @param  array $arg - Validation argument, array [0=> value, 1=> class, 2=> key]
      * @return object
      */
     public function noExists(array $arg) : object
@@ -286,7 +305,8 @@ class Validator
 
     /**
      * Function minLen
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function minLen($arg) : object
@@ -305,7 +325,8 @@ class Validator
 
     /**
      * Function maxlen
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function maxLen($arg) : object
@@ -324,7 +345,8 @@ class Validator
 
     /**
      * Function mincount
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function minCount($arg) : object
@@ -343,7 +365,8 @@ class Validator
 
     /**
      * Function maxcount
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function maxCount($arg) : object
@@ -362,7 +385,8 @@ class Validator
 
     /**
      * Function boolean
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function boolean($arg) : object
@@ -379,7 +403,8 @@ class Validator
 
     /**
      * Function bool
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function bool($arg) : object
@@ -389,7 +414,8 @@ class Validator
 
     /**
      * Function confirmPass
-     * @param array $arg - Validation argument, array or string
+     *
+     * @param  array $arg - Validation argument, array or string
      * @return object
      */
     public function confirmPass(array $arg) : object
@@ -406,7 +432,8 @@ class Validator
 
     /**
      * Function compareHash
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function compareHash(array $arg) : object
@@ -423,7 +450,8 @@ class Validator
 
     /**
      * Function isNull
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function isNull($arg) : object
@@ -436,7 +464,8 @@ class Validator
 
     /**
      * Function noIsNull
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function noIsNull($arg) : object
@@ -449,7 +478,8 @@ class Validator
 
     /**
      * Function startWith
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function startWith($arg) : object
@@ -465,7 +495,8 @@ class Validator
 
     /**
      * Function endWith
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function endWith($arg) : object
@@ -481,7 +512,8 @@ class Validator
     
     /**
      * Function hasKey
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function hasKey($arg) : object
@@ -497,7 +529,8 @@ class Validator
 
     /**
      * Function has
-     * @param mixed $arg - Validation argument, array or string
+     *
+     * @param  mixed $arg - Validation argument, array or string
      * @return object
      */
     public function has($arg) : object

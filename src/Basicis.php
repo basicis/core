@@ -54,24 +54,24 @@ class Basicis extends RequestHandler
     ];
 
     /**
-    * $mode variable
-    *
-    * @var String
-    */
+     * $mode variable
+     *
+     * @var String
+     */
     private $mode = self::DEFAULT_ENV["APP_ENV"];
 
     /**
-    * $timezone variable
-    *
-    * @var String
-    */
+     * $timezone variable
+     *
+     * @var String
+     */
     private $timezone = self::DEFAULT_ENV["APP_TIMEZONE"];
 
     /**
-    * $path variable
-    *
-    * @var String
-    */
+     * $path variable
+     *
+     * @var String
+     */
     private static $path = self::DEFAULT_ENV["APP_PATH"];
 
     /**
@@ -103,10 +103,10 @@ class Basicis extends RequestHandler
     private $response;
 
     /**
-    * $view variable
-    *
-    * @var String
-    */
+     * $view variable
+     *
+     * @var String
+     */
     private $view = "";
 
     /**
@@ -128,10 +128,10 @@ class Basicis extends RequestHandler
     ];
 
     /**
-    * $viewFilters variable
-    *
-    * @var array
-    */
+     * $viewFilters variable
+     *
+     * @var array
+     */
     private $viewFilters = [];
 
 
@@ -139,7 +139,7 @@ class Basicis extends RequestHandler
      * Function __construct
      *
      * @param ServerRequestInterface $request
-     * @param array ...$options
+     * @param array                  ...$options
      */
     public function __construct(ServerRequestInterface $request, array ...$options)
     {
@@ -155,8 +155,8 @@ class Basicis extends RequestHandler
     /**
      * Function createApp Factory
      *
-     * @param ServerRequestInterface $request
-     * @param array ...$options
+     * @param  ServerRequestInterface $request
+     * @param  array                  ...$options
      * @return Basicis
      */
     public static function createApp(ServerRequestInterface $request = null, array ...$options) : Basicis
@@ -249,9 +249,13 @@ class Basicis extends RequestHandler
     /**
      * Undocumented function
      *
-     * @param array $middlewares
-     * @param boolean $requireKey = false
-     *  If A middleware key must be defined
+     * @param array   $middlewares
+     * @param boolean $requireKey  = false
+     *                             If A
+     *                             middleware
+     *                             key
+     *                             must be
+     *                             defined
      *
      * @return array
      */
@@ -297,7 +301,7 @@ class Basicis extends RequestHandler
         try {
             $this->middlewares['before'] = $this->filterMiddlewares($middlewares);
         } catch (InvalidArgumentException $e) {
-           $this->middlewares['before'] = [];
+            $this->middlewares['before'] = [];
         }
         return $this;
     }
@@ -342,7 +346,7 @@ class Basicis extends RequestHandler
      * Function getMiddlewares
      *
      * @param string $type ['before'|'route'|'after'|null]
-     * Return an arra with especified middlewares type or all if no is especified the $type argument
+     *                     Return an arra with especified middlewares type or all if no is especified the $type argument
      * 
      * @return array
      */
@@ -359,6 +363,7 @@ class Basicis extends RequestHandler
     /**
      * Function path
      * Return app project root path
+     *
      * @return string
      */
     // To-do remove
@@ -415,11 +420,11 @@ class Basicis extends RequestHandler
     }
 
      /**
-     * Function env
-     *
-     * @param string $name
-     * @return string|null
-     */
+      * Function env
+      *
+      * @param  string $name
+      * @return string|null
+      */
     // To-do remove
     public static function getEnv(string $name) : ?string
     {
@@ -435,9 +440,9 @@ class Basicis extends RequestHandler
     /**
      * Function validate
      *
-     * @param string|array $data
-     * @param string|array $validations
-     * @param string $class
+     * @param  string|array $data
+     * @param  string|array $validations
+     * @param  string $class
      * @return boolean
      */
     // To-do remove
@@ -452,7 +457,7 @@ class Basicis extends RequestHandler
      * Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"]
      *
      * @param string $mode = ["dev"|"production"|"prod"|null]
-     * Default value "dev" == Development Mode
+     *                     Default value "dev" == Development Mode
      *
      * @return Basicis
      */
@@ -554,7 +559,7 @@ class Basicis extends RequestHandler
     /**
      * Function getResponse
      *
-     * @param int $code
+     * @param  int    $code
      * @param  string $reasonPhrase
      * @return ResponseInterface
      */
@@ -568,7 +573,7 @@ class Basicis extends RequestHandler
      * Function response
      * Alias for getResponse
      *
-     * @param int $code
+     * @param  int    $code
      * @param  string $reasonPhrase
      * @return ResponseInterface
      */
@@ -604,7 +609,7 @@ class Basicis extends RequestHandler
      * Function setRoutesByAnnotations
      * Receives a class as an argument, and works with the comment blocks as @Route
      * 
-     * @param string $class
+     * @param  string $class
      * @return Basicis
      */
     public function setRoutesByAnnotations(string $class) : Basicis
@@ -626,7 +631,7 @@ class Basicis extends RequestHandler
      * Function setRoutesByControllers
      * Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'
      * 
-     * @param array|Controller[] $controllers
+     * @param  array|Controller[] $controllers
      * @return Basicis
      */
     public function setRoutesByControllers(array $controllers) : Basicis
@@ -644,9 +649,9 @@ class Basicis extends RequestHandler
     /**
      * Function get
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
+     * @param  string          $url
+     * @param  string|\Closure $callback
+     * @param  string|array    $middlewares
      * @return void
      */
     public function get(string $url = "/", $callback = null, $middlewares = null)
@@ -660,9 +665,9 @@ class Basicis extends RequestHandler
     /**
      * Function post
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
+     * @param  string          $url
+     * @param  string|\Closure $callback
+     * @param  string|array    $middlewares
      * @return void
      */
     public function post(string $url, $callback = null, $middlewares = null)
@@ -676,9 +681,9 @@ class Basicis extends RequestHandler
     /**
      * Function put
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
+     * @param  string          $url
+     * @param  string|\Closure $callback
+     * @param  string|array    $middlewares
      * @return void
      */
     public function put(string $url, $callback = null, $middlewares = null)
@@ -692,9 +697,9 @@ class Basicis extends RequestHandler
     /**
      * Function patch
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
+     * @param  string          $url
+     * @param  string|\Closure $callback
+     * @param  string|array    $middlewares
      * @return void
      */
     public function patch(string $url, $callback = null, $middlewares = null)
@@ -708,9 +713,9 @@ class Basicis extends RequestHandler
     /**
      * Function detete
      *
-     * @param string $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
+     * @param  string          $url
+     * @param  string|\Closure $callback
+     * @param  string|array    $middlewares
      * @return void
      */
     public function delete(string $url, $callback = null, $middlewares = null)
@@ -727,7 +732,7 @@ class Basicis extends RequestHandler
      * Function write
      *
      * @param string $text
-     * @param int $statusCode default=200
+     * @param int    $statusCode default=200
      *
      * @return ResponseInterface
      */
@@ -743,15 +748,15 @@ class Basicis extends RequestHandler
     /**
      * Function json
      *
-     * @param array $data = []
-     * @param int $statusCode = 200
+     * @param array $data       = []
+     * @param int   $statusCode = 200
      *
      * @return ResponseInterface
      */
     public function json($data = [], int $statusCode = 200) : ResponseInterface
     {
         $this->response()->withHeader("Content-Type", "application/json; charset=UTF-8")
-                       ->withStatus($statusCode);
+            ->withStatus($statusCode);
         $data = [
             "BasicisAPI" => [
                 "meta" => [
@@ -767,26 +772,26 @@ class Basicis extends RequestHandler
 
 
      /**
-     * Function view
-     *
-     * @param string $name
-     * @param array $data
-     * @param int $statusCode default=200
-     * @param string $customPath
-     *
-     * @return ResponseInterface
-     */
+      * Function view
+      *
+      * @param string $name
+      * @param array  $data
+      * @param int    $statusCode default=200
+      * @param string $customPath
+      *
+      * @return ResponseInterface
+      */
     public function view(string $name, array $data = [], int $statusCode = 200, $customPath = "") : ResponseInterface
     {
         $view = new View(
-                [
+            [
                     self::path() . "storage/templates/",
                     self::path() . $customPath,
                 ]
-            );
+        );
         $view->setFilters($this->viewFilters);
         $this->response->withHeader("Content-Type", ["text/html", "charset=UTF-8"])
-                         ->withStatus($statusCode);
+            ->withStatus($statusCode);
 
         $content = $view->getView($name, $data);
         if ($content !== null) {
@@ -811,11 +816,11 @@ class Basicis extends RequestHandler
             $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
                 return $this->response->withHeaders(
-                        [
+                    [
                             "Content-Type" => \MimeType\MimeType::getType($filename),
                             "Content-disposition" => ["attachment", "filename=".basename($filename)]
                         ]
-                    )
+                )
                     ->withBody($file)
                     ->withStatus(200, "Ok, working as expected!");
             }
@@ -832,7 +837,7 @@ class Basicis extends RequestHandler
      * Function clientFileupload
      *
      * @param UploadedFileInterface $infile
-     * @param string $outfile
+     * @param string                $outfile
      *
      * @return array|null
      */
@@ -908,10 +913,12 @@ class Basicis extends RequestHandler
     {
         if ($callback instanceof \Closure) {
             //Binding $this == $app, $request , $response and $args
-            $callback->bindTo((object) [
+            $callback->bindTo(
+                (object) [
                 "app" => &$this,
                 "args" => $args
-            ]);
+                ]
+            );
             
             //Runing $callback function
             $result = $callback($this, (object) $args);
@@ -933,7 +940,8 @@ class Basicis extends RequestHandler
     /**
      * Function input
      * Opens a Stream Resource in Read mode and returns its content
-     * @param string $resourceFileName = "php://input"
+     *
+     * @param  string $resourceFileName = "php://input"
      * @return void
      */
     public static function input(string $resourceFileName = "php://input"): string
@@ -950,9 +958,9 @@ class Basicis extends RequestHandler
      * Function output
      * Open a Stream Resource in Recording mode and write a text in it, sending headers
      *
-     * @param string $resourceFileName
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
+     * @param  string                 $resourceFileName
+     * @param  ServerRequestInterface $request
+     * @param  ResponseInterface      $response
      * @return integer
      */
     public static function output(
@@ -991,7 +999,7 @@ class Basicis extends RequestHandler
     /**
      * Function middlewaresHandle
      *
-     * @param string|array $middlewares
+     * @param  string|array $middlewares
      * @return ResponseInterface
      */
     private function middlewaresHandle($middlewares) : ResponseInterface
@@ -1000,8 +1008,9 @@ class Basicis extends RequestHandler
         $response = $this->getResponse();
 
         foreach (is_string($middlewares) ? explode(",", $middlewares) : $middlewares as $middleware) {
-            if (key_exists($middleware, $this->middlewares['route']) &&
-            (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206)) {
+            if (key_exists($middleware, $this->middlewares['route']) 
+                && (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206)
+            ) {
                 $response = (new $this->middlewares['route'][$middleware])->handle($this->request);
             }
         }
@@ -1101,7 +1110,8 @@ class Basicis extends RequestHandler
             $this->view(
                 "error", 
                 [
-                    "errorMessage" => sprintf("%s | %s",   
+                    "errorMessage" => sprintf(
+                        "%s | %s",   
                         $this->router->getResponse()->getStatusCode(),
                         $this->router->getResponse()->getReasonPhrase()
                     )

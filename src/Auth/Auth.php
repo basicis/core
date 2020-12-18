@@ -1,7 +1,7 @@
 <?php
 namespace Basicis\Auth;
 
-use \Firebase\JWT\JWT;
+use Doctrine\ORM\Mapping as ORM;
 use Basicis\Model\Model;
 use Basicis\Core\Validator;
 
@@ -10,10 +10,11 @@ use Basicis\Core\Validator;
  * Basicis default authentication class
  * @category Basicis\Auth
  * @package  Basicis\Auth
-  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
+ * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Basicis/Auth/Auth.php
- * @ORM\MappedSuperclass
+ * @ORM\Entity
+ * @ORM\Table(name="Auth")
  */
 class Auth extends Model implements AuthInterface
 {
@@ -34,21 +35,21 @@ class Auth extends Model implements AuthInterface
 
     /**
      * $username variable
-     * @ORM\@Column(name="username", length=300, unique=true)
+     * @ORM\Column(name="username", length=300, unique=true)
      * @var string
      */
     protected $username;
 
     /**
      * $email variable
-     * @ORM\@Column(name="email", length=300, unique=true)
+     * @ORM\Column(name="email", length=300, unique=true)
      * @var string
      */
     protected $email;
 
     /**
      * $pass variable
-     * @ORM\@Column(name="pass", length=300, unique=true)
+     * @ORM\Column(name="pass", length=60, unique=true)
      * @var string
      */
     protected $pass;
@@ -56,7 +57,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * $role variable
-     * @ORM\@Column(name="role", type="integer")
+     * @ORM\Column(name="role", type="integer")
      * @var int
      */
     protected $role;
@@ -84,9 +85,9 @@ class Auth extends Model implements AuthInterface
      * Function getUsername
      * Get Auth username key
      *
-     * @return string
+     * @return string|null
      */
-    public function getUsername() : string
+    public function getUsername() : ?string
     {
         return $this->username;
     }
@@ -101,7 +102,7 @@ class Auth extends Model implements AuthInterface
      */
     public function setUsername(string $username) : Auth
     {
-        //if(Validator::validate($username, "noExists:".get_called_class())) { 
+        //if(Validator::validate($username, "noExists", get_called_class())) { 
             $this->username = $username;
         //}
         return $this;
@@ -113,9 +114,9 @@ class Auth extends Model implements AuthInterface
      * Function getEmail
      * Get Auth email key
      *
-     * @return string
+     * @return string|null
      */
-    public function getEmail() : string
+    public function getEmail() : ?string
     {
         return $this->email;
     }
@@ -130,38 +131,68 @@ class Auth extends Model implements AuthInterface
      */
     public function setEmail(string $email) : Auth
     {
-      if(Validator::validate($username, "email")) { 
-         $this->email = $email;
-      }
-      return $this;
-    }
-
-
-    /**
-     * Function setPass
-     * Set Auth password key
-     * @param string $pass
-     *
-     * @return Auth
-     */
-    public function setPass(string $pass) : Auth
-    {
-        $this->pass = $pass;
-        if (count_chars($this->pass) !== 60) {
-          $this->pass = password_hash($pass, PASSWORD_BCRYPT);
+        if(Validator::validate($email, "email")) { 
+            $this->email = $email;
+            if ($this->getUsername() === null) {
+                $this->setUsername($email);
+            }
         }
         return $this;
     }
 
 
     /**
+     * Function setPass
+     * Set Auth password key
+     * @param string $passKey
+     *
+     * @return Auth
+     */
+    public function setPass(string $passKey) : Auth
+    {
+        $this->pass = password_hash($passKey, PASSWORD_BCRYPT);
+        return $this;
+    }
+
+
+
+    /**
+     * Function checkPass
+     * Check Auth password key
+     * @param string $passKey
+     *
+     * @return bool
+     */
+    public function checkPass(string $passKey) : bool
+    {
+        return password_verify($passKey, $this->pass);
+    }
+
+
+
+    /**
      * Function getRole
      * Get role permission ID 
-     * @return string
+     * @return int
      */
     public function getRole() : int
     {
-      return $this->role ?? 5;
+        return $this->role !== null ? $this->role : 5;
+    }
+
+
+    /**
+     * Function getRoleName
+     * Get role permission Name
+     * 
+     * @return string|null
+     */
+    public function getRoleName() : ?string
+    {
+        if (array_key_exists($this->getRole(), self::DEFAULT_ROLES)) {
+            return self::DEFAULT_ROLES[$this->getRole()];
+        }
+        return null;
     }
 
 
@@ -174,23 +205,10 @@ class Auth extends Model implements AuthInterface
      */
     public function setRole(int $roleId) : Auth
     {
-        if (in_array($roleId, self::DEFAULT_ROLES) | (int) $roleId > 5) {
+        if (array_key_exists($roleId, self::DEFAULT_ROLES) | (int) $roleId > 5) {
             $this->role = $roleId;
         }
         return $this;
-    }
-
-
-    /**
-     * Function checkPass
-     * Check Auth password key
-     * @param string $pass
-     *
-     * @return bool
-     */
-    public function checkPass(string $pass) : bool
-    {
-        return password_verify($pass, $this->pass);
     }
 
 
@@ -206,15 +224,19 @@ class Auth extends Model implements AuthInterface
     public static function login(
       string $username,
       string $passKey,
-      string $appKey = ""
+      string $appKey,
+      string $iss = ""
     ) : ?string {
+
         $user = self::findOneBy(['username' => $username]);
         if($user === null)  {
             $user = self::findOneBy(['email' => $username]);
         }
 
-        if ($user instanceof Auth && $user->checkPass($passKey)) {
-            return Token::create($user, "+30 minutes", $appKey);
+        $entityClass = get_called_class();
+        if (($user instanceof $entityClass) && $user->checkPass($passKey)) {
+          $token = new Token($appKey, $iss, "+30 minutes", "now");
+          return $token->create($user);
         }
         return null;
     }
@@ -225,14 +247,18 @@ class Auth extends Model implements AuthInterface
      *
      * @param string $token
      *
-     * @return void
+     * @return Auth|null
      */
-    public function getUser(string $token)
+    public static function getUser(string $token, string $appKey) : ?Auth
     {
-        if (Token::check($token)) {
-          return self::find((int) Token::decode($token)->usr->id); 
+        $tokenObj = new Token($appKey);
+        if ($tokenObj->check($token)) {
+          $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
+          if ($user === null) {
+              $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+          }
+          return $user; 
         }
-    
         return null;
     }
 }

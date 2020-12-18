@@ -54,7 +54,7 @@ class Annotations
     /**
      * Function setClass
      *
-     * @param string $class
+     * @param  string $class
      * @return Annotations
      */
     public function setClass(string $class) : Annotations
@@ -79,7 +79,7 @@ class Annotations
     /**
      * Function setMethod
      *
-     * @param string $method
+     * @param  string $method
      * @return Annotations
      */
     public function setMethod(string $method) : Annotations
@@ -104,9 +104,9 @@ class Annotations
      * Function getCommentByTag
      * Get a documentation bloc line by any tag, and return this line
      *
-     * @param string $method
-     * @param string $tag
-     * @param integer $index
+     * @param  string  $method
+     * @param  string  $tag
+     * @param  integer $index
      * @return string|null
      */
     

@@ -18,7 +18,7 @@ abstract class Model implements ModelInterface
     /**
       * @ORM\Id
       * @ORM\Column(type="integer")
-      * @ORM\GeneratedValue
+      * @ORM\GeneratedValue 
       * @var int $id
       */
     protected $id;
@@ -154,23 +154,18 @@ abstract class Model implements ModelInterface
      */
     public static function getManager() : ?EntityManager
     {
-        $dataBase = new DataBase();
-        return $dataBase->setORMConfig(
-            [
-                App::path()."src/",
-                App::path()."src/models/",
-                App::path()."src/model/"
-            ],
-            $_ENV["APP_ENV"] ?? true
-        )->setDBConfig(
-            $_ENV["DB_USER"] ?? 'basicis',
-            $_ENV["DB_PASS"] ?? 'basicis',
-            $_ENV["DB_NAME"] ?? 'basicis',
-            $_ENV["DB_HOST"] ?? 'localhost',
-            (int) $_ENV["DB_PORT"] ?? 3306,
-            $_ENV["DB_DRIVER"] ?? "pdo_mysql",
-            $_ENV["DB_PATH"] ?? null //For sqlite
-        )->getManager();
+        //To-do change in te future :) by: McGiver Developers
+        if(file_exists(App::path()."config/db-config.php")) {
+            //Include doctrine db-config
+            $dataBase = require App::path()."config/db-config.php";
+            if ($dataBase instanceof DataBase) {
+                $entityManager = $dataBase->getManager();
+                if ($entityManager instanceof EntityManager) {
+                    return $entityManager;
+                }
+            }
+        }
+        return null;
     }
     
 
@@ -182,15 +177,17 @@ abstract class Model implements ModelInterface
     public function save() : Bool
     {
         $manager = self::getManager();
-        $manager->persist($this);
+        if ($manager instanceof EntityManager) {
+            $manager->persist($this);
 
-        try {
-            $manager->flush();
-        } catch (Exception $e) {
-            return false;
+            try {
+                $manager->flush();
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
         }
-
-        return true;
+        return false;
     }
 
 
@@ -202,14 +199,16 @@ abstract class Model implements ModelInterface
     public function delete() : Bool
     {
         $manager = self::getManager();
-        try {
-            $manager->remove($this);
-            $manager->flush();
-        } catch (Exception $e) {
-            return false;
+        if ($manager instanceof EntityManager) {
+            try {
+                $manager->remove($manager->merge($this));
+                $manager->flush();
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
         }
-
-        return true;
+        return false;
     }
 
 
@@ -217,13 +216,16 @@ abstract class Model implements ModelInterface
      * Function findBy
      *
      * @param array $findBy
-     * @return Model|null
+     * @return Array|Model[]|null
      */
-    public static function findBy(array $findBy = []) : ?Model
+    public static function findBy(array $findBy = []) : ?Array
     {
-        $entity = self::getManager()->getRepository(get_called_class())->findBy($findBy);
-        if ($entity) {
-            return $entity->getData();
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            $entities = $manager->getRepository(get_called_class())->findBy($findBy);
+            if (is_array($entities) && (count($entities) > 0)) {
+                return $entities;
+            }
         }
         return null;
     }
@@ -237,9 +239,13 @@ abstract class Model implements ModelInterface
      */
     public static function findOneBy(array $findOneBy = []) : ?Model
     {
-        $entity = self::getManager()->getRepository(get_called_class())->findOneBy($findOneBy);
-        if ($entity) { 
-            return $entity->getData();
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            $entityClass = get_called_class();
+            $entity = $manager->getRepository($entityClass)->findOneBy($findOneBy);
+            if ($entity instanceof $entityClass) {
+                return $entity;
+            }
         }
         return null;
     }
@@ -253,9 +259,13 @@ abstract class Model implements ModelInterface
      */
     public static function find(int $id) : ?Model
     {
-        $entity = self::getManager()->find(get_called_class(), $id);
-        if ($entity) {
-            return $entity->getData();
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            $entityClass = get_called_class();
+            $entity = $manager->find($entityClass, $id);
+            if ($entity instanceof $entityClass) { 
+                return $entity;
+            }
         }
         return null;
     }
@@ -268,13 +278,12 @@ abstract class Model implements ModelInterface
      */
     public static function all() : ?array
     {
-        $entities = self::getManager()->getRepository(\get_called_class())->findAll();
-        if ($entities) { 
-            $data = [];
-            foreach ($entities as $key => $entity) {
-                $data[$key] = $entity->getData();
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            $entities = $manager->getRepository(\get_called_class())->findAll();
+            if (is_array($entities) && (count($entities) > 0)) {
+                return $entities;
             }
-            return $data;
         }
         return null;
     }
@@ -293,8 +302,21 @@ abstract class Model implements ModelInterface
             $method = "get".ucfirst($prop);
             if (method_exists($this, $method) && !in_array($prop, $this->protecteds)) {
                 $data[$prop] = $this->$method();
+                if ($prop instanceof Model) {
+                    $data[$prop] = $this->$prop->getData();
+                }
             }
         }
         return $data;
+    }
+
+    /**
+     * Function __toString
+     *
+     * @return String
+     */
+    public function __toString() : String
+    {
+        return json_encode($this->getData());
     }
 }

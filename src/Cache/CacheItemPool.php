@@ -33,10 +33,10 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function addItem
      *
-     * @param string $key
-     * @param mixed $value
-     * @param \DateTimeInterface|null $expiration
-     * @param  int|string|\DateIntervalInterface|null $time
+     * @param string                                 $key
+     * @param mixed                                  $value
+     * @param \DateTimeInterface|null                $expiration
+     * @param int|string|\DateIntervalInterface|null $time
      */
     public function addItem(
         string $key = null,
@@ -55,10 +55,10 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function withItem
      *
-     * @param string $key
-     * @param CacheItemInterface|mixed $value
-     * @param \DateTimeInterface|null $expiration
-     * @param  int|string|\DateIntervalInterface|null $time
+     * @param string                                 $key
+     * @param CacheItemInterface|mixed               $value
+     * @param \DateTimeInterface|null                $expiration
+     * @param int|string|\DateIntervalInterface|null $time
      */
     public function withItem(string $key, $value, $expiration = null, $time = null) : CacheItemPoolInterface
     {
@@ -74,7 +74,8 @@ class CacheItemPool implements CacheItemPoolInterface
      * Returns a Cache Item representing the specified key.
      * This method must always return a CacheItemInterface object, even in case of
      * a cache miss. It MUST NOT return null.
-     * @param string $key
+     *
+     * @param  string $key
      *   The key for which to return the corresponding Cache Item.
      * @throws InvalidArgumentException
      *   If the $key string is not a legal value a \Psr\Cache\InvalidArgumentException
@@ -98,7 +99,8 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function getItems
      * Returns a traversable set of cache items.
-     * @param string[] $keys
+     *
+     * @param  string[] $keys
      *   An indexed array of keys of items to retrieve.
      * @throws InvalidArgumentException
      *   If any of the keys in $keys are not a legal value a \Psr\Cache\InvalidArgumentException
@@ -132,7 +134,8 @@ class CacheItemPool implements CacheItemPoolInterface
      * Note: This method MAY avoid retrieving the cached value for performance reasons.
      * This could result in a race condition with CacheItemInterface::get(). To avoid
      * such situation use CacheItemInterface::isHit() instead.
-     * @param string $key
+     *
+     * @param  string $key
      *   The key for which to check existence.
      * @throws InvalidArgumentException
      *   If the $key string is not a legal value a \Psr\Cache\InvalidArgumentException
@@ -153,6 +156,7 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function clear
      * Deletes all items in the pool.
+     *
      * @return bool
      *   True if the pool was successfully cleared. False if there was an error.
      */
@@ -164,9 +168,10 @@ class CacheItemPool implements CacheItemPoolInterface
 
 
     /**
-      * Funtion deleteItem
+     * Funtion deleteItem
      * Removes the item from the pool.
-     * @param string $key
+     *
+     * @param  string $key
      *   The key to delete.
      * @throws InvalidArgumentException
      *   If the $key string is not a legal value a \Psr\Cache\InvalidArgumentException
@@ -191,7 +196,8 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function deleteItems
      * Removes multiple items from the pool.
-     * @param string[] $keys
+     *
+     * @param  string[] $keys
      *   An array of keys that should be removed from the pool.
      * @throws InvalidArgumentException
      *   If any of the keys in $keys are not a legal value a \Psr\Cache\InvalidArgumentException

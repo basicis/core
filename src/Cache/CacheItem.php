@@ -61,9 +61,9 @@ class CacheItem implements CacheItemInterface
     /**
      * __construct function
      *
-     * @param string $key
-     * @param mixed $value
-     * @param \DateTimeInterface|null $expiration
+     * @param  string                                 $key
+     * @param  mixed                                  $value
+     * @param  \DateTimeInterface|null                $expiration
      * @param  int|string|\DateIntervalInterface|null $time
      * @return void
      */
@@ -98,7 +98,8 @@ class CacheItem implements CacheItemInterface
 
     /**
      * Function setKey
-     * @param string $key
+     *
+     * @param  string $key
      * @return void
      */
     public function setKey(string $key)

@@ -124,8 +124,8 @@ class MessageTest extends TestCase
     */
     public function testWithHeader()
     {
-        $this->message->withHeader('token', 'token_test_here2');
-        $this->assertEquals(['token_test_here2'], $this->message->getHeader('token'));
+        $this->message->withHeader('token', 'token_test_here');
+        $this->assertEquals(['token_test_here'], $this->message->getHeader('token'));
     }
 
 
@@ -137,9 +137,9 @@ class MessageTest extends TestCase
     */
     public function testWithAddedHeader()
     {
-        $this->message->withHeader('token', 'token_test_here2');
-        $this->message->withAddedHeader('token', 'token_test_here3');
-        $this->assertEquals(['token_test_here2', 'token_test_here3'], $this->message->getHeader('token'));
+        $this->message->withHeader('token', 'token_test_here');
+        $this->message->withAddedHeader('token', 'token_test_here2');
+        $this->assertEquals(['token_test_here', 'token_test_here2'], $this->message->getHeader('token'));
     }
 
     /**
@@ -149,9 +149,10 @@ class MessageTest extends TestCase
     */
     public function testWithoutHeader()
     {
-        //return a empty array if unset header
+        //return a empty array if unset header;
+        $this->message->withHeader('token', 'token_test_here');
         $this->message->withoutHeader('token');
-        $this->assertEquals([], $this->message->getHeader('token'));
+        $this->assertEquals([], $this->message->getHeader("token"));
     }
 
     /**

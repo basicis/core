@@ -6,40 +6,46 @@ use \Firebase\JWT\JWT;
 /**
  * Token Class
  * Basicis default Token class
+ *
  * @category Basicis\Auth
  * @package  Basicis\Auth
-  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
+ * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Basicis/Auth/Token.php
  */
 class Token
 {
-  /**
-   * $appKey variable
-   * @var string
-   */
+    /**
+     * $appKey variable
+     *
+     * @var string
+     */
     private $appKey;
 
     /**
      * $iss variable
+     *
      * @var string
      */
     private $iss;
 
     /**
      * $exp variable
+     *
      * @var int
      */
     private $exp;
 
     /**
      * $nbf variable
+     *
      * @var int
      */
     private $nbf;
 
     /**
      * $nbf variable
+     *
      * @var int
      */
     private $iat;
@@ -47,6 +53,7 @@ class Token
 
     /**
      * $encoded variable
+     *
      * @var string
      */
     private $encoded;
@@ -54,6 +61,7 @@ class Token
 
     /**
      * $decoded variable
+     *
      * @var object
      */
     private $decoded;
@@ -62,12 +70,13 @@ class Token
 
     /**
      * Function __construct
-     * @return  void
+     *
+     * @return void
      * 
      * @param AuthInterface $user
-     * @param string $appKey
-     * @param string $expiration
-     * @param string $nobefore
+     * @param string        $appKey
+     * @param string        $expiration
+     * @param string        $nobefore
      */
     public function __construct(
         string $appKey,
@@ -85,12 +94,13 @@ class Token
 
 
     /**
-    * Function create
-    * Receive an instance of AuthInterface user and Creating a token
-    * @param AuthInterface $user
-    * @param array|string|null $data
-    * @return string|null
-    */
+     * Function create
+     * Receive an instance of AuthInterface user and Creating a token
+     *
+     * @param  AuthInterface     $user
+     * @param  array|string|null $data
+     * @return string|null
+     */
     public function create(AuthInterface $user, $data = null) : ?string
     {
         $token = array(
@@ -113,32 +123,34 @@ class Token
 
 
     /** 
-    * Function check
-    * Checking a token
-    * @param string $token
-    * @return boolean  
-    */
+     * Function check
+     * Checking a token
+     *
+     * @param  string $token
+     * @return boolean  
+     */
     public function check(string $token)
     {
         $tokenDecoded = $this->decode($token);
         if ($tokenDecoded) {
-          return ((new \DateTime("now"))->getTimestamp() >= $tokenDecoded->nbf) && ($tokenDecoded->exp > (new \DateTime("now"))->getTimestamp()) ? true : false;
+            return ((new \DateTime("now"))->getTimestamp() >= $tokenDecoded->nbf) && ($tokenDecoded->exp > (new \DateTime("now"))->getTimestamp()) ? true : false;
         } 
         return false;
     }
 
 
     /** 
-    * Function renew
-    * Renew a Token, optionaly set any data type of string, array or null
-    * @param string $token
-    * @param string $expiration
-    * @param string $nobefore
-    * Parse about any English textual datetime description into a Unix timestamp
-    * https://www.php.net/manual/en/function.strtotime
-    * @param string|array|null $data
-    * @return string|null  
-    */
+     * Function renew
+     * Renew a Token, optionaly set any data type of string, array or null
+     *
+     * @param  string            $token
+     * @param  string            $expiration
+     * @param  string            $nobefore
+     * Parse about any English textual datetime description into a Unix timestamp
+     * https://www.php.net/manual/en/function.strtotime
+     * @param  string|array|null $data
+     * @return string|null  
+     */
     public function renew(
         string $token,
         string $expiration = "+30 minutes",
@@ -157,10 +169,10 @@ class Token
                 $tokenDecode->nbf = $this->nbf;
                 $tokenDecode->exp = $this->exp;
 
-                if ( !is_null($data) ){
-                  $tokenDecode->dat = $data;
+                if (!is_null($data) ) {
+                    $tokenDecode->dat = $data;
                 }
-                return $this->encode((array) $tokenDecode) ;
+                return $this->encode((array) $tokenDecode);
             } 
         }
         return null;
@@ -168,11 +180,12 @@ class Token
 
 
     /** 
-    * Function Encode Token
-    * Enconding a Token
-    * @param array $token
-    * @return string  
-    */
+     * Function Encode Token
+     * Enconding a Token
+     *
+     * @param  array $token
+     * @return string  
+     */
     public function encode(array $token) : ?string
     {
         if (isset($token) && is_array($token)) {
@@ -185,16 +198,17 @@ class Token
     /**
      * Function Decode Token
      *
-     * @param string $token
+     * @param  string $token
      * @return object|null
      * @throws \Exception
      */
     public function decode(string $token) : ?object
     {
         if (isset($token) && (count(explode('.', $token)) == 3)) {
-          try {
-            return JWT::decode($token, $this->appKey, array('HS256'));
-          } catch(\Exception $e) {}
+            try {
+                return JWT::decode($token, $this->appKey, array('HS256'));
+            } catch(\Exception $e) {
+            }
         }
         return null;
     }

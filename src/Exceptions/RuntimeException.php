@@ -26,9 +26,10 @@ namespace Basicis\Exceptions;
  *   - public function log() : void
  *
  *  }
+ *
  * @category Exceptions
  * @package  Basicis/Exceptions
-  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
+ * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Exceptions/RuntimeException.php
  */
