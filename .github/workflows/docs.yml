@@ -19,7 +19,7 @@ jobs:
           ref: master
           check-name: test
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 2   
+          #wait-interval: 2   
 
       - name: Run Documentation Build 🛠️
         run: |
