@@ -24,11 +24,14 @@ Basicis\Http\Server\RequestHandler
 |[createApp](#basiciscreateapp)|Function createApp Factory|
 |[delete](#basicisdelete)|Function detete|
 |[get](#basicisget)|Function get|
+|[getAppDescription](#basicisgetappdescription)|Function getAppDescription
+Getting App description string|
 |[getAppKey](#basicisgetappkey)|Function getAppKey
 Getting hash appKey|
 |[getController](#basicisgetcontroller)|Function getController|
 |[getEnv](#basicisgetenv)|Function env|
-|[getMiddlewares](#basicisgetmiddlewares)|Function getMiddlewares|
+|[getMiddlewares](#basicisgetmiddlewares)|Function getMiddlewares
+Getting middlewares by type ['before'|'route'|'after'|null to all]|
 |[getMode](#basicisgetmode)|Function getMode
 Getting App operation Mode, development "dev" ou production "production"|
 |[getRequest](#basicisgetrequest)|Function getRequest|
@@ -54,15 +57,20 @@ Alias for getRequest|
 |[response](#basicisresponse)|Function response
 Alias for getResponse|
 |[run](#basicisrun)|Function run|
-|[setAfterMiddlewares](#basicissetaftermiddlewares)|Function setAfterMiddlewares|
+|[setAfterMiddlewares](#basicissetaftermiddlewares)|Function setAfterMiddlewares
+Setting after middlewares|
+|[setAppDescription](#basicissetappdescription)|Function setAppDescription
+Setting App description string|
 |[setAppKey](#basicissetappkey)|Function setAppKey
 Setting hash appKey|
-|[setBeforeMiddlewares](#basicissetbeforemiddlewares)|Function setBeforeMiddlewares|
+|[setBeforeMiddlewares](#basicissetbeforemiddlewares)|Function setBeforeMiddlewares
+Setting before middlewares|
 |[setControllers](#basicissetcontrollers)|Function setControllers|
 |[setMode](#basicissetmode)|Function setMode
 Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"]|
 |[setRequest](#basicissetrequest)|Function setRequest|
-|[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setMiddlewares|
+|[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setMiddlewares
+Setting route middlewares|
 |[setRoutesByAnnotations](#basicissetroutesbyannotations)|Function setRoutesByAnnotations
 Receives a class as an argument, and works with the comment blocks as @Route|
 |[setRoutesByControllers](#basicissetroutesbycontrollers)|Function setRoutesByControllers
@@ -320,6 +328,33 @@ Function get
 <hr />
 
 
+### Basicis::getAppDescription  
+
+**Description**
+
+```php
+public getAppDescription (void)
+```
+
+Function getAppDescription
+Getting App description string 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`string`
+
+
+
+
+<hr />
+
+
 ### Basicis::getAppKey  
 
 **Description**
@@ -408,7 +443,8 @@ Function env
 public getMiddlewares (string $type)
 ```
 
-Function getMiddlewares 
+Function getMiddlewares
+Getting middlewares by type ['before'|'route'|'after'|null to all] 
 
  
 
@@ -925,7 +961,8 @@ Function run
 public setAfterMiddlewares (array $middlewares)
 ```
 
-Function setAfterMiddlewares 
+Function setAfterMiddlewares
+Setting after middlewares 
 
  
 
@@ -936,6 +973,35 @@ Function setAfterMiddlewares
 **Return Values**
 
 `void`
+
+
+
+
+<hr />
+
+
+### Basicis::setAppDescription  
+
+**Description**
+
+```php
+public setAppDescription (string $mode)
+```
+
+Function setAppDescription
+Setting App description string 
+
+ 
+
+**Parameters**
+
+* `(string) $mode`
+: = ["dev"|"production"|"prod"|null]  
+Default value "dev" == Development Mode  
+
+**Return Values**
+
+`\Basicis`
 
 
 
@@ -978,7 +1044,8 @@ Setting hash appKey
 public setBeforeMiddlewares (array $middlewares)
 ```
 
-Function setBeforeMiddlewares 
+Function setBeforeMiddlewares
+Setting before middlewares 
 
  
 
@@ -1085,7 +1152,8 @@ Function setRequest
 public setRouteMiddlewares (array $middlewares)
 ```
 
-Function setMiddlewares 
+Function setMiddlewares
+Setting route middlewares 
 
  
 

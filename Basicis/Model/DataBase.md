@@ -18,7 +18,8 @@ Get a instance of Doctrine ORM EntityManager an return this, or null|
 |[setDBConfig](#databasesetdbconfig)|Function setDBConfig
 Set database configurations, driver, url and/or path (for sqlite)|
 |[setORMConfig](#databasesetormconfig)|Function setORMConfig
-Set database orm configurations, a array of entities paths and if is dev mode, for this, default value is true|
+Set database orm configurations, a array of entities paths and if is dev mode,
+for this, default value is true|
 
 
 
@@ -141,7 +142,8 @@ public setORMConfig (array $entityPaths, bool $isDevMode)
 ```
 
 Function setORMConfig
-Set database orm configurations, a array of entities paths and if is dev mode, for this, default value is true 
+Set database orm configurations, a array of entities paths and if is dev mode,
+for this, default value is true 
 
  
 
