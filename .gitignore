@@ -6,3 +6,5 @@ src/controllers/
 src/middlewares/
 src/routes/
 docs/
+.vscode/
+bin/basicis.db

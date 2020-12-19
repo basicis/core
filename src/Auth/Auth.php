@@ -73,7 +73,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function __construct
-     *
+     * Run parent Basicis\Model\Model::__construct method with $data [array|int(id)] as argument
      * @param array|int $data
      */
     public function __construct($data = null)
@@ -102,9 +102,7 @@ class Auth extends Model implements AuthInterface
      */
     public function setUsername(string $username) : Auth
     {
-        //if(Validator::validate($username, "noExists", get_called_class())) { 
-            $this->username = $username;
-        //}
+        $this->username = $username;
         return $this;
     }
 
@@ -214,7 +212,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function function
-     *
+     * Check  Auth User and return a string token of on success or null in error case
      * @param string $username
      * @param string $passKey
      * @param string $appKey
@@ -244,7 +242,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function getUser
-     *
+     * Get a Auth User by token and appKey
      * @param string $token
      *
      * @return Auth|null

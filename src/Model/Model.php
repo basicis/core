@@ -148,7 +148,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function getManager
-     *
+     * Get a instance of Doctrine ORM EntityManager an return this, or null
      * @param string $class
      * @return  EntityManager|null
      */
@@ -171,7 +171,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function save
-     *
+     * Save data of this entity to database, use for create or update entities
      * @return Bool
      */
     public function save() : Bool
@@ -193,7 +193,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function delete
-     *
+     * Remove data of this entity of database
      * @return Bool
      */
     public function delete() : Bool
@@ -214,7 +214,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function findBy
-     *
+     * Find all entities by any column match
      * @param array $findBy
      * @return Array|Model[]|null
      */
@@ -233,7 +233,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function findOneBy
-     *
+     * Find a entity by any column match
      * @param array $findOneBy
      * @return Model|null
      */
@@ -253,7 +253,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function find
-     *
+     * Find a entity by id
      * @param array $id
      * @return Model|null
      */
@@ -273,7 +273,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function all
-     *
+     * Find all entities
      * @return array|null
      */
     public static function all() : ?array
@@ -290,11 +290,11 @@ abstract class Model implements ModelInterface
 
 
     /**
-     * Function function
-     *
+     * Function __toArray
+     * Get Entity Data as Array, without the propreties defined in the array property $protecteds
      * @return array
      */
-    public function getData() : array
+    public function __toArray() : array
     {
         $data = [];
         $props = \array_keys(\get_object_vars($this));
@@ -303,7 +303,7 @@ abstract class Model implements ModelInterface
             if (method_exists($this, $method) && !in_array($prop, $this->protecteds)) {
                 $data[$prop] = $this->$method();
                 if ($prop instanceof Model) {
-                    $data[$prop] = $this->$prop->getData();
+                    $data[$prop] = $this->$prop->__toArray();
                 }
             }
         }
@@ -312,11 +312,11 @@ abstract class Model implements ModelInterface
 
     /**
      * Function __toString
-     *
+     * Get Entity Data as Json, without the propreties defined in the array property $protecteds
      * @return String
      */
     public function __toString() : String
     {
-        return json_encode($this->getData());
+        return json_encode($this->__toArray());
     }
 }

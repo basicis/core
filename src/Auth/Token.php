@@ -70,7 +70,7 @@ class Token
 
     /**
      * Function __construct
-     *
+     * Defining a new instance de Token
      * @return void
      * 
      * @param AuthInterface $user
@@ -197,7 +197,7 @@ class Token
 
     /**
      * Function Decode Token
-     *
+     * Deconding a token
      * @param  string $token
      * @return object|null
      * @throws \Exception

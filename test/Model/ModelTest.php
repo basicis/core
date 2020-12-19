@@ -74,13 +74,15 @@ class ModelTest extends TestCase
         $this->assertInstanceOf(\DateTime::class, $this->model->getUpdated());
     }
 
-
+    
     /**
-     * Function testGetData
+     * Function testArrayAndJson
      * @return void
      */
-    public function testGetData()
+    public function testArrayAndJson()
     {
-        $this->assertEquals(true, is_array($this->model->getData()));
+        $this->assertEquals(true, is_array($this->model->__toArray()));
+        $this->assertEquals(true, is_string($this->model->__toString()));
     }
+
 }
