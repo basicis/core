@@ -129,7 +129,7 @@ class Auth extends Model implements AuthInterface
      */
     public function setEmail(string $email) : Auth
     {
-        if(Validator::validate($email, "email")) { 
+        if (Validator::validate($email, "email")) {
             $this->email = $email;
             if ($this->getUsername() === null) {
                 $this->setUsername($email);
@@ -170,7 +170,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function getRole
-     * Get role permission ID 
+     * Get role permission ID
      * @return int
      */
     public function getRole() : int
@@ -182,7 +182,7 @@ class Auth extends Model implements AuthInterface
     /**
      * Function getRoleName
      * Get role permission Name
-     * 
+     *
      * @return string|null
      */
     public function getRoleName() : ?string
@@ -213,28 +213,32 @@ class Auth extends Model implements AuthInterface
     /**
      * Function function
      * Check  Auth User and return a string token of on success or null in error case
-     * @param string $username
-     * @param string $passKey
-     * @param string $appKey
+     * @param string $username - Auth username
+     * @param string $passKey - Auth password key
+     * @param string $appKey - Basicis AppKey
+     * @param string $expiration - Expires at specified monent
+     * @param string $nobefore - No use Before of this moment
      *
      * @return string|null
      */
     public static function login(
-      string $username,
-      string $passKey,
-      string $appKey,
-      string $iss = ""
+        string $username,
+        string $passKey,
+        string $appKey,
+        string $iss = "",
+        string $expiration = "+30 minutes",
+        string $nobefore = "now"
     ) : ?string {
 
         $user = self::findOneBy(['username' => $username]);
-        if($user === null)  {
+        if ($user === null) {
             $user = self::findOneBy(['email' => $username]);
         }
 
         $entityClass = get_called_class();
         if (($user instanceof $entityClass) && $user->checkPass($passKey)) {
-          $token = new Token($appKey, $iss, "+30 minutes", "now");
-          return $token->create($user);
+            $token = new Token($appKey, $iss, $expiration, $nobefore);
+            return $token->create($user);
         }
         return null;
     }
@@ -251,11 +255,11 @@ class Auth extends Model implements AuthInterface
     {
         $tokenObj = new Token($appKey);
         if ($tokenObj->check($token)) {
-          $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
-          if ($user === null) {
-              $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
-          }
-          return $user; 
+            $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
+            if ($user === null) {
+                $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+            }
+            return $user;
         }
         return null;
     }

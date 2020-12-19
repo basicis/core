@@ -1,6 +1,8 @@
 <?php
 namespace Basicis;
 
+use Basicis\Auth\Auth;
+use Basicis\Auth\Token;
 use Basicis\Core\Log;
 use Basicis\Core\Validator;
 use Basicis\Core\Annotations;
@@ -52,6 +54,14 @@ class Basicis extends RequestHandler
         "APP_TIMEZONE" =>  "America/Recife",
         "APP_PATH" => null
     ];
+
+
+    /**
+     * $appKey variable
+     *
+     * @var String
+     */
+    private $appKey = "default-appkey";
 
     /**
      * $mode variable
@@ -134,6 +144,13 @@ class Basicis extends RequestHandler
      */
     private $viewFilters = [];
 
+    /**
+     * $auth variable
+     *
+     * @var Auth;
+     */
+    private $auth;
+
 
     /**
      * Function __construct
@@ -143,11 +160,13 @@ class Basicis extends RequestHandler
      */
     public function __construct(ServerRequestInterface $request, array ...$options)
     {
-        $this->router  = 
         $this->setMode($options['mode'] ?? 'dev');
         $this->setTimezone($options['timezone'] ?? 'America/Recife');
         $this->setRequest($request);
-        $this->response = (ResponseFactory::create())->withHeader("X-Powered-By", $options['appDescription'] ?? "Basicis Framework!");
+        $this->response = (ResponseFactory::create())->withHeader(
+            "X-Powered-By",
+            $options['appDescription'] ?? "Basicis Framework!"
+        );
     }
 
 
@@ -181,7 +200,7 @@ class Basicis extends RequestHandler
             if ($value instanceof controller) {
                 $class = get_class($value);
                 $controllers[$key] = get_class($value);
-            } 
+            }
 
             if (class_exists($class)) {
                 $this->setRoutesByAnnotations($class);
@@ -346,8 +365,8 @@ class Basicis extends RequestHandler
      * Function getMiddlewares
      *
      * @param string $type ['before'|'route'|'after'|null]
-     *                     Return an arra with especified middlewares type or all if no is especified the $type argument
-     * 
+     * Return an arra with especified middlewares type or all if no is especified the $type argument
+     *
      * @return array
      */
     public function getMiddlewares(string $type = null) : array
@@ -414,7 +433,7 @@ class Basicis extends RequestHandler
             $env = Dotenv::createImmutable(self::path());
             $env->load();
             return true;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -465,7 +484,7 @@ class Basicis extends RequestHandler
     {
         $displayErrors = 1;
         $appEnv = "APP_ENV=dev";
-        $errorReporting = E_ALL; 
+        $errorReporting = E_ALL;
 
         if (in_array($mode, ["production", "prod"])) {
             $appEnv = "APP_ENV=production";
@@ -480,29 +499,45 @@ class Basicis extends RequestHandler
         return $this;
     }
 
-    
-    /**
-     * Function setRequest
-     *
-     * @param ServerRequestinterface $request
-     *
-     * @return Basicis
-     */
-    public function setRequest(ServerRequestinterface $request) : Basicis
-    {
-        $this->router = RouterFactory::create($this->request = $request);
-        return $this;
-    }
+
 
     /**
      * Function getMode
      * Getting App operation Mode, development "dev" ou production "production"
-     * 
+     *
      * @return String
      */
     public function getMode() : String
     {
         return $this->mode;
+    }
+
+
+    /**
+     * Function getAppKey
+     * Getting hash appKey
+     *
+     * @return String
+     */
+    public function getAppKey() : String
+    {
+        return $this->appKey;
+    }
+
+
+    /**
+     * Function setAppKey
+     * Setting hash appKey
+     * @param string $appKey
+     *
+     * @return Basicis
+     */
+    public function setAppKey(string $appKey = null) : Basicis
+    {
+        if ($appKey !== null) {
+            $this->appKey = $appKey;
+        }
+        return $this;
     }
 
 
@@ -515,7 +550,7 @@ class Basicis extends RequestHandler
      * @return Basicis
      */
     public function setTimezone(string $timezone = null) : Basicis
-    {   
+    {
         $this->timezone = isset($timezone) ? $timezone : self::DEFAULT_ENV['APP_TIMEZONE'];
         date_default_timezone_set($this->timezone);
         return $this;
@@ -541,6 +576,20 @@ class Basicis extends RequestHandler
     public function getRequest() : ServerRequestInterface
     {
         return $this->request;
+    }
+
+    
+    /**
+     * Function setRequest
+     *
+     * @param ServerRequestinterface $request
+     *
+     * @return Basicis
+     */
+    public function setRequest(ServerRequestinterface $request) : Basicis
+    {
+        $this->router = RouterFactory::create($this->request = $request);
+        return $this;
     }
 
 
@@ -594,6 +643,14 @@ class Basicis extends RequestHandler
     }
 
 
+
+    public function auth(string $authClass = "Basicis\Auth\Auth") : ?Auth
+    {
+        $tokenString = $this->request()->getHeader('authorization')[0];
+        return $authClass::getUser($tokenString, $this->getAppKey());
+    }
+
+
     /**
      * Function getRoute
      *
@@ -608,7 +665,7 @@ class Basicis extends RequestHandler
     /**
      * Function setRoutesByAnnotations
      * Receives a class as an argument, and works with the comment blocks as @Route
-     * 
+     *
      * @param  string $class
      * @return Basicis
      */
@@ -616,7 +673,7 @@ class Basicis extends RequestHandler
     {
         if (new $class() instanceof Controller) {
             $annotations = new Annotations($class);
-            foreach($annotations->getClass()->getMethods() as $method) {
+            foreach ($annotations->getClass()->getMethods() as $method) {
                 $comment = $annotations->getCommentByTag($method->name, "@Route");
                 if ($comment !== null) {
                     $this->router->setRouteByAnnotation($comment, $class.'@'.$method->name);
@@ -630,7 +687,7 @@ class Basicis extends RequestHandler
     /**
      * Function setRoutesByControllers
      * Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'
-     * 
+     *
      * @param  array|Controller[] $controllers
      * @return Basicis
      */
@@ -738,7 +795,7 @@ class Basicis extends RequestHandler
      */
     public function write(string $text = "", int $statusCode = null) : ResponseInterface
     {
-        $stream = (new StreamFactory)->createStream($text); 
+        $stream = (new StreamFactory)->createStream($text);
         $this->response->withBody($stream);
         return $this->response->withStatus($statusCode === null ? 200 : $statusCode);
     }
@@ -958,15 +1015,15 @@ class Basicis extends RequestHandler
      * Function output
      * Open a Stream Resource in Recording mode and write a text in it, sending headers
      *
-     * @param  string                 $resourceFileName
      * @param  ServerRequestInterface $request
-     * @param  ResponseInterface      $response
+     * @param  ResponseInterface $response
+     * @param  string $resourceFileName
      * @return integer
      */
     public static function output(
-        string $resourceFileName = "php://output",
         ServerRequestInterface $request,
-        ResponseInterface $response
+        ResponseInterface $response,
+        string $resourceFileName = "php://output"
     ) : int {
         //Opening output stream
         $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
@@ -1008,7 +1065,7 @@ class Basicis extends RequestHandler
         $response = $this->getResponse();
 
         foreach (is_string($middlewares) ? explode(",", $middlewares) : $middlewares as $middleware) {
-            if (key_exists($middleware, $this->middlewares['route']) 
+            if (key_exists($middleware, $this->middlewares['route'])
                 && (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206)
             ) {
                 $response = (new $this->middlewares['route'][$middleware])->handle($this->request);
@@ -1066,7 +1123,7 @@ class Basicis extends RequestHandler
      */
     public function run(string $inputResource = "php://input", string $outputResource = "php://output")
     {
-        $this->request->withParsedBody($this->input($inputResource));
+        $this->request->withParsedBody(self::input($inputResource));
 
         //Before middlewares here
         foreach ($this->middlewares['before'] as $key => $before) {
@@ -1108,10 +1165,10 @@ class Basicis extends RequestHandler
         if ($this->response->getStatusCode() > 206 && $this->response->getBody()->getSize() === null) {
             //todo after middlweare default
             $this->view(
-                "error", 
+                "error",
                 [
                     "errorMessage" => sprintf(
-                        "%s | %s",   
+                        "%s | %s",
                         $this->router->getResponse()->getStatusCode(),
                         $this->router->getResponse()->getReasonPhrase()
                     )
@@ -1119,7 +1176,6 @@ class Basicis extends RequestHandler
             );
         }
 
-        return $this->output($outputResource, $this->request, $this->response);
+        return self::output($this->request, $this->response, $outputResource);
     }
-    
 }

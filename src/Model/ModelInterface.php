@@ -9,7 +9,7 @@ use \Doctrine\ORM\EntityManager;
 interface ModelInterface
 {
 
-    public function save() : Bool;
+    public function save() : Model;
     public function delete(): Bool;
     public function getCreated() : \DateTime;
     public function setCreated(string $created = null): Model;

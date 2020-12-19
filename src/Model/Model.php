@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Basicis\Model\ModelInteface;
 use Basicis\Model\DataBase;
 use Basicis\Basicis as App;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 
 /**
  *  Model class
@@ -155,7 +156,7 @@ abstract class Model implements ModelInterface
     public static function getManager() : ?EntityManager
     {
         //To-do change in te future :) by: McGiver Developers
-        if(file_exists(App::path()."config/db-config.php")) {
+        if (file_exists(App::path()."config/db-config.php")) {
             //Include doctrine db-config
             $dataBase = require App::path()."config/db-config.php";
             if ($dataBase instanceof DataBase) {
@@ -172,22 +173,32 @@ abstract class Model implements ModelInterface
     /**
      * Function save
      * Save data of this entity to database, use for create or update entities
-     * @return Bool
+     * @return Model
      */
-    public function save() : Bool
+    public function save() : Model
     {
+        $modelClass = get_called_class();
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
             $manager->persist($this);
 
             try {
                 $manager->flush();
-                return true;
+
+                $model = self::findOneBy(["email" => $this->getEmail()]);
+                if ($model === null) {
+                    $model = self::findOneBy(["username" => $this->getUsername()]);
+                }
+
+                if ($model instanceof $modelClass) {
+
+                    //var_dump($model->getID());
+                    //return  $model;
+                }
             } catch (\Exception $e) {
-                return false;
             }
         }
-        return false;
+        return $this;
     }
 
 
@@ -222,7 +233,11 @@ abstract class Model implements ModelInterface
     {
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
-            $entities = $manager->getRepository(get_called_class())->findBy($findBy);
+            try {
+                $entities = $manager->getRepository(get_called_class())->findBy($findBy);
+            } catch (\Exception $e) {
+                return null;
+            }
             if (is_array($entities) && (count($entities) > 0)) {
                 return $entities;
             }
@@ -242,7 +257,12 @@ abstract class Model implements ModelInterface
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
             $entityClass = get_called_class();
-            $entity = $manager->getRepository($entityClass)->findOneBy($findOneBy);
+            try {
+                $entity = $manager->getRepository($entityClass)->findOneBy($findOneBy);
+            } catch (\Exception $e) {
+                return null;
+            }
+
             if ($entity instanceof $entityClass) {
                 return $entity;
             }
@@ -262,7 +282,12 @@ abstract class Model implements ModelInterface
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
             $entityClass = get_called_class();
-            $entity = $manager->find($entityClass, $id);
+            try {
+                $entity = $manager->find($entityClass, $id);
+            } catch (\Exception $e) {
+                return null;
+            }
+
             if ($entity instanceof $entityClass) { 
                 return $entity;
             }
@@ -280,7 +305,11 @@ abstract class Model implements ModelInterface
     {
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
-            $entities = $manager->getRepository(\get_called_class())->findAll();
+            try {
+                $entities = $manager->getRepository(\get_called_class())->findAll();
+            } catch (\Exception $e) {
+                return null;
+            }
             if (is_array($entities) && (count($entities) > 0)) {
                 return $entities;
             }

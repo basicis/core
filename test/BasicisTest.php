@@ -10,6 +10,8 @@ use Basicis\Controller\ExampleController;
 use Basicis\Http\Server\ExampleMiddleware;
 use Basicis\Router\Router;
 use Basicis\Router\Route;
+use Basicis\Auth\Auth;
+use Basicis\Auth\Token;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
@@ -107,7 +109,7 @@ class BasicisTest extends TestCase
         //Required an middleware indentification key
         $this->assertInstanceOf(
             App::class,
-            $this->app->setRouteMiddlewares(["example" => "Basicis\Http\Server\ExampleMiddleware"]) 
+            $this->app->setRouteMiddlewares(["example" => "Basicis\Http\Server\ExampleMiddleware"])
         );
 
         $this->assertInstanceOf(
@@ -195,11 +197,39 @@ class BasicisTest extends TestCase
     {
         $this->assertEquals(null, $this->app->getRoute());
         
-        $this->app->get("/", function () { 
+        $this->app->get("/", function () {
             return $app->response(200);
         });
 
         $this->assertInstanceOf(Route::class, $this->app->getRoute());
     }
-    
+
+    /**
+     * Function testAuth
+     *
+     * @return void
+     */
+    public function testAuth()
+    {
+        //Setup Test, setting appKey
+        $this->app->setAppKey("test-app-key-here");
+
+        //Creating a instanceof Token and a instanceof Auth (user)
+        $tokenObj = new Token($this->app->getAppKey(), "Test Iss", "+10 minutes", "now");
+        $user = new Auth();
+
+        //Setting Auth (user) params
+        $user->setEmail("user@test.com")->setRole(5)->setPass("1234")->save();
+        //Creating a string token, with $user obj as params
+        $tokenString = $tokenObj->create($user);
+
+        //Setting this string token to a instanceof ServerRequestInterface in the Basicis App
+        //In the actual operation of the application, it must reach the same via http header in the format 'Authorization: Bearer <You-access-token-here>'
+        $this->app->setRequest($this->app->request()->withHeader("authorization", "Bearer ".$tokenString));
+        
+        //Exec tests assertions
+        $this->assertInstanceOf(Auth::class, $this->app->auth());
+        $this->assertEquals(true, $user->delete()); //delete test user
+        $this->assertEquals(null, Auth::all()); //check if all is removed
+    }
 }

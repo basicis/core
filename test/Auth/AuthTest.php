@@ -139,8 +139,4 @@ class AuthTest extends TestCase
         $user->delete();
         $this->assertEquals(null, Auth::all());
     }
-
-    
-
-
 }

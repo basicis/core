@@ -37,4 +37,21 @@ interface AuthInterface
      * @return int
      */
     public function getRole() : int;
+
+    /**
+     * Function getRoleName
+     * Get role permission Name
+     *
+     * @return string|null
+     */
+    public function getRoleName() : ?string;
+
+    /**
+     * Function checkPass
+     * Check Auth password key
+     * @param string $passKey
+     *
+     * @return bool
+     */
+    public function checkPass(string $passKey) : bool;
 }

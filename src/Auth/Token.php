@@ -72,7 +72,7 @@ class Token
      * Function __construct
      * Defining a new instance de Token
      * @return void
-     * 
+     *
      * @param AuthInterface $user
      * @param string        $appKey
      * @param string        $expiration
@@ -80,7 +80,7 @@ class Token
      */
     public function __construct(
         string $appKey,
-        string $iss = "", 
+        string $iss = "",
         string $expiration = "+30 minutes",
         string $nobefore = "now"
     ) {
@@ -90,7 +90,6 @@ class Token
         $this->nbf = (new \DateTime($nobefore))->getTimestamp();
         $this->exp = ($this->nbf + (new \DateTime($expiration))->getTimestamp()) - $this->iat;
     }
-
 
 
     /**
@@ -113,33 +112,46 @@ class Token
                 "username" => $user->getUsername(),
                 "role" => $user->getRole()
             ]
-        ); 
+        );
 
         if ($data !== null) {
             $token["dat"] = $data;
         }
-        return $this->encode($token); 
+        return $this->encode($token);
     }
 
 
-    /** 
+    /**
+     * Function extractBearer
+     * Extract Token '/[Bb]earer /i' part
+     * @param string $token
+     *
+     * @return string
+     */
+    private function extractBearer(string $token) : string
+    {
+        return preg_replace("/[Bb]earer /i", '', $token);
+    }
+
+
+    /**
      * Function check
      * Checking a token
      *
      * @param  string $token
-     * @return boolean  
+     * @return boolean
      */
     public function check(string $token)
     {
-        $tokenDecoded = $this->decode($token);
+        $tokenDecoded = $this->decode(self::extractBearer($token));
         if ($tokenDecoded) {
             return ((new \DateTime("now"))->getTimestamp() >= $tokenDecoded->nbf) && ($tokenDecoded->exp > (new \DateTime("now"))->getTimestamp()) ? true : false;
-        } 
+        }
         return false;
     }
 
 
-    /** 
+    /**
      * Function renew
      * Renew a Token, optionaly set any data type of string, array or null
      *
@@ -149,17 +161,18 @@ class Token
      * Parse about any English textual datetime description into a Unix timestamp
      * https://www.php.net/manual/en/function.strtotime
      * @param  string|array|null $data
-     * @return string|null  
+     * @return string|null
      */
     public function renew(
         string $token,
         string $expiration = "+30 minutes",
         string $nobefore = "now",
-        $data=null
+        $data = null
     ) : ?string {
 
         $this->nbf = (new \DateTime($nobefore))->getTimestamp();
         $this->exp = $this->nbf + (new \DateTime($expiration))->getTimestamp();
+        $token = self::extractBearer($token);
 
         if ($this->check($token)) {
             $tokenDecode =  $this->decode($token);
@@ -169,27 +182,27 @@ class Token
                 $tokenDecode->nbf = $this->nbf;
                 $tokenDecode->exp = $this->exp;
 
-                if (!is_null($data) ) {
+                if (!is_null($data)) {
                     $tokenDecode->dat = $data;
                 }
                 return $this->encode((array) $tokenDecode);
-            } 
+            }
         }
         return null;
     }
 
 
-    /** 
+    /**
      * Function Encode Token
      * Enconding a Token
      *
      * @param  array $token
-     * @return string  
+     * @return string
      */
     public function encode(array $token) : ?string
     {
         if (isset($token) && is_array($token)) {
-            return JWT::encode($token, $this->appKey); 
+            return JWT::encode($token, $this->appKey);
         }
         return null;
     }
@@ -204,13 +217,13 @@ class Token
      */
     public function decode(string $token) : ?object
     {
+        $token = self::extractBearer($token);
         if (isset($token) && (count(explode('.', $token)) == 3)) {
             try {
                 return JWT::decode($token, $this->appKey, array('HS256'));
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
         return null;
     }
-
 }
