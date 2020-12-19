@@ -19,7 +19,7 @@ abstract class Model implements ModelInterface
     /**
       * @ORM\Id
       * @ORM\Column(type="integer")
-      * @ORM\GeneratedValue 
+      * @ORM\GeneratedValue
       * @var int $id
       */
     protected $id;
@@ -184,17 +184,6 @@ abstract class Model implements ModelInterface
 
             try {
                 $manager->flush();
-
-                $model = self::findOneBy(["email" => $this->getEmail()]);
-                if ($model === null) {
-                    $model = self::findOneBy(["username" => $this->getUsername()]);
-                }
-
-                if ($model instanceof $modelClass) {
-
-                    //var_dump($model->getID());
-                    //return  $model;
-                }
             } catch (\Exception $e) {
             }
         }
@@ -288,7 +277,7 @@ abstract class Model implements ModelInterface
                 return null;
             }
 
-            if ($entity instanceof $entityClass) { 
+            if ($entity instanceof $entityClass) {
                 return $entity;
             }
         }
@@ -327,7 +316,7 @@ abstract class Model implements ModelInterface
     {
         $data = [];
         $props = \array_keys(\get_object_vars($this));
-        foreach ($props as  $prop) {
+        foreach ($props as $prop) {
             $method = "get".ucfirst($prop);
             if (method_exists($this, $method) && !in_array($prop, $this->protecteds)) {
                 $data[$prop] = $this->$method();
