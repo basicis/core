@@ -7,7 +7,7 @@ There is no response object as this exception is thrown when no response has bee
 Example: the target host name can not be resolved or the connection failed.  
 
 ## Implements:
-Throwable, Psr\Http\Client\ClientExceptionInterface, Psr\Http\Client\NetworkExceptionInterface
+Stringable, Throwable, Psr\Http\Client\ClientExceptionInterface, Psr\Http\Client\NetworkExceptionInterface
 
 ## Extend:
 

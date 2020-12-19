@@ -1,6 +1,9 @@
 # Basicis | Core
 
 * [Basicis\Basicis](Basicis/Basicis.md) 
+* [Basicis\Auth\Auth](Basicis/Auth/Auth.md) 
+* [Basicis\Auth\AuthInterface](Basicis/Auth/AuthInterface.md) 
+* [Basicis\Auth\Token](Basicis/Auth/Token.md) 
 * [Basicis\Core\Log](Basicis/Core/Log.md) 
 * [Basicis\Core\Validator](Basicis/Core/Validator.md) 
 * [Basicis\Core\Annotations](Basicis/Core/Annotations.md) 

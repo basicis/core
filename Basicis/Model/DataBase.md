@@ -11,9 +11,14 @@ DataBase Class
 | Name | Description |
 |------|-------------|
 |[__construct](#database__construct)|Function __construct|
-|[getManager](#databasegetmanager)|Function getManager|
-|[setDBConfig](#databasesetdbconfig)|Function setDBConfig|
-|[setORMConfig](#databasesetormconfig)|Function setORMConfig|
+|[extractUrlParams](#databaseextracturlparams)|Function extractUrlParams
+ Extract url a params to array ans return this|
+|[getManager](#databasegetmanager)|Function getManager
+Get a instance of Doctrine ORM EntityManager an return this, or null|
+|[setDBConfig](#databasesetdbconfig)|Function setDBConfig
+Set database configurations, driver, url and/or path (for sqlite)|
+|[setORMConfig](#databasesetormconfig)|Function setORMConfig
+Set database orm configurations, a array of entities paths and if is dev mode, for this, default value is true|
 
 
 
@@ -44,6 +49,34 @@ Function __construct
 <hr />
 
 
+### DataBase::extractUrlParams  
+
+**Description**
+
+```php
+public extractUrlParams (string $url)
+```
+
+Function extractUrlParams
+ Extract url a params to array ans return this 
+
+ 
+
+**Parameters**
+
+* `(string) $url`
+: Database url on format driver://user:pass@host:port/dbname  
+
+**Return Values**
+
+`array`
+
+
+
+
+<hr />
+
+
 ### DataBase::getManager  
 
 **Description**
@@ -52,7 +85,8 @@ Function __construct
 public getManager (void)
 ```
 
-Function getManager 
+Function getManager
+Get a instance of Doctrine ORM EntityManager an return this, or null 
 
  
 
@@ -75,22 +109,18 @@ Function getManager
 **Description**
 
 ```php
-public setDBConfig (string $user, string $pass, string $dbname, string $host, int $port, string $driver, string $path)
+public setDBConfig (array $options)
 ```
 
-Function setDBConfig 
+Function setDBConfig
+Set database configurations, driver, url and/or path (for sqlite) 
 
  
 
 **Parameters**
 
-* `(string) $user`
-* `(string) $pass`
-* `(string) $dbname`
-* `(string) $host`
-* `(int) $port`
-* `(string) $driver`
-* `(string) $path`
+* `(array) $options`
+: = ["driver" => null,"url" => null, "path" => null]  
 
 **Return Values**
 
@@ -110,7 +140,8 @@ Function setDBConfig
 public setORMConfig (array $entityPaths, bool $isDevMode)
 ```
 
-Function setORMConfig 
+Function setORMConfig
+Set database orm configurations, a array of entities paths and if is dev mode, for this, default value is true 
 
  
 

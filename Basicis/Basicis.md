@@ -16,6 +16,7 @@ Basicis\Http\Server\RequestHandler
 | Name | Description |
 |------|-------------|
 |[__construct](#basicis__construct)|Function __construct|
+|[auth](#basicisauth)||
 |[clientFileDownload](#basicisclientfiledownload)|Function clientFileDownload|
 |[clientFileupload](#basicisclientfileupload)|Function clientFileupload|
 |[closure](#basicisclosure)|Function closure|
@@ -23,6 +24,8 @@ Basicis\Http\Server\RequestHandler
 |[createApp](#basiciscreateapp)|Function createApp Factory|
 |[delete](#basicisdelete)|Function detete|
 |[get](#basicisget)|Function get|
+|[getAppKey](#basicisgetappkey)|Function getAppKey
+Getting hash appKey|
 |[getController](#basicisgetcontroller)|Function getController|
 |[getEnv](#basicisgetenv)|Function env|
 |[getMiddlewares](#basicisgetmiddlewares)|Function getMiddlewares|
@@ -52,6 +55,8 @@ Alias for getRequest|
 Alias for getResponse|
 |[run](#basicisrun)|Function run|
 |[setAfterMiddlewares](#basicissetaftermiddlewares)|Function setAfterMiddlewares|
+|[setAppKey](#basicissetappkey)|Function setAppKey
+Setting hash appKey|
 |[setBeforeMiddlewares](#basicissetbeforemiddlewares)|Function setBeforeMiddlewares|
 |[setControllers](#basicissetcontrollers)|Function setControllers|
 |[setMode](#basicissetmode)|Function setMode
@@ -94,6 +99,30 @@ Function __construct
 
 * `(\ServerRequestInterface) $request`
 * `(array) $options`
+
+**Return Values**
+
+`void`
+
+
+<hr />
+
+
+### Basicis::auth  
+
+**Description**
+
+```php
+ auth (void)
+```
+
+ 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
 
 **Return Values**
 
@@ -284,6 +313,33 @@ Function get
 **Return Values**
 
 `void`
+
+
+
+
+<hr />
+
+
+### Basicis::getAppKey  
+
+**Description**
+
+```php
+public getAppKey (void)
+```
+
+Function getAppKey
+Getting hash appKey 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`string`
 
 
 
@@ -593,7 +649,7 @@ Function json
 **Description**
 
 ```php
-public static loadEnv (string $name)
+public static loadEnv (void)
 ```
 
 Function env 
@@ -602,11 +658,11 @@ Function env
 
 **Parameters**
 
-* `(string) $name`
+`This function has no parameters.`
 
 **Return Values**
 
-`void`
+`bool`
 
 
 
@@ -645,7 +701,7 @@ Function logger
 **Description**
 
 ```php
-public static output (string $resourceFileName, \ServerRequestInterface $request, \ResponseInterface $response)
+public static output (\ServerRequestInterface $request, \ResponseInterface $response, string $resourceFileName)
 ```
 
 Function output
@@ -655,9 +711,9 @@ Open a Stream Resource in Recording mode and write a text in it, sending headers
 
 **Parameters**
 
-* `(string) $resourceFileName`
 * `(\ServerRequestInterface) $request`
 * `(\ResponseInterface) $response`
+* `(string) $resourceFileName`
 
 **Return Values**
 
@@ -880,6 +936,33 @@ Function setAfterMiddlewares
 **Return Values**
 
 `void`
+
+
+
+
+<hr />
+
+
+### Basicis::setAppKey  
+
+**Description**
+
+```php
+public setAppKey (string $appKey)
+```
+
+Function setAppKey
+Setting hash appKey 
+
+ 
+
+**Parameters**
+
+* `(string) $appKey`
+
+**Return Values**
+
+`\Basicis`
 
 
 

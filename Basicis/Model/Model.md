@@ -5,7 +5,7 @@ Model class
  @ORM\MappedSuperclass  
 
 ## Implements:
-Basicis\Model\ModelInterface
+Basicis\Model\ModelInterface, Stringable
 
 
 
@@ -13,18 +13,33 @@ Basicis\Model\ModelInterface
 
 | Name | Description |
 |------|-------------|
-|[__construct](#model__construct)|Function __construct|
-|[all](#modelall)|Function all|
-|[delete](#modeldelete)|Function delete|
-|[find](#modelfind)|Function find|
-|[findBy](#modelfindby)|Function findBy|
-|[findOneBy](#modelfindoneby)|Function findOneBy|
-|[getCreated](#modelgetcreated)|Function getCreated|
-|[getManager](#modelgetmanager)|Function getManager|
+|[__construct](#model__construct)|Function function|
+|[__toArray](#model__toarray)|Function __toArray
+Get Entity Data as Array, without the propreties defined in the array property $protecteds|
+|[__toString](#model__tostring)|Function __toString
+Get Entity Data as Json, without the propreties defined in the array property $protecteds|
+|[all](#modelall)|Function all
+Find all entities|
+|[delete](#modeldelete)|Function delete
+Remove data of this entity of database|
+|[find](#modelfind)|Function find
+Find a entity by id|
+|[findBy](#modelfindby)|Function findBy
+Find all entities by any column match|
+|[findOneBy](#modelfindoneby)|Function findOneBy
+Find a entity by any column match|
+|[getCreated](#modelgetcreated)|Function getCreated
+Return entity created timestamp|
+|[getId](#modelgetid)|Function getId
+Return entity ID (unique on system identification)|
+|[getManager](#modelgetmanager)|Function getManager
+Get a instance of Doctrine ORM EntityManager an return this, or null|
 |[getUpdated](#modelgetupdated)|Get updated.|
-|[save](#modelsave)|Function save|
+|[save](#modelsave)|Function save
+Save data of this entity to database, use for create or update entities|
 |[setCreated](#modelsetcreated)|Function setCreated.|
-|[setUpdated](#modelsetupdated)|Function setUpdated|
+|[setUpdated](#modelsetupdated)|Function setUpdated
+Return entity updated timestamp|
 
 
 
@@ -34,10 +49,35 @@ Basicis\Model\ModelInterface
 **Description**
 
 ```php
-public __construct (void)
+public __construct (array|int|null $data)
 ```
 
-Function __construct 
+Function function 
+
+ 
+
+**Parameters**
+
+* `(array|int|null) $data`
+
+**Return Values**
+
+`void`
+
+
+<hr />
+
+
+### Model::__toArray  
+
+**Description**
+
+```php
+public __toArray (void)
+```
+
+Function __toArray
+Get Entity Data as Array, without the propreties defined in the array property $protecteds 
 
  
 
@@ -47,7 +87,34 @@ Function __construct
 
 **Return Values**
 
-`void`
+`array`
+
+
+
+
+<hr />
+
+
+### Model::__toString  
+
+**Description**
+
+```php
+public __toString (void)
+```
+
+Function __toString
+Get Entity Data as Json, without the propreties defined in the array property $protecteds 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`string`
 
 
 
@@ -63,7 +130,8 @@ Function __construct
 public static all (void)
 ```
 
-Function all 
+Function all
+Find all entities 
 
  
 
@@ -89,7 +157,8 @@ Function all
 public delete (void)
 ```
 
-Function delete 
+Function delete
+Remove data of this entity of database 
 
  
 
@@ -115,7 +184,8 @@ Function delete
 public static find (array $id)
 ```
 
-Function find 
+Function find
+Find a entity by id 
 
  
 
@@ -141,7 +211,8 @@ Function find
 public static findBy (array $findBy)
 ```
 
-Function findBy 
+Function findBy
+Find all entities by any column match 
 
  
 
@@ -151,7 +222,7 @@ Function findBy
 
 **Return Values**
 
-`\Model|null`
+`array|\Model[]|null`
 
 
 
@@ -167,7 +238,8 @@ Function findBy
 public static findOneBy (array $findOneBy)
 ```
 
-Function findOneBy 
+Function findOneBy
+Find a entity by any column match 
 
  
 
@@ -193,7 +265,8 @@ Function findOneBy
 public getCreated (void)
 ```
 
-Function getCreated 
+Function getCreated
+Return entity created timestamp 
 
  
 
@@ -211,6 +284,33 @@ Function getCreated
 <hr />
 
 
+### Model::getId  
+
+**Description**
+
+```php
+public getId (void)
+```
+
+Function getId
+Return entity ID (unique on system identification) 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`int|null`
+
+
+
+
+<hr />
+
+
 ### Model::getManager  
 
 **Description**
@@ -219,7 +319,8 @@ Function getCreated
 public static getManager (string $class)
 ```
 
-Function getManager 
+Function getManager
+Get a instance of Doctrine ORM EntityManager an return this, or null 
 
  
 
@@ -271,7 +372,8 @@ Get updated.
 public save (void)
 ```
 
-Function save 
+Function save
+Save data of this entity to database, use for create or update entities 
 
  
 
@@ -281,7 +383,7 @@ Function save
 
 **Return Values**
 
-`bool`
+`\Model`
 
 
 
@@ -299,7 +401,7 @@ public setCreated (string $created)
 
 Function setCreated. 
 
- 
+Set entity creation timestamp 
 
 **Parameters**
 
@@ -323,7 +425,8 @@ Function setCreated.
 public setUpdated (string $updated)
 ```
 
-Function setUpdated 
+Function setUpdated
+Return entity updated timestamp 
 
  
 

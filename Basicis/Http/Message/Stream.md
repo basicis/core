@@ -8,7 +8,7 @@ a wrapper around the most common operations, including serialization of
 the entire stream to a string.  
 
 ## Implements:
-Psr\Http\Message\StreamInterface
+Psr\Http\Message\StreamInterface, Stringable
 
 
 

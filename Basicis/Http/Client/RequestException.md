@@ -8,7 +8,7 @@ Examples:
 - Runtime request errors (e.g. the body stream is not seekable)  
 
 ## Implements:
-Throwable, Psr\Http\Client\ClientExceptionInterface, Psr\Http\Client\RequestExceptionInterface
+Stringable, Throwable, Psr\Http\Client\ClientExceptionInterface, Psr\Http\Client\RequestExceptionInterface
 
 ## Extend:
 

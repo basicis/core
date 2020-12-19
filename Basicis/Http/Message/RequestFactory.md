@@ -38,8 +38,9 @@ Create a new request.
 : The HTTP method associated with the request.  
 * `(\UriInterface|string) $uri`
 : The URI associated with the request. If  
-the value is a string, the factory MUST create a UriInterface  
-instance based on it.  
+the value is a string, the factory MUST  
+create a UriInterface instance based on  
+it.  
 
 **Return Values**
 
@@ -70,8 +71,9 @@ Create a new request.
 : The HTTP method associated with the request.  
 * `(\UriInterface|string) $uri`
 : The URI associated with the request. If  
-the value is a string, the factory MUST create a UriInterface  
-instance based on it.  
+the value is a string, the factory MUST  
+create a UriInterface instance based on  
+it.  
 
 **Return Values**
 

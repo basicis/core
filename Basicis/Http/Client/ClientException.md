@@ -6,7 +6,7 @@ Every HTTP client related exception MUST implement this interface.
 - ClientException extends Basicis\Core\Exception  
 
 ## Implements:
-Throwable, Psr\Http\Client\ClientExceptionInterface
+Stringable, Throwable, Psr\Http\Client\ClientExceptionInterface
 
 ## Extend:
 

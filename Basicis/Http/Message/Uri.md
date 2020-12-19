@@ -3,7 +3,7 @@
 Uri class
 
 ## Implements:
-Psr\Http\Message\UriInterface
+Psr\Http\Message\UriInterface, Stringable
 
 
 
