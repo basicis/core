@@ -39,23 +39,6 @@ use \Mimey\MimeTypes;
  */
 class Basicis extends RequestHandler
 {
-    
-    /**
-     * const DEFAULT_ENV = [
-     *   "APP_ENV" => "dev",
-     *   "APP_TIMEZONE" =>  "America/Recife",
-     *   "APP_PATH" => null
-     *  ];
-     *
-     * Default app enviroments variables values
-     */
-    const DEFAULT_ENV = [
-        "APP_ENV" => "dev",
-        "APP_TIMEZONE" =>  "America/Recife",
-        "APP_PATH" => null
-    ];
-
-
     /**
      * $appKey variable
      *
@@ -68,21 +51,14 @@ class Basicis extends RequestHandler
      *
      * @var String
      */
-    private $mode = self::DEFAULT_ENV["APP_ENV"];
+    private $mode = "dev";
 
     /**
      * $timezone variable
      *
      * @var String
      */
-    private $timezone = self::DEFAULT_ENV["APP_TIMEZONE"];
-
-    /**
-     * $path variable
-     *
-     * @var String
-     */
-    private static $path = self::DEFAULT_ENV["APP_PATH"];
+    private $timezone = "America/Recife";
 
     /**
      * $router variable
@@ -97,6 +73,9 @@ class Basicis extends RequestHandler
      * @var Route
      */
     private $route;
+
+
+    private $appDescription;
 
     /**
      * $request variable
@@ -162,6 +141,8 @@ class Basicis extends RequestHandler
     {
         $this->setMode($options['mode'] ?? 'dev');
         $this->setTimezone($options['timezone'] ?? 'America/Recife');
+        $this->setAppKey($options['appKey'] ?? null);
+        $this->setAppDescription($options['appDescription'] ?? null);
         $this->setRequest($request);
         $this->response = (ResponseFactory::create())->withHeader(
             "X-Powered-By",
@@ -266,16 +247,10 @@ class Basicis extends RequestHandler
 
 
     /**
-     * Undocumented function
+     * Function filterMiddlewares
      *
      * @param array   $middlewares
-     * @param boolean $requireKey  = false
-     *                             If A
-     *                             middleware
-     *                             key
-     *                             must be
-     *                             defined
-     *
+     * @param boolean $requireKey  = falseIf A middleware key must be defined
      * @return array
      */
     private function filterMiddlewares(array $middlewares = [], $requireKey = false) : array
@@ -292,7 +267,7 @@ class Basicis extends RequestHandler
 
     /**
      * Function setMiddlewares
-     *
+     * Setting route middlewares
      * @param array $middlewares
      *
      * @return void
@@ -310,7 +285,7 @@ class Basicis extends RequestHandler
 
     /**
      * Function setBeforeMiddlewares
-     *
+     * Setting before middlewares
      * @param array $middlewares
      *
      * @return void
@@ -328,7 +303,7 @@ class Basicis extends RequestHandler
 
     /**
      * Function setAfterMiddlewares
-     *
+     * Setting after middlewares
      * @param array $middlewares
      *
      * @return void
@@ -363,7 +338,7 @@ class Basicis extends RequestHandler
 
     /**
      * Function getMiddlewares
-     *
+     * Getting middlewares by type ['before'|'route'|'after'|null to all]
      * @param string $type ['before'|'route'|'after'|null]
      * Return an arra with especified middlewares type or all if no is especified the $type argument
      *
@@ -429,15 +404,25 @@ class Basicis extends RequestHandler
     // To-do remove
     public static function loadEnv() : bool
     {
-        try {
-            $env = Dotenv::createImmutable(self::path());
-            $env->load();
+        $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+        $testEnv = self::path().'.env.test';
+        $localEnv = self::path().'.env.local';
+        $defaultEnv = self::path().'.env';
+
+        if (file_exists($defaultEnv)) {
+            $dotenv->load($defaultEnv);
             return true;
-        } catch (\Exception $e) {
-            return false;
+        } elseif (file_exists($localEnv)) {
+            $dotenv->load($localEnv);
+            return true;
+        } elseif (file_exists($testEnv)) {
+            $dotenv->load($testEnv);
+            return true;
         }
+        return false;
     }
 
+    
      /**
       * Function env
       *
@@ -469,6 +454,40 @@ class Basicis extends RequestHandler
     {
         return Validator::validate($data, $validations, $class);
     }
+
+
+    /**
+     * Function setAppDescription
+     * Setting App description string
+     *
+     * @param string $mode = ["dev"|"production"|"prod"|null]
+     *                     Default value "dev" == Development Mode
+     *
+     * @return Basicis
+     */
+    public function setAppDescription(string $description = null) : Basicis
+    {
+        if ($description === null) {
+            $this->appDescription = "A Basicis Framework Project!";
+            return $this;
+        }
+        $this->appDescription = $description;
+        return $this;
+    }
+
+
+
+    /**
+     * Function getAppDescription
+     * Getting App description string
+     *
+     * @return String
+     */
+    public function getAppDescription() : String
+    {
+        return $this->appDescription;
+    }
+
 
 
     /**
@@ -534,9 +553,15 @@ class Basicis extends RequestHandler
      */
     public function setAppKey(string $appKey = null) : Basicis
     {
-        if ($appKey !== null) {
-            $this->appKey = $appKey;
+        if ($appKey === null) {
+            $hash = "";
+            if (file_exists(self::path()."composer.lock")) {
+                $hash = ((array) json_decode(self::input(self::path()."composer.lock")))["content-hash"];
+                $this->appKey = "default-appkey". $hash;
+            }
+            return $this;
         }
+        $this->appKey = $appKey;
         return $this;
     }
 

@@ -9,6 +9,16 @@ use \Doctrine\ORM\EntityManager;
  */
 class DataBase
 {
+
+    /**
+     * const DEFAULT_DB_PORTS = [
+     *   "pdo_mysql" => 3306
+     *  ];
+     */
+    const DEFAULT_DB_PORTS = [
+        "pdo_mysql" => 3306
+    ];
+
     /**
      * @var array $config
      */
@@ -37,7 +47,6 @@ class DataBase
         );
     }
 
-
     private function isPath(string $path)
     {
         return preg_match(
@@ -59,20 +68,21 @@ class DataBase
         $dbParams['driver'] = explode("://", $url)[0];
         $url = explode("://", $url)[1];
 
-        $dbParams['user'] = explode(":", explode($url, "@")[0])[0];
-        $dbParams['pass'] = explode(":", explode($url, "@")[0])[1];
+        $dbParams['user'] = explode(":", explode("@", $url)[0])[0];
+        if (count(explode(":", explode("@", $url)[0])) === 2) {
+            $dbParams['password'] = explode(":", explode("@", $url)[0])[1];
+        }
         $url = explode("@", $url)[1];
 
-        if (count(explode(":", $url)) === 1) {
-            $dbParams['host'] = explode("/", $url);
-        } 
-
-        if (count(explode(":", $url)) === 2) {
-            $dbParams['host'] = explode(":", explode("/", $url)[0]);
-            $dbParams['port'] = (int) explode(":", explode("/", $url)[0]);
-        } 
-
-        $dbParams['dbname'] = explode("/", $url)[1];
+        $dbParams['host'] = explode(":", explode("/", $url)[0])[0];
+        if (count(explode(":", explode("/", $url)[0])) === 2) {
+            $dbParams['port'] = explode(":", explode("/", $url)[0])[1];
+        } else {
+            $dbParams['port'] = self::DEFAULT_DB_PORTS[$dbParams['driver']];
+        }
+        $url = explode("/", $url)[1];
+    
+        $dbParams['dbname'] = $url;
         return $dbParams;
     }
 
@@ -92,10 +102,13 @@ class DataBase
 
         if (isset($options['url']) && $this->isUrl($options['url'])) {
             $this->config['db'] = array_merge($this->config['db'], $this->extractUrlParams($options['url']));
+            //To-do review
+            //$this->config["db"]['driver'] = $this->extractUrlParams($options['url'])['driver'];
+            //$this->config['db']['url'] = $options['url'];
         }
         
-        if (isset($options['path']) && 
-            $this->isPath($options['path']) && 
+        if (isset($options['path']) &&
+            $this->isPath($options['path']) &&
             ($this->config["db"]['driver'] === "pdo_sqlite")
         ) {
             $this->config['db']['path'] = $options['path'];
@@ -106,7 +119,8 @@ class DataBase
 
     /**
      * Function setORMConfig
-     * Set database orm configurations, a array of entities paths and if is dev mode, for this, default value is true 
+     * Set database orm configurations, a array of entities paths and if is dev mode,
+     * for this, default value is true
      * @param array $entityPaths
      * @param bool $isDevMode
      * @return void
@@ -125,6 +139,8 @@ class DataBase
         );
         return $this;
     }
+
+
 
     /**
      * Function getManager

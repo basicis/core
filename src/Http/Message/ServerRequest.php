@@ -97,7 +97,6 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function __construct($uri = "/", string $method = 'GET', array $serverParams = [])
     {
         parent::__construct($uri, $method);
-        //$this->withQueryParams($serverParams);
     }
 
     /**
