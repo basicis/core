@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Basicis\Model\ModelInteface;
 use Basicis\Model\DataBase;
 use Basicis\Basicis as App;
-use Doctrine\DBAL\Exception\TableNotFoundException;
 
 /**
  *  Model class
@@ -180,11 +179,18 @@ abstract class Model implements ModelInterface
         $modelClass = get_called_class();
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
-            $manager->persist($this);
-
             try {
+                $manager->persist($this);
                 $manager->flush();
             } catch (\Exception $e) {
+                throw new \Exception(
+                    sprintf(
+                        "%s\nMessage: %s\nCode: %s",
+                        "Database connection error on save $modelClass!",
+                        $e->getMessage(),
+                        $e->getCode()
+                    )
+                );
             }
         }
         return $this;
@@ -205,6 +211,14 @@ abstract class Model implements ModelInterface
                 $manager->flush();
                 return true;
             } catch (\Exception $e) {
+                throw new \Exception(
+                    sprintf(
+                        "%s\nMessage: %s\nCode: %s",
+                        "Database connection error on delete ".get_called_class()."!",
+                        $e->getMessage(),
+                        $e->getCode()
+                    )
+                );
                 return false;
             }
         }
@@ -225,6 +239,14 @@ abstract class Model implements ModelInterface
             try {
                 $entities = $manager->getRepository(get_called_class())->findBy($findBy);
             } catch (\Exception $e) {
+                throw new \Exception(
+                    sprintf(
+                        "%s\nMessage: %s\nCode: %s",
+                        "Database connection error on search ".get_called_class()."!",
+                        $e->getMessage(),
+                        $e->getCode()
+                    )
+                );
                 return null;
             }
             if (is_array($entities) && (count($entities) > 0)) {
@@ -249,6 +271,14 @@ abstract class Model implements ModelInterface
             try {
                 $entity = $manager->getRepository($entityClass)->findOneBy($findOneBy);
             } catch (\Exception $e) {
+                throw new \Exception(
+                    sprintf(
+                        "%s\nMessage: %s\nCode: %s",
+                        "Database connection error on search ".get_called_class()."!",
+                        $e->getMessage(),
+                        $e->getCode()
+                    )
+                );
                 return null;
             }
 
@@ -274,6 +304,14 @@ abstract class Model implements ModelInterface
             try {
                 $entity = $manager->find($entityClass, $id);
             } catch (\Exception $e) {
+                throw new \Exception(
+                    sprintf(
+                        "%s\nMessage: %s\nCode: %s",
+                        "Database connection error on search ".get_called_class()."!",
+                        $e->getMessage(),
+                        $e->getCode()
+                    )
+                );
                 return null;
             }
 
@@ -297,6 +335,14 @@ abstract class Model implements ModelInterface
             try {
                 $entities = $manager->getRepository(\get_called_class())->findAll();
             } catch (\Exception $e) {
+                throw new \Exception(
+                    sprintf(
+                        "%s\nMessage: %s\nCode: %s",
+                        "Database connection error on search ".get_called_class()."!",
+                        $e->getMessage(),
+                        $e->getCode()
+                    )
+                );
                 return null;
             }
             if (is_array($entities) && (count($entities) > 0)) {
