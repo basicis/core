@@ -1,7 +1,6 @@
-name: Basicis | Core - Generate and Deploy Documentation
+name: Generate and Deploy Documentation
 on:
-  check_suite:
-    types: [completed]
+  pull_request:
     branchs: 
       - [master]
 jobs: 
@@ -13,6 +12,14 @@ jobs:
 
       - name: Composer 🔧
         uses: php-actions/composer@v1
+
+      - name: Wait on tests
+        uses: lewagon/wait-on-check-action@master
+        with:
+          ref: master
+          check-name: test
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 2   
 
       - name: Run Documentation Build 🛠️
         run: |
