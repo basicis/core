@@ -27,38 +27,78 @@ class DataBase
         }
     }
 
+
+
+    private function isUrl(string $url)
+    {
+        return preg_match(
+            "/[a-z_]\:\/\/[a-zA-Z0-9.:][a-zA-Z0-9.@][a-zA-Z0-9.:0-9\/a-zA-Z0-9.]/",
+            $url
+        );
+    }
+
+
+    private function isPath(string $path)
+    {
+        return preg_match(
+            "/[a-zA-Z0-9\/]\.[a-z0-9]/",
+            $path
+        );
+    }
+
+
+    /**
+     *  Function extractUrlParams
+     *  Extract url a params to array ans return this
+     * @param string $url Database url on format driver://user:pass@host:port/dbname
+     * @return array
+     */
+    public function extractUrlParams(string $url) : array
+    {
+        $dbParams = [];
+        $dbParams['driver'] = explode("://", $url)[0];
+        $url = explode("://", $url)[1];
+
+        $dbParams['user'] = explode(":", explode($url, "@")[0])[0];
+        $dbParams['pass'] = explode(":", explode($url, "@")[0])[1];
+        $url = explode("@", $url)[1];
+
+        if (count(explode(":", $url)) === 1) {
+            $dbParams['host'] = explode("/", $url);
+        } 
+
+        if (count(explode(":", $url)) === 2) {
+            $dbParams['host'] = explode(":", explode("/", $url)[0]);
+            $dbParams['port'] = (int) explode(":", explode("/", $url)[0]);
+        } 
+
+        $dbParams['dbname'] = explode("/", $url)[1];
+        return $dbParams;
+    }
+
+
+
     /**
      * Function setDBConfig
-     *
-     * @param string $user
-     * @param string $pass
-     * @param string $dbname
-     * @param string $host
-     * @param int $port
-     * @param string $driver
-     * @param string $path
+     * Set database configurations, driver, url and/or path (for sqlite)
+     * @param array $options = ["driver" => null,"url" => null, "path" => null]
      * @return void
      */
-    public function setDBConfig(
-        string $user,
-        string $pass,
-        string $dbname,
-        string $host = "localhost",
-        int $port = 3306,
-        string $driver = "pdo_mysql",
-        string $path = ""
-    ) {
+    public function setDBConfig(array $options = ["driver" => null,"url" => null, "path" => null])
+    {
         $this->config["db"] = [
-            'driver' => $driver,
-            'host' => $host ,
-            'port' => $port,
-            'user'     => $user,
-            'password' => $pass,
-            'dbname'   => $dbname,
+            'driver' => $options['driver'] ?? "pdo_sqlite",
         ];
 
-        if ($driver === 'sqlite') {
-            $this->config["db"]['path'] = $path;
+        if (isset($options['url']) && $this->isUrl($options['url'])) {
+            $this->config['db'] = array_merge($this->config['db'], $this->extractUrlParams($options['url']));
+        }
+        
+        if (isset($options['path']) && 
+            $this->isPath($options['path']) && 
+            ($this->config["db"]['driver'] === "pdo_sqlite")
+        ) {
+            $this->config['db']['path'] = $options['path'];
         }
         return $this;
     }
@@ -66,6 +106,7 @@ class DataBase
 
     /**
      * Function setORMConfig
+     * Set database orm configurations, a array of entities paths and if is dev mode, for this, default value is true 
      * @param array $entityPaths
      * @param bool $isDevMode
      * @return void
@@ -87,7 +128,7 @@ class DataBase
 
     /**
      * Function getManager
-     *
+     * Get a instance of Doctrine ORM EntityManager an return this, or null
      * @return EntityManager|null
      */
     public function getManager() : ?EntityManager

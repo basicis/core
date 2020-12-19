@@ -6,6 +6,7 @@ use Basicis\Exceptions\BasicisException;
 
 /**
  *  CacheException class for all exceptions thrown by an Implementing Cache.
+ *
  * @category Basicis/Cache
  * @package  Basicis/Cache
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>

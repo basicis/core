@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Basicis\Model\ModelInteface;
 use Basicis\Model\DataBase;
 use Basicis\Basicis as App;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 
 /**
  *  Model class
@@ -18,7 +19,7 @@ abstract class Model implements ModelInterface
     /**
       * @ORM\Id
       * @ORM\Column(type="integer")
-      * @ORM\GeneratedValue
+      * @ORM\GeneratedValue 
       * @var int $id
       */
     protected $id;
@@ -37,12 +38,20 @@ abstract class Model implements ModelInterface
      * */
     protected $updated;
 
-
     /**
-     * Function __construct
+     * $protecteds variable
      *
-     * @return void
+     * @var array
      */
+    protected $protecteds = [];
+
+
+
+     /**
+      * Function function
+      *
+      * @param array|int|null $data
+      */
     public function __construct($data = null)
     {
         if (($data !== null) && is_array($data)) {
@@ -69,8 +78,20 @@ abstract class Model implements ModelInterface
 
 
     /**
+     * Function getId
+     * Return entity ID (unique on system identification)
+     * @return int|null
+     */
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+
+
+
+    /**
      * Function setCreated.
-     *
+     * Set entity creation timestamp
      * @param string $created
      *
      * @return Model
@@ -88,7 +109,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function getCreated
-     *
+     * Return entity created timestamp
      * @return \DateTime
      */
     public function getCreated() : \DateTime
@@ -99,7 +120,7 @@ abstract class Model implements ModelInterface
 
     /**
      * Function setUpdated
-     *
+     * Return entity updated timestamp
      * @param string $updated
      *
      * @return User
@@ -128,117 +149,203 @@ abstract class Model implements ModelInterface
 
     /**
      * Function getManager
-     *
+     * Get a instance of Doctrine ORM EntityManager an return this, or null
      * @param string $class
      * @return  EntityManager|null
      */
     public static function getManager() : ?EntityManager
     {
-        $dataBase = new DataBase();
-        $dataBase->setORMConfig(
-            [
-                App::path()."src/",
-                App::path()."src/models/",
-                App::path()."src/model/"
-            ],
-            App::getEnv("APP_ENV") ?? true
-        )->setDBConfig(
-            App::getEnv("DB_USER") ?? 'basicis',
-            App::getEnv("DB_PASS") ?? 'basicis',
-            App::getEnv("DB_NAME") ?? 'basicis',
-            App::getEnv("DB_HOST") ?? 'localhost',
-            (int) App::getEnv("DB_PORT") ?? 3306,
-            App::getEnv("DB_DRIVER") ?? "pdo_mysql",
-            App::getEnv("DB_PATH") ?? null //For sqlite
-        );
-        
-
-        return $dataBase->getManager();
+        //To-do change in te future :) by: McGiver Developers
+        if (file_exists(App::path()."config/db-config.php")) {
+            //Include doctrine db-config
+            $dataBase = require App::path()."config/db-config.php";
+            if ($dataBase instanceof DataBase) {
+                $entityManager = $dataBase->getManager();
+                if ($entityManager instanceof EntityManager) {
+                    return $entityManager;
+                }
+            }
+        }
+        return null;
     }
     
 
     /**
      * Function save
-     *
-     * @return Bool
+     * Save data of this entity to database, use for create or update entities
+     * @return Model
      */
-    public function save() : Bool
+    public function save() : Model
     {
+        $modelClass = get_called_class();
         $manager = self::getManager();
-        $manager->persist($this);
+        if ($manager instanceof EntityManager) {
+            $manager->persist($this);
 
-        try {
-            $manager->flush();
-        } catch (Exception $e) {
-            return false;
+            try {
+                $manager->flush();
+
+                $model = self::findOneBy(["email" => $this->getEmail()]);
+                if ($model === null) {
+                    $model = self::findOneBy(["username" => $this->getUsername()]);
+                }
+
+                if ($model instanceof $modelClass) {
+
+                    //var_dump($model->getID());
+                    //return  $model;
+                }
+            } catch (\Exception $e) {
+            }
         }
-
-        return true;
+        return $this;
     }
 
 
     /**
      * Function delete
-     *
+     * Remove data of this entity of database
      * @return Bool
      */
     public function delete() : Bool
     {
         $manager = self::getManager();
-        try {
-            $manager->remove($this);
-            $manager->flush();
-        } catch (Exception $e) {
-            return false;
+        if ($manager instanceof EntityManager) {
+            try {
+                $manager->remove($manager->merge($this));
+                $manager->flush();
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
         }
-
-        return true;
+        return false;
     }
 
 
     /**
      * Function findBy
-     *
+     * Find all entities by any column match
      * @param array $findBy
-     * @return Model|null
+     * @return Array|Model[]|null
      */
-    public static function findBy(array $findBy = []) : ?Model
+    public static function findBy(array $findBy = []) : ?Array
     {
-        return self::getManager()->getRepository(get_called_class())->findBy($findBy);
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            try {
+                $entities = $manager->getRepository(get_called_class())->findBy($findBy);
+            } catch (\Exception $e) {
+                return null;
+            }
+            if (is_array($entities) && (count($entities) > 0)) {
+                return $entities;
+            }
+        }
+        return null;
     }
 
 
     /**
      * Function findOneBy
-     *
+     * Find a entity by any column match
      * @param array $findOneBy
      * @return Model|null
      */
-    public static function findOneBy(array $findOneBy = []) :? Model
+    public static function findOneBy(array $findOneBy = []) : ?Model
     {
-        return self::getManager()->getRepository(get_called_class())->findOneBy($findOneBy);
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            $entityClass = get_called_class();
+            try {
+                $entity = $manager->getRepository($entityClass)->findOneBy($findOneBy);
+            } catch (\Exception $e) {
+                return null;
+            }
+
+            if ($entity instanceof $entityClass) {
+                return $entity;
+            }
+        }
+        return null;
     }
 
 
     /**
      * Function find
-     *
+     * Find a entity by id
      * @param array $id
      * @return Model|null
      */
     public static function find(int $id) : ?Model
     {
-        return self::getManager()->find(get_called_class(), $id);
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            $entityClass = get_called_class();
+            try {
+                $entity = $manager->find($entityClass, $id);
+            } catch (\Exception $e) {
+                return null;
+            }
+
+            if ($entity instanceof $entityClass) { 
+                return $entity;
+            }
+        }
+        return null;
     }
 
 
     /**
      * Function all
-     *
+     * Find all entities
      * @return array|null
      */
     public static function all() : ?array
     {
-        return self::getManager()->getRepository(get_called_class())->findAll();
+        $manager = self::getManager();
+        if ($manager instanceof EntityManager) {
+            try {
+                $entities = $manager->getRepository(\get_called_class())->findAll();
+            } catch (\Exception $e) {
+                return null;
+            }
+            if (is_array($entities) && (count($entities) > 0)) {
+                return $entities;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Function __toArray
+     * Get Entity Data as Array, without the propreties defined in the array property $protecteds
+     * @return array
+     */
+    public function __toArray() : array
+    {
+        $data = [];
+        $props = \array_keys(\get_object_vars($this));
+        foreach ($props as  $prop) {
+            $method = "get".ucfirst($prop);
+            if (method_exists($this, $method) && !in_array($prop, $this->protecteds)) {
+                $data[$prop] = $this->$method();
+                if ($prop instanceof Model) {
+                    $data[$prop] = $this->$prop->__toArray();
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Function __toString
+     * Get Entity Data as Json, without the propreties defined in the array property $protecteds
+     * @return String
+     */
+    public function __toString() : String
+    {
+        return json_encode($this->__toArray());
     }
 }

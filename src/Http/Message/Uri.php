@@ -155,7 +155,7 @@ class Uri implements UriInterface
      * The trailing ":" character is not part of the scheme and MUST NOT be
      * added.
      *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.1
+     * @see    https://tools.ietf.org/html/rfc3986#section-3.1
      * @return string The URI scheme.
      */
     public function getScheme() : string
@@ -175,7 +175,7 @@ class Uri implements UriInterface
      * If the port component is not set or is the standard port for the current
      * scheme, it SHOULD NOT be included.
      *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.2
+     * @see    https://tools.ietf.org/html/rfc3986#section-3.2
      * @return string The URI authority, in "[user-info@]host[:port]" format.
      */
     public function getAuthority() : string
@@ -211,7 +211,7 @@ class Uri implements UriInterface
      * The value returned MUST be normalized to lowercase, per RFC 3986
      * Section 3.2.2.
      *
-     * @see http://tools.ietf.org/html/rfc3986#section-3.2.2
+     * @see    http://tools.ietf.org/html/rfc3986#section-3.2.2
      * @return string The URI host.
      */
     public function getHost() : string
@@ -255,8 +255,8 @@ class Uri implements UriInterface
      * delimiter between path segments, that value MUST be passed in encoded
      * form (e.g., "%2F") to the instance.
      *
-     * @see https://tools.ietf.org/html/rfc3986#section-2
-     * @see https://tools.ietf.org/html/rfc3986#section-3.3
+     * @see    https://tools.ietf.org/html/rfc3986#section-2
+     * @see    https://tools.ietf.org/html/rfc3986#section-3.3
      * @return string The URI path.
      */
     public function getPath() : string
@@ -277,8 +277,8 @@ class Uri implements UriInterface
      * include an ampersand ("&") not intended as a delimiter between values,
      * that value MUST be passed in encoded form (e.g., "%26") to the instance.
      *
-     * @see https://tools.ietf.org/html/rfc3986#section-2
-     * @see https://tools.ietf.org/html/rfc3986#section-3.4
+     * @see    https://tools.ietf.org/html/rfc3986#section-2
+     * @see    https://tools.ietf.org/html/rfc3986#section-3.4
      * @return string The URI query string.
      */
     public function getQuery() : string
@@ -300,8 +300,8 @@ class Uri implements UriInterface
      * any characters. To determine what characters to encode, please refer to
      * RFC 3986, Sections 2 and 3.5.
      *
-     * @see https://tools.ietf.org/html/rfc3986#section-2
-     * @see https://tools.ietf.org/html/rfc3986#section-3.5
+     * @see    https://tools.ietf.org/html/rfc3986#section-2
+     * @see    https://tools.ietf.org/html/rfc3986#section-3.5
      * @return string The URI fragment.
      */
     public function getFragment() : string
@@ -318,7 +318,7 @@ class Uri implements UriInterface
      * insensitively, and MAY accommodate other schemes if required.
      * An empty scheme is equivalent to removing the scheme.
      *
-     * @param string $scheme The scheme to use with the new instance.
+     * @param  string $scheme The scheme to use with the new instance.
      * @return static A new instance with the specified scheme.
      * @throws InvalidArgumentException for invalid or unsupported schemes.
      */
@@ -341,8 +341,8 @@ class Uri implements UriInterface
      * user; an empty string for the user is equivalent to removing user
      * information.
      *
-     * @param string $user The user name to use for authority.
-     * @param null|string $password The password associated with $user.
+     * @param  string      $user     The user name to use for authority.
+     * @param  null|string $password The password associated with $user.
      * @return static A new instance with the specified user information.
      */
     public function withUserInfo($user, $password = null) : Uri
@@ -359,7 +359,7 @@ class Uri implements UriInterface
      * an instance that contains the specified host.
      * An empty host value is equivalent to removing the host.
      *
-     * @param string $host The hostname to use with the new instance.
+     * @param  string $host The hostname to use with the new instance.
      * @return static A new instance with the specified host.
      * @throws InvalidArgumentException for invalid hostnames.
      */
@@ -385,8 +385,8 @@ class Uri implements UriInterface
      * A null value provided for the port is equivalent to removing the port
      * information.
      *
-     * @param null|int $port The port to use with the new instance; a null value
-     *     removes the port information.
+     * @param  null|int $port The port to use with the new instance; a null value
+     *                        removes the port information.
      * @return static A new instance with the specified port.
      * @throws InvalidArgumentException for invalid ports.
      */
@@ -416,7 +416,7 @@ class Uri implements UriInterface
      * Users can provide both encoded and decoded path characters.
      * Implementations ensure the correct encoding as outlined in getPath().
      *
-     * @param string $path The path to use with the new instance.
+     * @param  string $path The path to use with the new instance.
      * @return static A new instance with the specified path.
      * @throws InvalidArgumentException for invalid paths.
      */
@@ -441,7 +441,7 @@ class Uri implements UriInterface
      * Implementations ensure the correct encoding as outlined in getQuery().
      * An empty query string value is equivalent to removing the query string.
      *
-     * @param string $query The query string to use with the new instance.
+     * @param  string $query The query string to use with the new instance.
      * @return static A new instance with the specified query string.
      * @throws InvalidArgumentException for invalid query strings.
      */
@@ -471,7 +471,7 @@ class Uri implements UriInterface
      *
      * An empty fragment value is equivalent to removing the fragment.
      *
-     * @param string $fragment The fragment to use with the new instance.
+     * @param  string $fragment The fragment to use with the new instance.
      * @return static A new instance with the specified fragment.
      */
     public function withFragment($fragment = '') : Uri
@@ -503,7 +503,7 @@ class Uri implements UriInterface
      * - If a query is present, it MUST be prefixed by "?".
      * - If a fragment is present, it MUST be prefixed by "#".
      *
-     * @see http://tools.ietf.org/html/rfc3986#section-4.1
+     * @see    http://tools.ietf.org/html/rfc3986#section-4.1
      * @return string
      */
     public function __toString() : string

@@ -1,3 +1,3 @@
 #!/bin/bash
 composer phpdoc &&
-cp _config.yml docs/
+cp .github/configs/ghpages.yml docs/_config.yml

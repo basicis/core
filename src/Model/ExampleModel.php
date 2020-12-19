@@ -1,6 +1,8 @@
 <?php
 namespace Basicis\Model;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  *  ExampleModel class
  *

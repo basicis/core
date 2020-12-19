@@ -55,6 +55,7 @@ class Request extends Message implements RequestInterface
     
     /**
      * VALID_METHODS constant
+     *
      * @var const
      */
     const VALID_METHODS = [
@@ -75,7 +76,7 @@ class Request extends Message implements RequestInterface
      *
      * @param string $target = null
      * @param string $method = 'GET' for Dafault
-     * @param array $data [,$options = []]
+     * @param array  $data   [,$options = []]
      */
     public function __construct(string $target = '/', string $method = 'GET', array ...$options)
     {
@@ -132,9 +133,9 @@ class Request extends Message implements RequestInterface
      * immutability of the message, and MUST return an instance that has the
      * changed request target.
      *
-     * @link http://tools.ietf.org/html/rfc7230#section-5.3 (for the various
+     * @link   http://tools.ietf.org/html/rfc7230#section-5.3 (for the various
      *     request-target forms allowed in request messages)
-     * @param mixed $requestTarget
+     * @param  mixed $requestTarget
      * @return static
      */
     public function withRequestTarget($requestTarget) : Request
@@ -165,7 +166,7 @@ class Request extends Message implements RequestInterface
      * immutability of the message, and MUST return an instance that has the
      * changed request method.
      *
-     * @param string $method Case-sensitive method.
+     * @param  string $method Case-sensitive method.
      * @return static
      * @throws InvalidArgumentException for invalid HTTP methods.
      */
@@ -184,7 +185,7 @@ class Request extends Message implements RequestInterface
      * Retrieves the URI instance.
      * This method MUST return a UriInterface instance.
      *
-     * @link http://tools.ietf.org/html/rfc3986#section-4.3
+     * @link   http://tools.ietf.org/html/rfc3986#section-4.3
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      */
@@ -216,9 +217,9 @@ class Request extends Message implements RequestInterface
      * immutability of the message, and MUST return an instance that has the
      * new UriInterface instance.
      *
-     * @link http://tools.ietf.org/html/rfc3986#section-4.3
-     * @param UriInterface $uri New request URI to use.
-     * @param bool $preserveHost Preserve the original state of the Host header.
+     * @link   http://tools.ietf.org/html/rfc3986#section-4.3
+     * @param  UriInterface $uri          New request URI to use.
+     * @param  bool         $preserveHost Preserve the original state of the Host header.
      * @return static
      */
 
@@ -245,7 +246,7 @@ class Request extends Message implements RequestInterface
     /**
      * Function withContentData
      *
-     * @param array $data
+     * @param  array $data
      * @return Request
      * @throws InvalidArgumentException
      */

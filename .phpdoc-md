@@ -8,6 +8,11 @@ return (object) [
         /* Basicis\ */
         '\Basicis\Basicis',
 
+         /* Basicis\Auth\ */
+        '\Basicis\Auth\Auth',
+        '\Basicis\Auth\AuthInterface',
+        '\Basicis\Auth\Token',
+
         /* Basicis\Core\ */
         '\Basicis\Core\Log',
         '\Basicis\Core\Validator',

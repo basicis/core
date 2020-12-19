@@ -96,9 +96,11 @@ class Route
      * @param mixed $value - value to this key
      * @return Route
      */
-    public function setArgument(string $key, $value)
-    {
-        $this->args[$key] = $value;
+    public function setArgument(string $key, $value) : Route
+    {   
+        if (!empty($key) && strlen($key) >= 2) {
+            $this->args[$key] = urldecode($value);
+        }
         return $this;
     }
 
@@ -107,9 +109,12 @@ class Route
      * @param array $args - Array of arguments
      * @return Route
      */
-    public function setArguments(array $args = [])
+    public function setArguments(array $args = []) : Route
     {
-        $this->args = $args;
+        foreach ($args as $key => $value) {
+            $this->setArgument($key, $value);
+        }
+        return $this;
     }
 
     /**
