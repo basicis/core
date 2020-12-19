@@ -1,25 +1,30 @@
-name: Generate and Deploy Documentation
+name: Unit Testing
 on:
   pull_request:
     branchs: 
       - [master]
-jobs: 
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout ✔
+        uses: actions/checkout@v2
+      
+      - name: Composer 🔧	
+        uses: php-actions/composer@v1
+
+      - name: PHPUnit Tests 🧪
+        run: |
+          bash $GITHUB_WORKSPACE/.github/scripts/test.sh
   deploy:
     runs-on: ubuntu-18.04
+    needs: test
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
 
       - name: Composer 🔧
         uses: php-actions/composer@v1
-
-      - name: Wait on tests
-        uses: lewagon/wait-on-check-action@master
-        with:
-          ref: master
-          check-name: test
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          #wait-interval: 2   
 
       - name: Run Documentation Build 🛠️
         run: |
