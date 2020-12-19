@@ -1,4 +1,4 @@
-name: Unit Testing
+name: Unit Testing, Generate and Deploy Documentation 
 on:
   pull_request:
     branchs: 
