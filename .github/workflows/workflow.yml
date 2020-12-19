@@ -1,12 +1,24 @@
-name: Basicis | Core - Generate and Deploy Documentation
+name: Unit Testing, Generate and Deploy Documentation 
 on:
-  check_suite:
-    types: [completed]
+  pull_request:
     branchs: 
       - [master]
-jobs: 
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout ✔
+        uses: actions/checkout@v2
+      
+      - name: Composer 🔧	
+        uses: php-actions/composer@v1
+
+      - name: PHPUnit Tests 🧪
+        run: |
+          bash $GITHUB_WORKSPACE/.github/scripts/test.sh
   deploy:
     runs-on: ubuntu-18.04
+    needs: test
     steps:
       - name: Checkout ✔
         uses: actions/checkout@v2
