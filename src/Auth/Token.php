@@ -6,7 +6,6 @@ use \Firebase\JWT\JWT;
 /**
  * Token Class
  * Basicis default Token class
- *
  * @category Basicis\Auth
  * @package  Basicis\Auth
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -31,21 +30,18 @@ class Token
 
     /**
      * $exp variable
-     *
      * @var int
      */
     private $exp;
 
     /**
      * $nbf variable
-     *
      * @var int
      */
     private $nbf;
 
     /**
      * $nbf variable
-     *
      * @var int
      */
     private $iat;
@@ -53,7 +49,6 @@ class Token
 
     /**
      * $encoded variable
-     *
      * @var string
      */
     private $encoded;
@@ -61,7 +56,6 @@ class Token
 
     /**
      * $decoded variable
-     *
      * @var object
      */
     private $decoded;
@@ -72,7 +66,6 @@ class Token
      * Function __construct
      * Defining a new instance de Token
      * @return void
-     *
      * @param AuthInterface $user
      * @param string        $appKey
      * @param string        $expiration
@@ -95,7 +88,6 @@ class Token
     /**
      * Function create
      * Receive an instance of AuthInterface user and Creating a token
-     *
      * @param  AuthInterface     $user
      * @param  array|string|null $data
      * @return string|null
@@ -125,7 +117,6 @@ class Token
      * Function extractBearer
      * Extract Token '/[Bb]earer /i' part
      * @param string $token
-     *
      * @return string
      */
     private function extractBearer(string $token) : string
@@ -137,7 +128,6 @@ class Token
     /**
      * Function check
      * Checking a token
-     *
      * @param  string $token
      * @return boolean
      */
@@ -155,7 +145,6 @@ class Token
     /**
      * Function renew
      * Renew a Token, optionaly set any data type of string, array or null
-     *
      * @param  string            $token
      * @param  string            $expiration
      * @param  string            $nobefore
@@ -196,7 +185,6 @@ class Token
     /**
      * Function Encode Token
      * Enconding a Token
-     *
      * @param  array $token
      * @return string
      */
