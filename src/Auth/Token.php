@@ -145,7 +145,8 @@ class Token
     {
         $tokenDecoded = $this->decode(self::extractBearer($token));
         if ($tokenDecoded) {
-            return ((new \DateTime("now"))->getTimestamp() >= $tokenDecoded->nbf) && ($tokenDecoded->exp > (new \DateTime("now"))->getTimestamp()) ? true : false;
+            return ((new \DateTime("now"))->getTimestamp() >= $tokenDecoded->nbf) &&
+            ($tokenDecoded->exp > (new \DateTime("now"))->getTimestamp()) ? true : false;
         }
         return false;
     }

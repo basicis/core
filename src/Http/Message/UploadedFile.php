@@ -167,7 +167,8 @@ class UploadedFile implements UploadedFileInterface
             
             if ($this->getStream() instanceof StreamInterface && \is_uploaded_file($this->getTmpName())) {
                 if (!move_uploaded_file($this->getTmpName(), $targetPath)) {
-                    throw new RuntimeException('There is an error during the move uploaded File operation or on the second or subsequent call to the method.');
+                    throw new RuntimeException('There is an error during the move uploaded File operation
+                     or on the second or subsequent call to the method.');
                 }
             }
             return;

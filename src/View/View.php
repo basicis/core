@@ -18,6 +18,11 @@ class View
      */
     private $paths;
 
+    /**
+     * Function __construct
+     *
+     * @param array $paths
+     */
     public function __construct(array $paths = [])
     {
         if ($paths !== []) {
@@ -26,7 +31,15 @@ class View
         }
     }
 
-
+    /**
+     * Function extractTemplate
+     * Extract template part name
+     * @param string $name
+     * @param string $path
+     * @param array $data
+     *
+     * @return string
+     */
     private function extractTemplate(string $name, string &$path, &$data = []) : string
     {
         $template = "";
@@ -75,18 +88,28 @@ class View
             }
         }
 
-        /*if (!file_exists($path.$template)) {
-           $data = [
-               'title' =>'Template Not Found!',
-                'subtitle' => "Template File <b>$template</b> no exists in <u>$path</u> !"
-            ];
-            $template = 'layout/msg.html';
-        }*/
-
         return  $template;
     }
 
-
+    /**
+     * Function setFilters
+     * Setting filters functions for use into template
+     * - Setting into config/app-config.php file
+     * ```php
+     *  $app->setViewFilters([
+     *  //here, key is required
+     *  "isTrue" => function ($value = true) {
+     *      return $value;
+     *  }
+     *  ]);
+     * ```
+     * - Using into Twig Template file
+     * `{{isTrue($var = true)}}`
+     *
+     * @param array $filters
+     *
+     * @return void
+     */
     public function setFilters(array $filters)
     {
         foreach ($filters as $key => $filter) {
@@ -97,6 +120,14 @@ class View
     }
 
 
+    /**
+     * Fuction getView
+     * Get a string result os template with optional $data array
+     * @param string $name
+     * @param array $data
+     *
+     * @return string|null
+     */
     public function getView(string $name, $data = []) : ?string
     {
         foreach ($this->paths as $path) {
@@ -108,10 +139,10 @@ class View
 
         foreach ($this->paths as $path) {
             $errorTemplate = $path . "error.html";
-            if(file_exists($errorTemplate) && !is_dir($errorTemplate)) {
+            if (file_exists($errorTemplate) && !is_dir($errorTemplate)) {
                 return $this->view->render("error.html", ["errorMessage" => "Template file '$name' not found!"]);
             }
-        }   
+        }
 
         return null;
     }

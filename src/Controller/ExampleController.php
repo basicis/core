@@ -28,5 +28,4 @@ class ExampleController extends Controller
     {
         return $app->json(["test" => "Teste Ok!"], 201);
     }
-
 }

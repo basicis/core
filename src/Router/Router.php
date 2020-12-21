@@ -103,7 +103,7 @@ class Router
         $method = "GET";
         $middlewares = null;
         $route = str_replace("@", '', $annotation);
-        $routeArray = explode('","', str_replace([" ", "@Route(", ")"],[""], $annotation));
+        $routeArray = explode('","', str_replace([" ", "@Route(", ")"], [""], $annotation));
        
         if (isset($routeArray[0])) {
             $url = explode(',', str_replace('"', "", $routeArray[0]));
