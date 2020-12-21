@@ -1086,7 +1086,7 @@ class Basicis extends RequestHandler
                 $response = (new $this->middlewares['route'][$middleware]($this))->handle($this->request);
             }
         }
-        
+
         return $response;
     }
 
@@ -1162,14 +1162,14 @@ class Basicis extends RequestHandler
                 $response = $this->middlewaresHandle($this->route->getMiddlewares());
 
                 //Routing and handle Request
-                if (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206) { 
+                if (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206) {
                     $response = $this->handle($this->request);
                 }
                 $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
             }
         }
 
-        if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) { 
+        if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
             //After middlewares aqui
             foreach ($this->middlewares['after'] as $after) {
                 if ($this->response->getStatusCode() < 300) {
