@@ -29,7 +29,7 @@ Route Class
 **Description**
 
 ```php
-public __construct (string $name, string $method, mixed $callback, mixed $middlewares)
+public __construct (string $url, string $method, mixed $callback, mixed $middlewares)
 ```
 
 Function __construct 
@@ -38,12 +38,12 @@ Function __construct
 
 **Parameters**
 
-* `(string) $name`
-: - Route name or signature  
+* `(string) $url`
+: - Route url or signature  
 * `(string) $method`
-: - Http method name  
+: - Http method url  
 * `(mixed) $callback`
-: - A function or string corresponding to the name of the controller @ method  
+: - A function or string corresponding to the url of the controller @ method  
 * `(mixed) $middlewares`
 : - An array or string middlewares list  
 

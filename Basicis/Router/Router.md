@@ -380,7 +380,7 @@ Function getResponse
 **Description**
 
 ```php
-public setRoute (string $method, string|array $url, string|\Clousure $callback, string|array $middlewares)
+public setRoute (string|array $url, string|array $method, string|\Clousure $callback, string|array $middlewares)
 ```
 
 Function setRoute 
@@ -389,10 +389,10 @@ Function setRoute
 
 **Parameters**
 
-* `(string) $method`
-: = "GET"  
 * `(string|array) $url`
 : = "/"  
+* `(string|array) $method`
+: = "GET"  
 * `(string|\Clousure) $callback`
 : = null  
 * `(string|array) $middlewares`

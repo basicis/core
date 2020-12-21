@@ -18,6 +18,8 @@ Basicis\Http\Server\RequestHandler
 
 | Name | Description |
 |------|-------------|
+|[__construct](#middleware__construct)|Function __construct
+Receives an instance of Basicis \ Basicis or null as param|
 |[process](#middlewareprocess)|Function process
 Process an incoming server request.|
 
@@ -28,6 +30,31 @@ Process an incoming server request.|
 |handle|Function handle
 Handles a request and produces a response.|
 
+
+
+### Middleware::__construct  
+
+**Description**
+
+```php
+public __construct (\Basicis\Basicis $app)
+```
+
+Function __construct
+Receives an instance of Basicis \ Basicis or null as param 
+
+ 
+
+**Parameters**
+
+* `(\Basicis\Basicis) $app`
+
+**Return Values**
+
+`void`
+
+
+<hr />
 
 
 ### Middleware::process  

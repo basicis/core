@@ -277,7 +277,7 @@ Function createApp Factory
 **Description**
 
 ```php
-public delete (string $url, string|\Closure $callback, string|array $middlewares)
+public delete (string|array $url, string|\Closure $callback, string|array $middlewares)
 ```
 
 Function detete 
@@ -286,7 +286,7 @@ Function detete
 
 **Parameters**
 
-* `(string) $url`
+* `(string|array) $url`
 * `(string|\Closure) $callback`
 * `(string|array) $middlewares`
 
@@ -305,7 +305,7 @@ Function detete
 **Description**
 
 ```php
-public get (string $url, string|\Closure $callback, string|array $middlewares)
+public get (string|array $url, string|\Closure $callback, string|array $middlewares)
 ```
 
 Function get 
@@ -314,7 +314,7 @@ Function get
 
 **Parameters**
 
-* `(string) $url`
+* `(string|array) $url`
 * `(string|\Closure) $callback`
 * `(string|array) $middlewares`
 
@@ -766,7 +766,7 @@ Open a Stream Resource in Recording mode and write a text in it, sending headers
 **Description**
 
 ```php
-public patch (string $url, string|\Closure $callback, string|array $middlewares)
+public patch (string|array $url, string|\Closure $callback, string|array $middlewares)
 ```
 
 Function patch 
@@ -775,7 +775,7 @@ Function patch
 
 **Parameters**
 
-* `(string) $url`
+* `(string|array) $url`
 * `(string|\Closure) $callback`
 * `(string|array) $middlewares`
 
@@ -821,7 +821,7 @@ Return app project root path
 **Description**
 
 ```php
-public post (string $url, string|\Closure $callback, string|array $middlewares)
+public post (string|array $url, string|\Closure $callback, string|array $middlewares)
 ```
 
 Function post 
@@ -830,7 +830,7 @@ Function post
 
 **Parameters**
 
-* `(string) $url`
+* `(string|array) $url`
 * `(string|\Closure) $callback`
 * `(string|array) $middlewares`
 
@@ -849,7 +849,7 @@ Function post
 **Description**
 
 ```php
-public put (string $url, string|\Closure $callback, string|array $middlewares)
+public put (string|array $url, string|\Closure $callback, string|array $middlewares)
 ```
 
 Function put 
@@ -858,7 +858,7 @@ Function put
 
 **Parameters**
 
-* `(string) $url`
+* `(string|array) $url`
 * `(string|\Closure) $callback`
 * `(string|array) $middlewares`
 
@@ -1311,7 +1311,7 @@ Function validate
 **Description**
 
 ```php
-public view (string $name, array $data, int $statusCode, string $customPath)
+public view (string $name, array $data, string $customPath)
 ```
 
 Function view 
@@ -1322,8 +1322,6 @@ Function view
 
 * `(string) $name`
 * `(array) $data`
-* `(int) $statusCode`
-: default=200  
 * `(string) $customPath`
 
 **Return Values**
