@@ -183,10 +183,6 @@ class Basicis extends RequestHandler
                 $controllers[$key] = get_class($value);
             }
 
-            if (class_exists($class)) {
-                $this->setRoutesByAnnotations($class);
-            }
-
             if (!is_string($key) || !class_exists($class) | !(new $value() instanceof Controller)) {
                 throw new InvalidArgumentException("Unidentified key or class Basicis\Controller\Controller instance.");
                 unset($controllers[$key]);
@@ -671,8 +667,10 @@ class Basicis extends RequestHandler
 
     public function auth(string $authClass = "Basicis\Auth\Auth") : ?Auth
     {
-        $tokenString = $this->request()->getHeader('authorization')[0];
-        return $authClass::getUser($tokenString, $this->getAppKey());
+        if (count($this->request()->getHeader('authorization')) >= 1) {
+            return $authClass::getUser($this->request()->getHeader('authorization')[0], $this->getAppKey());
+        }
+        return null;
     }
 
 
@@ -719,7 +717,7 @@ class Basicis extends RequestHandler
     public function setRoutesByControllers(array $controllers) : Basicis
     {
         foreach ($controllers as $controller) {
-            if (new $controller() instanceof Controller) {
+            if (class_exists($controller) && new $controller() instanceof Controller) {
                 $this->setRoutesByAnnotations($controller);
             }
         }
@@ -731,14 +729,14 @@ class Basicis extends RequestHandler
     /**
      * Function get
      *
-     * @param  string          $url
+     * @param  string|array    $url
      * @param  string|\Closure $callback
      * @param  string|array    $middlewares
      * @return void
      */
-    public function get(string $url = "/", $callback = null, $middlewares = null)
+    public function get($url = "/", $callback = null, $middlewares = null)
     {
-        $this->router->setRoute("GET", $url, $callback, $middlewares);
+        $this->router->setRoute($url, "GET", $callback, $middlewares);
         return $this;
     }
 
@@ -747,14 +745,14 @@ class Basicis extends RequestHandler
     /**
      * Function post
      *
-     * @param  string          $url
+     * @param  string|array    $url
      * @param  string|\Closure $callback
      * @param  string|array    $middlewares
      * @return void
      */
-    public function post(string $url, $callback = null, $middlewares = null)
+    public function post($url, $callback = null, $middlewares = null)
     {
-        $this->router->setRoute("POST", $url, $callback, $middlewares);
+        $this->router->setRoute($url, "POST", $callback, $middlewares);
         return $this;
     }
 
@@ -763,14 +761,14 @@ class Basicis extends RequestHandler
     /**
      * Function put
      *
-     * @param  string          $url
+     * @param  string|array    $url
      * @param  string|\Closure $callback
      * @param  string|array    $middlewares
      * @return void
      */
-    public function put(string $url, $callback = null, $middlewares = null)
+    public function put($url, $callback = null, $middlewares = null)
     {
-        $this->router->setRoute("GET", $url, $callback, $middlewares);
+        $this->router->setRoute($url, "PUT", $callback, $middlewares);
         return $this;
     }
 
@@ -779,14 +777,14 @@ class Basicis extends RequestHandler
     /**
      * Function patch
      *
-     * @param  string          $url
+     * @param  string|array    $url
      * @param  string|\Closure $callback
      * @param  string|array    $middlewares
      * @return void
      */
-    public function patch(string $url, $callback = null, $middlewares = null)
+    public function patch($url, $callback = null, $middlewares = null)
     {
-        $this->router->setRoute("PATCH", $url, $callback, $middlewares);
+        $this->router->setRoute($url, "PATCH", $callback, $middlewares);
         return $this;
     }
 
@@ -795,14 +793,14 @@ class Basicis extends RequestHandler
     /**
      * Function detete
      *
-     * @param  string          $url
+     * @param  string|array    $url
      * @param  string|\Closure $callback
      * @param  string|array    $middlewares
      * @return void
      */
-    public function delete(string $url, $callback = null, $middlewares = null)
+    public function delete($url, $callback = null, $middlewares = null)
     {
-        $this->router->setRoute("DELETE", $url, $callback, $middlewares);
+        $this->router->setRoute($url, "DELETE", $callback, $middlewares);
         return $this;
     }
 
@@ -822,7 +820,7 @@ class Basicis extends RequestHandler
     {
         $stream = (new StreamFactory)->createStream($text);
         $this->response->withBody($stream);
-        return $this->response->withStatus($statusCode === null ? 200 : $statusCode);
+        return $this->response->withStatus($statusCode === null ?  $this->response->getStatusCode() : $statusCode);
     }
 
 
@@ -837,8 +835,7 @@ class Basicis extends RequestHandler
      */
     public function json($data = [], int $statusCode = 200) : ResponseInterface
     {
-        $this->response()->withHeader("Content-Type", "application/json; charset=UTF-8")
-            ->withStatus($statusCode);
+        $this->response()->withHeader("Content-Type", "application/json; charset=UTF-8");
         $data = [
             "BasicisAPI" => [
                 "meta" => [
@@ -849,7 +846,7 @@ class Basicis extends RequestHandler
                 "data" => $data
             ]
         ];
-        return $this->write(json_encode($data));
+        return $this->write(json_encode($data), $statusCode);
     }
 
 
@@ -858,22 +855,15 @@ class Basicis extends RequestHandler
       *
       * @param string $name
       * @param array  $data
-      * @param int    $statusCode default=200
       * @param string $customPath
       *
       * @return ResponseInterface
       */
-    public function view(string $name, array $data = [], int $statusCode = 200, $customPath = "") : ResponseInterface
+    public function view(string $name, array $data = [], $customPath = "") : ResponseInterface
     {
-        $view = new View(
-            [
-                    self::path() . "storage/templates/",
-                    self::path() . $customPath,
-                ]
-        );
+        $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
         $view->setFilters($this->viewFilters);
-        $this->response->withHeader("Content-Type", ["text/html", "charset=UTF-8"])
-            ->withStatus($statusCode);
+        $this->response->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
 
         $content = $view->getView($name, $data);
         if ($content !== null) {
@@ -1093,7 +1083,7 @@ class Basicis extends RequestHandler
             if (key_exists($middleware, $this->middlewares['route'])
                 && (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206)
             ) {
-                $response = (new $this->middlewares['route'][$middleware])->handle($this->request);
+                $response = (new $this->middlewares['route'][$middleware]($this))->handle($this->request);
             }
         }
 
@@ -1179,11 +1169,13 @@ class Basicis extends RequestHandler
             }
         }
 
-        //After middlewares aqui
-        foreach ($this->middlewares['after'] as $after) {
-            if ($this->response->getStatusCode() < 300) {
-                $response = (new $after())->handle($this->request);
-                $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
+        if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
+            //After middlewares aqui
+            foreach ($this->middlewares['after'] as $after) {
+                if ($this->response->getStatusCode() < 300) {
+                    $response = (new $after())->handle($this->request);
+                    $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
+                }
             }
         }
 
@@ -1194,8 +1186,8 @@ class Basicis extends RequestHandler
                 [
                     "errorMessage" => sprintf(
                         "%s | %s",
-                        $this->router->getResponse()->getStatusCode(),
-                        $this->router->getResponse()->getReasonPhrase()
+                        $this->response->getStatusCode(),
+                        $this->response->getReasonPhrase()
                     )
                 ]
             );

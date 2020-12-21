@@ -16,10 +16,10 @@ use Basicis\Basicis as App;
 class Route
 {
     /**
-     * $name variable
+     * $url variable
      * @var string
      */
-    private $name;
+    private $url;
 
     /**
      * $method variable
@@ -46,17 +46,31 @@ class Route
     private $callback;
 
     /** Function __construct
-     * @param string $name - Route name or signature
-     * @param string $method - Http method name
-     * @param mixed $callback - A function or string corresponding to the name of the controller @ method
+     * @param string $url - Route url or signature
+     * @param string $method - Http method url
+     * @param mixed $callback - A function or string corresponding to the url of the controller @ method
      * @param mixed $middlewares - An array or string middlewares list
      */
-    public function __construct($name = '/', $method = 'GET', $callback = null, $middlewares = null)
+    public function __construct($url = '/', $method = 'GET', $callback = null, $middlewares = null)
     {
-        $this->name = strtolower($name);
+        $this->url = strtolower($url);
         $this->method = strtoupper($method);
         $this->callback = $callback;
-        $this->middlewares = $middlewares;
+        
+        if (is_string($middlewares) && count(explode(",", $middlewares)) >= 2) {
+            $this->middlewares = explode(",", $middlewares);
+            return;
+        }
+
+        if (is_array($middlewares)) {
+            $this->middlewares = $middlewares;
+            return;
+        }
+
+        if ($middlewares === null) {
+            $this->middlewares =  ["guest"];
+            return;
+        }
     }
 
     /**
@@ -97,7 +111,7 @@ class Route
      * @return Route
      */
     public function setArgument(string $key, $value) : Route
-    {   
+    {
         if (!empty($key) && strlen($key) >= 2) {
             $this->args[$key] = urldecode($value);
         }
@@ -132,7 +146,7 @@ class Route
      */
     public function getName() : string
     {
-        return $this->name;
+        return $this->url;
     }
 
     /**

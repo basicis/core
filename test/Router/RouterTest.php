@@ -35,10 +35,16 @@ class RouterTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-
         $this->router = new Router(ServerRequestFactory::create("GET", "/"));
-        $this->router->setRoute("GET", "/", function() { return true;});
-        $this->router->setRoute("GET", "/test", function() { return true;});
+
+        $this->router->setRoute("/", "GET", function () {
+            return true;
+        });
+
+        $this->router->setRoute("/test", "GET", function () {
+            return true;
+        });
+
         $this->route = $this->router->getRoute();
     }
 

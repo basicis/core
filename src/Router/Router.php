@@ -70,23 +70,19 @@ class Router
     /**
     * Function setRoute
     *
-    * @param string $method = "GET"
     * @param string|array $url = "/"
+    * @param string|array $method = "GET"
     * @param string|\Clousure $callback = null
     * @param string|array $middlewares = null
     * @return Router
     */
-    public function setRoute(string $method = "GET", $url = "/", $callback = null, $middlewares = null) : Router
+    public function setRoute($url = "/", $method = "GET", $callback = null, $middlewares = null) : Router
     {
-        if (is_array($url)) {
-            foreach ($url as $url_as) {
-                if (!$this->hasRoute($url_as, $method)) {
-                    array_push($this->routes, new Route($url_as, $method, $callback, $middlewares));
+        foreach (is_array($url) ? $url : explode(",", $url) as $keyUrl => $valueUrl) {
+            foreach (is_array($method) ? $method : explode(",", $method) as $keyMethod => $valueMethod) {
+                if (!$this->hasRoute($valueUrl, $valueMethod)) {
+                    array_push($this->routes, new Route($valueUrl, $valueMethod, $callback, $middlewares));
                 }
-            }
-        } elseif (is_string($url)) {
-            if (!$this->hasRoute($url, $method)) {
-                array_push($this->routes, new Route($url, $method, $callback, $middlewares));
             }
         }
         return $this;
@@ -103,10 +99,25 @@ class Router
      */
     public function setRouteByAnnotation(string $annotation, string $callback)
     {
-        $route_array = explode(",", str_replace(array('\'', '"', " ", "@Route(", ")"), '', $annotation));
-            
-        //url [string|array], method [string|array], callback [string|Closure], middlewares [string|array]
-        $this->setRoute($route_array[1], $route_array[0], $callback, $route_array[3] ?? null);
+        $url = "/";
+        $method = "GET";
+        $middlewares = null;
+        $route = str_replace("@", '', $annotation);
+        $routeArray = explode('","', str_replace([" ", "@Route(", ")"],[""], $annotation));
+       
+        if (isset($routeArray[0])) {
+            $url = explode(',', str_replace('"', "", $routeArray[0]));
+        }
+
+        if (isset($routeArray[1])) {
+            $method = explode(',', str_replace('"', "", $routeArray[1]));
+        }
+
+        if (isset($routeArray[2])) {
+            $middlewares = explode(',', str_replace('"', "", $routeArray[2]));
+        }
+
+        $this->setRoute($url, $method, $callback, $middlewares);
         return $this;
     }
 
@@ -153,7 +164,7 @@ class Router
     * @param string $method
     * @return boolean
     */
-    public function hasRoute(string $name, string $method = "GET" ) : bool
+    public function hasRoute(string $name, string $method = "GET") : bool
     {
         foreach ($this->routes as $route) {
             if (($route->getName() === $name) && ($route->getMethod() === strtoupper($method))) {
@@ -208,7 +219,6 @@ class Router
             $routeNameExplode =  array_filter(explode("/", $route->getName()));
 
             foreach ($routeNameExplode as $routeNameExplode_key => $routeNameExplodeValue) {
-                
                 if (($routeNameExplodeValue === $urlExplode[$routeNameExplode_key])) {
                     $urlStartWith .= '/'.$routeNameExplodeValue;
 
@@ -399,21 +409,21 @@ class Router
                     foreach ($urlValue['url'] as $urlValue_item) {
                         $this->setRoute(
                             $urlValue_item,
+                            isset($urlValue['method']) ?  $urlValue['method'] : 'GET',
                             isset($urlValue['callback']) ? $urlValue['callback'] : $callback,
-                            isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares,
-                            isset($urlValue['method']) ?  $urlValue['method'] : 'GET'
+                            isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares
                         );
                     }
                 } else {
                     $this->setRoute(
                         $urlValue['url'],
+                        isset($urlValue['method']) ?  $urlValue['method'] : 'GET',
                         isset($urlValue['callback']) ? $urlValue['callback'] : $callback,
-                        isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares,
-                        isset($urlValue['method']) ?  $urlValue['method'] : 'GET'
+                        isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares
                     );
                 }
             } elseif (is_string($urlValue)) {
-                $this->setRoute($urlValue, $callback, $middlewares, 'GET');
+                $this->setRoute($urlValue, 'GET', $callback, $middlewares);
             }
         }
 
