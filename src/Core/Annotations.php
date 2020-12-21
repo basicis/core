@@ -111,7 +111,7 @@ class Annotations
      */
     
     public function getCommentByTag(string $method, string $tag, int $index = 0) : ?string
-    {   
+    {
         $this->setMethod($method);
         
         if (!empty($tag)) {

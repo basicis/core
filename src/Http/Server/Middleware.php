@@ -1,6 +1,7 @@
 <?php
 namespace Basicis\Http\Server;
 
+use Basicis\Basicis;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -22,6 +23,28 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 abstract class Middleware extends RequestHandler implements MiddlewareInterface
 {
+    /**
+     * $app variable
+     *
+     * @var Basicis
+     */
+    protected $app;
+
+    /**
+     * Function __construct
+     * Receives an instance of Basicis \ Basicis or null as param
+     * @param \Basicis\Basicis $app
+     */
+    public function __construct(Basicis $app = null)
+    {
+        if ($app instanceof Basicis) {
+            $this->app = $app;
+            return;
+        }
+        Basicis::loadEnv();
+        $this->app = Basicis::createApp();
+    }
+
     /**
      * Function process
      * Process an incoming server request.
