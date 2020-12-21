@@ -26,14 +26,16 @@ use Basicis\Http\Message\ServerRequestFactory;
  * Create an instance of Basicis\Basicis and setting arguments
  * @var Basicis $app
  */
+
+Basicis::loadEnv();
 $app = Basicis::createApp(
     //Creating ServerRequest and Uri into this
     ServerRequestFactory::create(
         $_SERVER['REQUEST_METHOD'],
         (new Uri())
-            ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0])
-            ->withHost($_SERVER['HTTP_HOST'])
-            ->withPort($_SERVER['SERVER_PORT'])
+            ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0] ?? "http")
+            ->withHost($_SERVER['HTTP_HOST'] ?? "localhost")
+            ->withPort($_SERVER['SERVER_PORT'] ?? null)
             ->withPath($_SERVER['REQUEST_URI'])
     )
     ->withHeaders(getallheaders())
@@ -42,11 +44,12 @@ $app = Basicis::createApp(
     //Setting app optionals flags
     [
       "appDescription" => $_ENV['APP_DESCRIPTION'],
-      "appKey" => $_ENV['APP_KEY']
       "mode" => $_ENV['APP_ENV'],
       "timezone" => $_ENV["APP_TIMEZONE"],
+      "appKey" => $_ENV['APP_KEY']
     ]
 );
+
 
 
 /**
@@ -76,6 +79,8 @@ $app->setBeforeMiddlewares([
 // Route middlweares
 $app->setRouteMiddlewares([
   //only here, key is required
+  "guest" => "App\\Middlewares\\Guest",
+  "auth" => "App\\Middlewares\\Auth",
   "example" => "App\\Middlewares\\Example",
   //...
 ]);
