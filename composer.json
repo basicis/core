@@ -45,7 +45,8 @@
         "test": "vendor/bin/phpunit --do-not-cache-result --no-logging test",
         "auto-test": "bash vendor/bin/test",
         "autotest": "composer auto-test",
-        "phpcs": "vendor/bin/phpcs --standard=PSR2",
+        "phpcs": "vendor/bin/phpcs --standard=PSR2 src/",
+        "phpcs-test": "vendor/bin/phpcs --standard=PSR2 test/",
         "phpdoc": "vendor/bin/phpdoc-md",
         "doctrine": "vendor/bin/doctrine",
         "doctrinem": "vendor/bin/doctrine-migrations"
