@@ -1,20 +1,21 @@
 <?php
 namespace Basicis\Cache;
 
+use Psr\Http\Message\StreamInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Basicis\Cache\InvalidArgumentException;
 use Basicis\Cache\CacheItem;
+use Basicis\Http\Message\StreamFactory;
+use Basicis\Basicis as App;
 
 /**
  * CacheItemPool generates CacheItemInterface objects.
- *
  * The primary purpose of Cache\CacheItemPoolInterface is to accept a key from
  * the Calling Library and return the associated Cache\CacheItemInterface object.
  * It is also the primary point of interaction with the entire cache collection.
  * All configuration and initialization of the Pool is left up to an
  * Implementing Library.
- *
  * @category Basicis/Cache
  * @package  Basicis/Cache
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -25,14 +26,40 @@ class CacheItemPool implements CacheItemPoolInterface
 {
     /**
      * $items variable
-     *
      * @var array|CacheItem[]
      */
     private $items = [];
 
     /**
+     * $cacheFilePath variable
+     * @var string
+     */
+    private $cacheFilePath;
+
+    /**
+     * Function __construct
+     * Receives a cacheFilePath path as param or null
+     * @param string|null $cacheFilePath
+     * If cacheFilePath is null, default path is defined the app path
+     */
+    public function __construct(string $cacheFilePath = null)
+    {
+        if ($cacheFilePath === null) {
+            $this->cacheFilePath = sprintf("%s%s", App::path(), "cache");
+        }
+
+        if ($cacheFilePath !== null) {
+            $this->cacheFilePath = $cacheFilePath.(preg_match("/\/^/", $cacheFilePath) ? "cache" : "/cache");
+        }
+
+        $this->load();
+        $this->checkItensHit();
+    }
+
+
+    /**
      * Function addItem
-     *
+     * Adding a chache item
      * @param string                                 $key
      * @param mixed                                  $value
      * @param \DateTimeInterface|null                $expiration
@@ -54,7 +81,7 @@ class CacheItemPool implements CacheItemPoolInterface
 
     /**
      * Function withItem
-     *
+     * With a Added chache item
      * @param string                                 $key
      * @param CacheItemInterface|mixed               $value
      * @param \DateTimeInterface|null                $expiration
@@ -62,8 +89,8 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function withItem(string $key, $value, $expiration = null, $time = null) : CacheItemPoolInterface
     {
-        if ($value instanceof CacheItemInterface) {
-            $this->items[$key] = $item;
+        if ($this->hasItem($key) && $value instanceof CacheItemInterface) {
+            $this->items[$key] = new CacheItem($key, $value, $expiration, $time);
             return $this;
         }
         return $this->addItem($key, $value, $expiration, $time);
@@ -74,7 +101,6 @@ class CacheItemPool implements CacheItemPoolInterface
      * Returns a Cache Item representing the specified key.
      * This method must always return a CacheItemInterface object, even in case of
      * a cache miss. It MUST NOT return null.
-     *
      * @param  string $key
      *   The key for which to return the corresponding Cache Item.
      * @throws InvalidArgumentException
@@ -91,15 +117,14 @@ class CacheItemPool implements CacheItemPoolInterface
             
         if (empty($key) | !is_string($key)) {
             throw new InvalidArgumentException("The key string '$key' is not a legal value.");
-            return new CacheItem();
         }
+        return new CacheItem();
     }
 
 
     /**
      * Function getItems
      * Returns a traversable set of cache items.
-     *
      * @param  string[] $keys
      *   An indexed array of keys of items to retrieve.
      * @throws InvalidArgumentException
@@ -111,11 +136,11 @@ class CacheItemPool implements CacheItemPoolInterface
      *   key is not found. However, if no keys are specified then an empty
      *   traversable MUST be returned instead.
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         $items = [];
-        if ($keys === array()) {
-            return $this->items ?? [];
+        if ($keys === []) {
+            return $this->items;
         }
 
         foreach ($keys as $key) {
@@ -130,11 +155,9 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function hasItem
      * Confirms if the cache contains specified cache item.
-     *
      * Note: This method MAY avoid retrieving the cached value for performance reasons.
      * This could result in a race condition with CacheItemInterface::get(). To avoid
      * such situation use CacheItemInterface::isHit() instead.
-     *
      * @param  string $key
      *   The key for which to check existence.
      * @throws InvalidArgumentException
@@ -153,24 +176,24 @@ class CacheItemPool implements CacheItemPoolInterface
     }
 
 
+
     /**
      * Function clear
      * Deletes all items in the pool.
-     *
      * @return bool
      *   True if the pool was successfully cleared. False if there was an error.
      */
     public function clear(): bool
     {
-        $this->items = [];
-        return (count($this->items) == 0);
+        $this->deleteItems();
+        $this->commit();
+        return unlink($this->cacheFilePath);
     }
 
 
     /**
      * Funtion deleteItem
      * Removes the item from the pool.
-     *
      * @param  string $key
      *   The key to delete.
      * @throws InvalidArgumentException
@@ -183,11 +206,12 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         if (empty($key) | !is_string($key)) {
             throw new InvalidArgumentException("The key string '$key' is not a legal value.");
+            return false;
         }
 
         if (isset($this->items[$key])) {
             unset($this->items[$key]);
-            return true;
+            return !$this->hasItem($key);
         }
         return false;
     }
@@ -196,8 +220,7 @@ class CacheItemPool implements CacheItemPoolInterface
     /**
      * Function deleteItems
      * Removes multiple items from the pool.
-     *
-     * @param  string[] $keys
+     * @param  string[]|array $keys
      *   An array of keys that should be removed from the pool.
      * @throws InvalidArgumentException
      *   If any of the keys in $keys are not a legal value a \Psr\Cache\InvalidArgumentException
@@ -205,57 +228,137 @@ class CacheItemPool implements CacheItemPoolInterface
      * @return bool
      *   True if the items were successfully removed. False if there was an error.
      */
-    public function deleteItems(array $keys) : bool
+    public function deleteItems(array $keys = null) : bool
     {
+        if ($keys === null) {
+            $keys = array_keys($this->items);
+        }
+
         foreach ($keys as $key) {
-            if ($this->hasItem($key)) {
-                $this->deleteItem($key);
-                if ($this->hasItem($key)) {
-                    return false;
-                }
+            if (!$this->deleteItem($key)) {
+                return false;
             }
         }
         return true;
     }
 
 
-    /**
-     * Persists a cache item immediately.
-     *
+     /**
+     * Function load
+     * Load a saved cache pool by stream and return this loaded, or return this current object
      * @param CacheItemInterface $item
      *   The cache item to save.
-     *
+     * @return bool
+     *   True if the item was successfully persisted. False if there was an error.
+     */
+    public function load() : ?CacheItemPool
+    {
+        if (file_exists($this->cacheFilePath)) {
+            $stream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "r+");
+            if ($stream instanceof StreamInterface && $stream->isReadable()) {
+                $this->unserialize($stream->getContents());
+                $stream->close();
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Function save
+     * Persists a cache item immediately.
+     * @param CacheItemInterface $item
+     *   The cache item to save.
      * @return bool
      *   True if the item was successfully persisted. False if there was an error.
      */
     public function save(CacheItemInterface $item) : bool
     {
-        //
+        $this->withItem($item->getKey(), $item->get(), $item->getExpiration(), $item->getTime());
+        if ($this->hasItem($item->getKey())) {
+            return $this->commit();
+        }
+        return false;
     }
 
 
     /**
+     * Function saveDeferred
      * Sets a cache item to be persisted later.
-     *
      * @param CacheItemInterface $item
      *   The cache item to save.
-     *
      * @return bool
      *   False if the item could not be queued or if a commit was attempted and failed. True otherwise.
      */
     public function saveDeferred(CacheItemInterface $item) : bool
     {
-        //
+        if ($item instanceof CacheItem) {
+            $this->withItem($item->getKey(), $item->get(), $item->getExpiration(), $item->getTime());
+            return $this->hasItem($item->getKey());
+        }
+        return false;
     }
 
     /**
+     * Function commit
      * Persists any deferred cache items.
-     *
      * @return bool
      *   True if all not-yet-saved items were successfully saved or there were none. False otherwise.
      */
     public function commit() : bool
     {
-        //
+        $this->checkItensHit();
+        $poolSerialized = $this->serialize();
+        $poolStream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath);
+        
+        if ($poolStream instanceof StreamInterface && $poolStream->isWritable()) {
+            $isWrite = $poolStream->write($poolSerialized) === strlen($poolSerialized);
+            $isSave = $isWrite && file_exists($this->cacheFilePath);
+            $poolStream->close();
+            return $isSave;
+        }
+
+        return true;
+    }
+
+    /**
+     * Function checkItensHit
+     * Check if items on is hitable and remove
+     * @return CacheItemPool
+     */
+    public function checkItensHit() : CacheItemPool
+    {
+        foreach ($this->items as $item) {
+            if (!$item->isHit()) {
+                $this->deleteItem($item->getKey());
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Function serialize
+     * Serialize this pool
+     * @return string
+     */
+    public function serialize() : string
+    {
+        return serialize($this);
+    }
+
+   
+    /**
+      * Function unserialize
+      * Unserialize this pool
+      * @param string $pool
+      *
+      * @return CacheItemPool
+      */
+    public function unserialize(string $pool) : CacheItemPool
+    {
+        $poolObj = unserialize($pool);
+        if ($poolObj instanceof CacheItemPool) {
+            $this->items = $poolObj->getItems();
+        }
+        return $this;
     }
 }
