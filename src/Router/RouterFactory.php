@@ -18,7 +18,6 @@ class RouterFactory
     /**
      * Function create
      * Create an instance of  Basicis\Router\Router
-     *
      * @param string $filesPath
      * @param ServerRequestInterface $request
      * @return Router

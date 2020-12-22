@@ -75,6 +75,7 @@ class Route
 
     /**
      * Function getCallback
+     * Get route callback if this is a Closure, else return null
      * @return \Closure|null
      */
     public function getCallback() : ?\Closure
@@ -85,6 +86,7 @@ class Route
 
     /**
     * Function getCallbackString
+    * Get route callback if this is a string, else return null
     * @return string|null
     */
     public function getCallbackString() : ?string
@@ -94,6 +96,7 @@ class Route
 
     /**
      * Function setCallback
+     * Set route a callback
      * @return Route
      */
     public function setCallback($callback = null) : Route
@@ -106,6 +109,7 @@ class Route
 
     /**
      * Function setArgument
+     * Set route argument
      * @param string $key - key of argument object
      * @param mixed $value - value to this key
      * @return Route
@@ -120,6 +124,7 @@ class Route
 
     /**
      * Function setArguments
+     * Set route arguments
      * @param array $args - Array of arguments
      * @return Route
      */
@@ -133,6 +138,7 @@ class Route
 
     /**
      * Function getArguments
+     * Get route arguments
      * @return object|null
      */
     public function getArguments() : ?object
@@ -142,6 +148,7 @@ class Route
 
     /**
      * Function getName
+     * Get route name/url
      * @return string
      */
     public function getName() : string
@@ -151,6 +158,7 @@ class Route
 
     /**
      * Function getMethod
+     * Get route method
      * @return string
      */
     public function getMethod() : string
@@ -160,6 +168,7 @@ class Route
 
     /**
      * Function getMiddlewares
+     * Get a array with route middlewares keys
      * @return array
      */
     public function getMiddlewares() : array
