@@ -7,7 +7,6 @@ use \ReflectionMethod;
 /**
  * Annotations Class
  * Describes a Annotations instance, and works with the comment blocks
- *
  * @category Core
  * @package  Basicis/Core
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -19,7 +18,6 @@ class Annotations
 
     /**
      * $class variable
-     *
      * @var \ReflectionClass
      */
     private $class;
@@ -27,7 +25,6 @@ class Annotations
 
     /**
      * $method variable
-     *
      * @var \ReflectionMethod
      */
     private $method;
@@ -36,7 +33,6 @@ class Annotations
     /**
      * Function __construct
      * Receives a class as an argument, and works with the comment blocks
-     *
      * @param string $class
      */
     public function __construct(string $class, string $method = null)
@@ -53,7 +49,7 @@ class Annotations
 
     /**
      * Function setClass
-     *
+     * Setting class for extract annotations
      * @param  string $class
      * @return Annotations
      */
@@ -68,7 +64,7 @@ class Annotations
 
     /**
      * Function getClass
-     *
+     * Getting a annotations ReflectionClass
      * @return \ReflectionClass|null
      */
     public function getClass() : ?\ReflectionClass
@@ -78,7 +74,7 @@ class Annotations
 
     /**
      * Function setMethod
-     *
+     * Setting a method into a instance of ReflectionClass for extract annotations
      * @param  string $method
      * @return Annotations
      */
@@ -92,7 +88,7 @@ class Annotations
 
     /**
      * Function getMethod
-     *
+     * Getting a annotations ReflectionMethod
      * @return \ReflectionMethod|null
      */
     public function getMethod() : ?\ReflectionMethod
@@ -103,7 +99,6 @@ class Annotations
     /**
      * Function getCommentByTag
      * Get a documentation bloc line by any tag, and return this line
-     *
      * @param  string  $method
      * @param  string  $tag
      * @param  integer $index
