@@ -4,14 +4,11 @@ Log Class
 Describes a logger instance.
 
 The message MUST be a string or object implementing __toString().
-
 The message MAY contain placeholders in the form: {foo} where foo
 will be replaced by the context data in key "foo".
-
 The context array can contain arbitrary data, the only assumption that
 can be made by implementors is that if an Exception instance is given
 to produce a stack trace, it MUST be in a key named "exception".
-
 See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
 for the full interface specification.  
 
@@ -30,7 +27,7 @@ Action must be taken immediately.|
 |[critical](#logcritical)|Function critical
 Critical conditions.|
 |[debug](#logdebug)|Funtion debug
-Detailed debug information.|
+Detailed debug information|
 |[emergency](#logemergency)|Function emergency
 System is unusable.|
 |[error](#logerror)|Function error
@@ -40,13 +37,15 @@ be logged and monitored.|
 Format Message to file log line|
 |[formatMessageToArray](#logformatmessagetoarray)|Function formatMessageToArray
 Format Message line, and return this as array
-Ex:
+- Ex:
+```php
 [
   "date" => Y/m/d H:i:s,
   "level" => "Level",
   "message" => "Text Message interpolated.",
   "context" => array()
-];|
+];
+```|
 |[info](#loginfo)|Function info
 Interesting events.|
 |[interpolate](#loginterpolate)|Function interpolate
@@ -54,7 +53,7 @@ Interpolates context values into the message placeholders.|
 |[log](#loglog)|Function log
 Logs with an arbitrary level.|
 |[notice](#lognotice)|Function notice
-Normal but significant events.|
+Normal but significant events|
 |[warning](#logwarning)|Function warning
 Exceptional occurrences that are not errors.|
 
@@ -101,7 +100,7 @@ public alert (string $message, array $context)
 Function alert
 Action must be taken immediately. 
 
-Example: Entire website down, database unavailable, etc. This should  
+- Ex: Entire website down, database unavailable, etc. This should  
 trigger the SMS alerts and wake you up. 
 
 **Parameters**
@@ -132,7 +131,7 @@ public critical (string $message, array $context)
 Function critical
 Critical conditions. 
 
-Example: Application component unavailable, unexpected exception. 
+- Ex: Application component unavailable, unexpected exception. 
 
 **Parameters**
 
@@ -160,7 +159,7 @@ public debug (string $message, array $context)
 ```
 
 Funtion debug
-Detailed debug information. 
+Detailed debug information 
 
  
 
@@ -286,13 +285,15 @@ public formatMessageToArray (string $level, string $message, string $date_format
 
 Function formatMessageToArray
 Format Message line, and return this as array
-Ex:
+- Ex:
+```php
 [
   "date" => Y/m/d H:i:s,
   "level" => "Level",
   "message" => "Text Message interpolated.",
   "context" => array()
-]; 
+];
+``` 
 
  
 
@@ -326,7 +327,7 @@ public info (string $message, array $context)
 Function info
 Interesting events. 
 
-Example: User logs in, SQL logs. 
+- Ex: User logs in, SQL logs. 
 
 **Parameters**
 
@@ -416,7 +417,7 @@ public notice (string $message, array $context)
 ```
 
 Function notice
-Normal but significant events. 
+Normal but significant events 
 
  
 
@@ -448,7 +449,7 @@ public warning (string $message, array $context)
 Function warning
 Exceptional occurrences that are not errors. 
 
-Example: Use of deprecated APIs, poor use of an API, undesirable things  
+- Ex: Use of deprecated APIs, poor use of an API, undesirable things  
 that are not necessarily wrong. 
 
 **Parameters**

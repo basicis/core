@@ -28,8 +28,10 @@ Another alternative to the *float* function|
 Another alternative to the *integer* function|
 |[integer](#validatorinteger)|Function integer|
 |[isNull](#validatorisnull)|Function isNull|
+|[max](#validatormax)|Function max|
 |[maxCount](#validatormaxcount)|Function maxcount|
 |[maxLen](#validatormaxlen)|Function maxlen|
+|[min](#validatormin)|Function min|
 |[minCount](#validatormincount)|Function mincount|
 |[minLen](#validatorminlen)|Function minLen|
 |[noExists](#validatornoexists)|Function noexists|
@@ -41,7 +43,40 @@ Another alternative to the *string* function|
 |[url](#validatorurl)|Function url|
 |[validArray](#validatorvalidarray)|Function validArray|
 |[validString](#validatorvalidstring)|Function validString|
-|[validate](#validatorvalidate)|Function validate|
+|[validate](#validatorvalidate)|Function validate
+Validate a string or array as first param, with regex as second params
+> Validations
+- bool
+- boolean
+- compareHash
+- confirmPass
+- email
+- endWith
+- execMethod
+- exists
+- float
+- flt
+- has
+- hasKey
+- int
+- integer
+- isNull
+- maxCount
+- maxLen
+- minCount
+- minLen
+- min
+- max
+- noExists
+- noIsNull
+- startWith
+- str
+- string
+- url
+> Using Validations
+```php
+$result = Validator::validate("My Text", "string|minLen:6");
+//$result = true;|
 
 
 
@@ -480,6 +515,32 @@ Function isNull
 <hr />
 
 
+### Validator::max  
+
+**Description**
+
+```php
+public max (string|array $arg)
+```
+
+Function max 
+
+ 
+
+**Parameters**
+
+* `(string|array) $arg`
+
+**Return Values**
+
+`object`
+
+
+
+
+<hr />
+
+
 ### Validator::maxCount  
 
 **Description**
@@ -523,6 +584,32 @@ Function maxlen
 
 * `(mixed) $arg`
 : - Validation argument, array or string  
+
+**Return Values**
+
+`object`
+
+
+
+
+<hr />
+
+
+### Validator::min  
+
+**Description**
+
+```php
+public min (string|array $arg)
+```
+
+Function min 
+
+ 
+
+**Parameters**
+
+* `(string|array) $arg`
 
 **Return Values**
 
@@ -815,9 +902,47 @@ Function validString
 public static validate (string|array $data, string|array $validations, string $class)
 ```
 
-Function validate 
+Function validate
+Validate a string or array as first param, with regex as second params
+> Validations
+- bool
+- boolean
+- compareHash
+- confirmPass
+- email
+- endWith
+- execMethod
+- exists
+- float
+- flt
+- has
+- hasKey
+- int
+- integer
+- isNull
+- maxCount
+- maxLen
+- minCount
+- minLen
+- min
+- max
+- noExists
+- noIsNull
+- startWith
+- str
+- string
+- url
+> Using Validations
+```php
+$result = Validator::validate("My Text", "string|minLen:6");
+//$result = true; 
 
- 
+$result = Validator::validate("My Text", "string|minLen:2|maxLen:4");  
+//$result = false;  
+  
+* $result = Validator::validate([ "id" => 10, name => "Marie" ], ["id" => "int|minCount:1"]);  
+//$result = true;  
+``` 
 
 **Parameters**
 

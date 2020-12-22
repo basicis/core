@@ -17,7 +17,7 @@ Basicis\Model\Model
 |[checkPass](#authcheckpass)|Function checkPass
 Check Auth password key|
 |[getEmail](#authgetemail)|Function getEmail
-Get Auth email key|
+Get Auth email|
 |[getRole](#authgetrole)|Function getRole
 Get role permission ID|
 |[getRoleName](#authgetrolename)|Function getRoleName
@@ -25,17 +25,17 @@ Get role permission Name|
 |[getUser](#authgetuser)|Function getUser
 Get a Auth User by token and appKey|
 |[getUsername](#authgetusername)|Function getUsername
-Get Auth username key|
+Get Auth username|
 |[login](#authlogin)|Function function
 Check  Auth User and return a string token of on success or null in error case|
 |[setEmail](#authsetemail)|Function setEmail
-Set Auth email key|
+Set Auth email|
 |[setPass](#authsetpass)|Function setPass
 Set Auth password key|
 |[setRole](#authsetrole)|Function setRole
 Set role permission ID includes is Default roles permissions IDs 'DEFAULT_ROLES' or optional > 5|
 |[setUsername](#authsetusername)|Function setUsername
-Set Auth username key|
+Set Auth username|
 
 ## Inherited methods
 
@@ -62,12 +62,14 @@ Return entity created timestamp|
 Return entity ID (unique on system identification)|
 |getManager|Function getManager
 Get a instance of Doctrine ORM EntityManager an return this, or null|
-|getUpdated|Get updated.|
+|getUpdated|Function getUpdated
+Return entity updated timestamp|
 |save|Function save
 Save data of this entity to database, use for create or update entities|
-|setCreated|Function setCreated.|
+|setCreated|Function setCreated
+Set entity creation timestamp|
 |setUpdated|Function setUpdated
-Return entity updated timestamp|
+Set entity updated timestamp|
 
 
 
@@ -107,7 +109,7 @@ public getEmail (void)
 ```
 
 Function getEmail
-Get Auth email key 
+Get Auth email 
 
  
 
@@ -215,7 +217,7 @@ public getUsername (void)
 ```
 
 Function getUsername
-Get Auth username key 
+Get Auth username 
 
  
 
@@ -278,7 +280,7 @@ public setEmail (string $email)
 ```
 
 Function setEmail
-Set Auth email key 
+Set Auth email 
 
  
 
@@ -359,7 +361,7 @@ public setUsername (string $username)
 ```
 
 Function setUsername
-Set Auth username key 
+Set Auth username 
 
  
 

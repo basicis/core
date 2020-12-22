@@ -11,15 +11,24 @@ Route Class
 | Name | Description |
 |------|-------------|
 |[__construct](#route__construct)|Function __construct|
-|[getArguments](#routegetarguments)|Function getArguments|
-|[getCallback](#routegetcallback)|Function getCallback|
-|[getCallbackString](#routegetcallbackstring)|Function getCallbackString|
-|[getMethod](#routegetmethod)|Function getMethod|
-|[getMiddlewares](#routegetmiddlewares)|Function getMiddlewares|
-|[getName](#routegetname)|Function getName|
-|[setArgument](#routesetargument)|Function setArgument|
-|[setArguments](#routesetarguments)|Function setArguments|
-|[setCallback](#routesetcallback)|Function setCallback|
+|[getArguments](#routegetarguments)|Function getArguments
+Get route arguments|
+|[getCallback](#routegetcallback)|Function getCallback
+Get route callback if this is a Closure, else return null|
+|[getCallbackString](#routegetcallbackstring)|Function getCallbackString
+Get route callback if this is a string, else return null|
+|[getMethod](#routegetmethod)|Function getMethod
+Get route method|
+|[getMiddlewares](#routegetmiddlewares)|Function getMiddlewares
+Get a array with route middlewares keys|
+|[getName](#routegetname)|Function getName
+Get route name/url|
+|[setArgument](#routesetargument)|Function setArgument
+Set route argument|
+|[setArguments](#routesetarguments)|Function setArguments
+Set route arguments|
+|[setCallback](#routesetcallback)|Function setCallback
+Set route a callback|
 
 
 
@@ -63,7 +72,8 @@ Function __construct
 public getArguments (void)
 ```
 
-Function getArguments 
+Function getArguments
+Get route arguments 
 
  
 
@@ -89,7 +99,8 @@ Function getArguments
 public getCallback (void)
 ```
 
-Function getCallback 
+Function getCallback
+Get route callback if this is a Closure, else return null 
 
  
 
@@ -115,7 +126,8 @@ Function getCallback
 public getCallbackString (void)
 ```
 
-Function getCallbackString 
+Function getCallbackString
+Get route callback if this is a string, else return null 
 
  
 
@@ -141,7 +153,8 @@ Function getCallbackString
 public getMethod (void)
 ```
 
-Function getMethod 
+Function getMethod
+Get route method 
 
  
 
@@ -167,7 +180,8 @@ Function getMethod
 public getMiddlewares (void)
 ```
 
-Function getMiddlewares 
+Function getMiddlewares
+Get a array with route middlewares keys 
 
  
 
@@ -193,7 +207,8 @@ Function getMiddlewares
 public getName (void)
 ```
 
-Function getName 
+Function getName
+Get route name/url 
 
  
 
@@ -219,7 +234,8 @@ Function getName
 public setArgument (string $key, mixed $value)
 ```
 
-Function setArgument 
+Function setArgument
+Set route argument 
 
  
 
@@ -248,7 +264,8 @@ Function setArgument
 public setArguments (array $args)
 ```
 
-Function setArguments 
+Function setArguments
+Set route arguments 
 
  
 
@@ -275,7 +292,8 @@ Function setArguments
 public setCallback (void)
 ```
 
-Function setCallback 
+Function setCallback
+Set route a callback 
 
  
 

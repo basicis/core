@@ -10,9 +10,22 @@ View Class
 
 | Name | Description |
 |------|-------------|
-|[__construct](#view__construct)||
-|[getView](#viewgetview)||
-|[setFilters](#viewsetfilters)||
+|[__construct](#view__construct)|Function __construct|
+|[getView](#viewgetview)|Fuction getView
+Get a string result os template with optional $data array|
+|[setFilters](#viewsetfilters)|Function setFilters
+Setting filters functions for use into template
+- Setting into config/app-config.php file
+```php
+ $app->setViewFilters([
+ //here, key is required
+ "isTrue" => function ($value = true) {
+     return $value;
+ }
+ ]);
+```
+- Using into Twig Template file
+`{{isTrue($var = true)}}`|
 
 
 
@@ -22,16 +35,16 @@ View Class
 **Description**
 
 ```php
- __construct (void)
+public __construct (array $paths)
 ```
 
- 
+Function __construct 
 
  
 
 **Parameters**
 
-`This function has no parameters.`
+* `(array) $paths`
 
 **Return Values**
 
@@ -46,20 +59,24 @@ View Class
 **Description**
 
 ```php
- getView (void)
+public getView (string $name, array $data)
 ```
 
- 
+Fuction getView
+Get a string result os template with optional $data array 
 
  
 
 **Parameters**
 
-`This function has no parameters.`
+* `(string) $name`
+* `(array) $data`
 
 **Return Values**
 
-`void`
+`string|null`
+
+
 
 
 <hr />
@@ -70,20 +87,34 @@ View Class
 **Description**
 
 ```php
- setFilters (void)
+public setFilters (array $filters)
 ```
 
- 
+Function setFilters
+Setting filters functions for use into template
+- Setting into config/app-config.php file
+```php
+ $app->setViewFilters([
+ //here, key is required
+ "isTrue" => function ($value = true) {
+     return $value;
+ }
+ ]);
+```
+- Using into Twig Template file
+`{{isTrue($var = true)}}` 
 
  
 
 **Parameters**
 
-`This function has no parameters.`
+* `(array) $filters`
 
 **Return Values**
 
 `void`
+
+
 
 
 <hr />

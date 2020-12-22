@@ -4,7 +4,7 @@ NetworkException class
 Thrown when the request cannot be completed because of network issues.
 
 There is no response object as this exception is thrown when no response has been received.
-Example: the target host name can not be resolved or the connection failed.  
+Ex: the target host name can not be resolved or the connection failed.  
 
 ## Implements:
 Stringable, Throwable, Psr\Http\Client\ClientExceptionInterface, Psr\Http\Client\NetworkExceptionInterface

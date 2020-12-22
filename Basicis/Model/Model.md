@@ -34,12 +34,14 @@ Return entity created timestamp|
 Return entity ID (unique on system identification)|
 |[getManager](#modelgetmanager)|Function getManager
 Get a instance of Doctrine ORM EntityManager an return this, or null|
-|[getUpdated](#modelgetupdated)|Get updated.|
+|[getUpdated](#modelgetupdated)|Function getUpdated
+Return entity updated timestamp|
 |[save](#modelsave)|Function save
 Save data of this entity to database, use for create or update entities|
-|[setCreated](#modelsetcreated)|Function setCreated.|
+|[setCreated](#modelsetcreated)|Function setCreated
+Set entity creation timestamp|
 |[setUpdated](#modelsetupdated)|Function setUpdated
-Return entity updated timestamp|
+Set entity updated timestamp|
 
 
 
@@ -346,7 +348,8 @@ Get a instance of Doctrine ORM EntityManager an return this, or null
 public getUpdated (void)
 ```
 
-Get updated. 
+Function getUpdated
+Return entity updated timestamp 
 
  
 
@@ -399,9 +402,10 @@ Save data of this entity to database, use for create or update entities
 public setCreated (string $created)
 ```
 
-Function setCreated. 
-
+Function setCreated
 Set entity creation timestamp 
+
+ 
 
 **Parameters**
 
@@ -426,7 +430,7 @@ public setUpdated (string $updated)
 ```
 
 Function setUpdated
-Return entity updated timestamp 
+Set entity updated timestamp 
 
  
 

@@ -13,12 +13,16 @@ Describes a Annotations instance, and works with the comment blocks
 |------|-------------|
 |[__construct](#annotations__construct)|Function __construct
 Receives a class as an argument, and works with the comment blocks|
-|[getClass](#annotationsgetclass)|Function getClass|
+|[getClass](#annotationsgetclass)|Function getClass
+Getting a annotations ReflectionClass|
 |[getCommentByTag](#annotationsgetcommentbytag)|Function getCommentByTag
 Get a documentation bloc line by any tag, and return this line|
-|[getMethod](#annotationsgetmethod)|Function getMethod|
-|[setClass](#annotationssetclass)|Function setClass|
-|[setMethod](#annotationssetmethod)|Function setMethod|
+|[getMethod](#annotationsgetmethod)|Function getMethod
+Getting a annotations ReflectionMethod|
+|[setClass](#annotationssetclass)|Function setClass
+Setting class for extract annotations|
+|[setMethod](#annotationssetmethod)|Function setMethod
+Setting a method into a instance of ReflectionClass for extract annotations|
 
 
 
@@ -56,7 +60,8 @@ Receives a class as an argument, and works with the comment blocks
 public getClass (void)
 ```
 
-Function getClass 
+Function getClass
+Getting a annotations ReflectionClass 
 
  
 
@@ -111,7 +116,8 @@ Get a documentation bloc line by any tag, and return this line
 public getMethod (void)
 ```
 
-Function getMethod 
+Function getMethod
+Getting a annotations ReflectionMethod 
 
  
 
@@ -137,7 +143,8 @@ Function getMethod
 public setClass (string $class)
 ```
 
-Function setClass 
+Function setClass
+Setting class for extract annotations 
 
  
 
@@ -163,7 +170,8 @@ Function setClass
 public setMethod (string $method)
 ```
 
-Function setMethod 
+Function setMethod
+Setting a method into a instance of ReflectionClass for extract annotations 
 
  
 

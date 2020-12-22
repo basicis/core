@@ -11,19 +11,32 @@ Router Class
 | Name | Description |
 |------|-------------|
 |[__construct](#router__construct)|Function __constructs|
-|[extractArgId](#routerextractargid)|function extractArgId|
-|[extractArgRegex](#routerextractargregex)|Function extractArgRegex|
-|[findByCount](#routerfindbycount)|Function findByCount|
-|[findByMethod](#routerfindbymethod)|Function findByMethod|
-|[findByName](#routerfindbyname)|Function findByName|
-|[findByRegex](#routerfindbyregex)|Function findByRegex|
-|[getResponse](#routergetresponse)|Function getResponse|
-|[getRoute](#routergetroute)|Function getRoute|
-|[getRoutes](#routergetroutes)|Function getRoutes|
-|[group](#routergroup)|group function alias for routerGroup|
-|[hasRoute](#routerhasroute)|Function hasRoute|
-|[setRequest](#routersetrequest)|Function getResponse|
-|[setRoute](#routersetroute)|Function setRoute|
+|[extractArgId](#routerextractargid)|Function extractArgId
+Extract a argument id/name of route name  part|
+|[extractArgRegex](#routerextractargregex)|Function extractArgRegex
+Extract a argument regex of route name part|
+|[findByCount](#routerfindbycount)|Function findByCount
+Find all routes by count spaces bar "/"|
+|[findByMethod](#routerfindbymethod)|Function findByMethod
+Find all routes by method|
+|[findByName](#routerfindbyname)|Function findByName
+Find a route by name/url|
+|[findByRegex](#routerfindbyregex)|Function findByRegex
+Find a route by regular expression|
+|[getResponse](#routergetresponse)|Function getResponse
+Get a ResponseInterface Object or router run|
+|[getRoute](#routergetroute)|Function getRoute
+Get route requested|
+|[getRoutes](#routergetroutes)|Function getRoutes
+Get a array with all routes into instance of router|
+|[group](#routergroup)|Function group
+A alias for routerGroup|
+|[hasRoute](#routerhasroute)|Function hasRoute
+Check if route match exists for name and method|
+|[setRequest](#routersetrequest)|Function getResponse
+Set a ServerRequestInterface Object for router run|
+|[setRoute](#routersetroute)|Function setRoute
+Set a route for router|
 |[setRouteByAnnotation](#routersetroutebyannotation)|Function setRouteByAnnotation
 Receives a class as an argument, and works with the comment blocks as @Route|
 
@@ -64,7 +77,8 @@ Function __constructs
 public extractArgId (string $routeNamePart)
 ```
 
-function extractArgId 
+Function extractArgId
+Extract a argument id/name of route name  part 
 
  
 
@@ -90,7 +104,8 @@ function extractArgId
 public extractArgRegex (string $routeNamePart)
 ```
 
-Function extractArgRegex 
+Function extractArgRegex
+Extract a argument regex of route name part 
 
  
 
@@ -116,7 +131,8 @@ Function extractArgRegex
 public findByCount (string $url, array $routes)
 ```
 
-Function findByCount 
+Function findByCount
+Find all routes by count spaces bar "/" 
 
  
 
@@ -143,7 +159,8 @@ Function findByCount
 public findByMethod (string $url, array $routes)
 ```
 
-Function findByMethod 
+Function findByMethod
+Find all routes by method 
 
  
 
@@ -170,7 +187,8 @@ Function findByMethod
 public findByName (string $url)
 ```
 
-Function findByName 
+Function findByName
+Find a route by name/url 
 
  
 
@@ -196,7 +214,8 @@ Function findByName
 public findByRegex (string $url)
 ```
 
-Function findByRegex 
+Function findByRegex
+Find a route by regular expression 
 
  
 
@@ -222,7 +241,8 @@ Function findByRegex
 public getResponse (void)
 ```
 
-Function getResponse 
+Function getResponse
+Get a ResponseInterface Object or router run 
 
  
 
@@ -248,7 +268,8 @@ Function getResponse
 public getRoute (string $url, string $method)
 ```
 
-Function getRoute 
+Function getRoute
+Get route requested 
 
  
 
@@ -276,7 +297,8 @@ Function getRoute
 public getRoutes (void)
 ```
 
-Function getRoutes 
+Function getRoutes
+Get a array with all routes into instance of router 
 
  
 
@@ -302,7 +324,8 @@ Function getRoutes
 public group (array $url, string|\Closure $callback, string|array $middlewares)
 ```
 
-group function alias for routerGroup 
+Function group
+A alias for routerGroup 
 
  
 
@@ -330,7 +353,8 @@ group function alias for routerGroup
 public hasRoute (string $name, string $method)
 ```
 
-Function hasRoute 
+Function hasRoute
+Check if route match exists for name and method 
 
  
 
@@ -357,7 +381,8 @@ Function hasRoute
 public setRequest (void)
 ```
 
-Function getResponse 
+Function getResponse
+Set a ServerRequestInterface Object for router run 
 
  
 
@@ -383,7 +408,8 @@ Function getResponse
 public setRoute (string|array $url, string|array $method, string|\Clousure $callback, string|array $middlewares)
 ```
 
-Function setRoute 
+Function setRoute
+Set a route for router 
 
  
 

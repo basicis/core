@@ -15,6 +15,10 @@ DataBase Class
  Extract url a params to array ans return this|
 |[getManager](#databasegetmanager)|Function getManager
 Get a instance of Doctrine ORM EntityManager an return this, or null|
+|[isPath](#databaseispath)|Function isPath
+Check if string is a database path|
+|[isUrl](#databaseisurl)|Function isUrl
+Check if string is a database url|
 |[setDBConfig](#databasesetdbconfig)|Function setDBConfig
 Set database configurations, driver, url and/or path (for sqlite)|
 |[setORMConfig](#databasesetormconfig)|Function setORMConfig
@@ -98,6 +102,60 @@ Get a instance of Doctrine ORM EntityManager an return this, or null
 **Return Values**
 
 `\EntityManager|null`
+
+
+
+
+<hr />
+
+
+### DataBase::isPath  
+
+**Description**
+
+```php
+public isPath (string $url)
+```
+
+Function isPath
+Check if string is a database path 
+
+ 
+
+**Parameters**
+
+* `(string) $url`
+
+**Return Values**
+
+`bool`
+
+
+
+
+<hr />
+
+
+### DataBase::isUrl  
+
+**Description**
+
+```php
+public isUrl (string $url)
+```
+
+Function isUrl
+Check if string is a database url 
+
+ 
+
+**Parameters**
+
+* `(string) $url`
+
+**Return Values**
+
+`bool`
 
 
 

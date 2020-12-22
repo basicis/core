@@ -41,11 +41,13 @@ Return entity created timestamp|
 Return entity ID (unique on system identification)|
 |getManager|Function getManager
 Get a instance of Doctrine ORM EntityManager an return this, or null|
-|getUpdated|Get updated.|
+|getUpdated|Function getUpdated
+Return entity updated timestamp|
 |save|Function save
 Save data of this entity to database, use for create or update entities|
-|setCreated|Function setCreated.|
+|setCreated|Function setCreated
+Set entity creation timestamp|
 |setUpdated|Function setUpdated
-Return entity updated timestamp|
+Set entity updated timestamp|
 
 

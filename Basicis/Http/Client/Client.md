@@ -11,18 +11,36 @@ Psr\Http\Client\ClientInterface
 
 | Name | Description |
 |------|-------------|
-|[connect](#clientconnect)|Function connect|
-|[delete](#clientdelete)|Function delete|
-|[get](#clientget)|Function get|
-|[head](#clienthead)|Function head|
-|[options](#clientoptions)|Function options|
-|[path](#clientpath)|Function path|
-|[post](#clientpost)|Function post|
-|[purge](#clientpurge)|Function purge|
+|[connect](#clientconnect)|Function connect
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[delete](#clientdelete)|Function delete
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[get](#clientget)|Function get
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[head](#clienthead)|Function head
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[options](#clientoptions)|Function options
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[path](#clientpath)|Function path
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[post](#clientpost)|Function post
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
+|[purge](#clientpurge)|Function purge
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
 |[put](#clientput)|Function put|
 |[sendRequest](#clientsendrequest)|Funtion sendRequest
 Sends a PSR-7 request and returns a PSR-7 response.|
-|[trace](#clienttrace)|Function trace|
+|[trace](#clienttrace)|Function trace
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
+and returns a ResponseInterface instance.|
 
 
 
@@ -35,10 +53,11 @@ Sends a PSR-7 request and returns a PSR-7 response.|
 public connect (string $uri, array $data)
 ```
 
-Function connect 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function connect
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -64,10 +83,11 @@ and returns a ResponseInterface instance.
 public delete (string $uri, array $data)
 ```
 
-Function delete 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function delete
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -93,10 +113,11 @@ and returns a ResponseInterface instance.
 public get (string $uri, array $data, array $data)
 ```
 
-Function get 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function get
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -123,10 +144,11 @@ and returns a ResponseInterface instance.
 public head (string $uri, array $data)
 ```
 
-Function head 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function head
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -152,10 +174,11 @@ and returns a ResponseInterface instance.
 public options (string $uri, array $data)
 ```
 
-Function options 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function options
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -181,10 +204,11 @@ and returns a ResponseInterface instance.
 public path (string $uri, array $data)
 ```
 
-Function path 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function path
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -210,10 +234,11 @@ and returns a ResponseInterface instance.
 public post (string $uri, array $data)
 ```
 
-Function post 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function post
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -239,10 +264,11 @@ and returns a ResponseInterface instance.
 public purge (string $uri, array $data)
 ```
 
-Function purge 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function purge
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
@@ -330,10 +356,11 @@ Sends a PSR-7 request and returns a PSR-7 response.
 public trace (string $uri, array $data)
 ```
 
-Function trace 
-
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
+Function trace
+Instance a Request Interface object with the specified $method, $uri, $data, and $options,
 and returns a ResponseInterface instance. 
+
+ 
 
 **Parameters**
 
