@@ -1,13 +1,13 @@
 <?php
-
 namespace Test\Message\Http;
+
 use PHPUnit\Framework\TestCase;
 use Basicis\Http\Message\Uri;
 
 /**
  *  classTest\Http\Message\UriTest
  */
-class UriTest extends TestCase 
+class UriTest extends TestCase
 {
 
     private $uri;
@@ -28,7 +28,7 @@ class UriTest extends TestCase
      */
     public function testContruct()
     {
-        $this->assertInstanceOf(Uri::class,$this->uri);
+        $this->assertInstanceOf(Uri::class, $this->uri);
     }
 
     /**
@@ -38,7 +38,7 @@ class UriTest extends TestCase
      */
     public function testGetScheme()
     {
-        //without scheme especification  
+        //without scheme especification
         $this->assertEquals('http', $this->uri->getScheme());
     }
 
@@ -62,23 +62,21 @@ class UriTest extends TestCase
      */
     public function testAuthority()
     {
-         //with empty host 
+         //with empty host
          $this->assertEquals('localhost', $this->uri->getAuthority());
-    } 
+    }
 
 
-
-
-     /**
+    /**
      * testGetUserInfo function
      * Check Uri::getUserInfo()
      * @return void
      */
-    public function testGetUserInfo ()
+    public function testGetUserInfo()
     {
 
         //With user and password credencials
-        $this->assertinstanceOf(Uri::class, $this->uri->withUserinfo('messias', '12345') );
+        $this->assertinstanceOf(Uri::class, $this->uri->withUserinfo('messias', '12345'));
         $this->assertEquals('messias:12345', $this->uri->getUserInfo());
         
         //With user and without password credencials
@@ -97,7 +95,7 @@ class UriTest extends TestCase
      * @return void
      */
     public function testHost()
-    {   
+    {
         //without host especification
         $this->assertEquals('localhost', $this->uri->getHost());
     }
@@ -109,12 +107,12 @@ class UriTest extends TestCase
      * @return void
      */
     public function testWithHost()
-    {   
+    {
         //with host especification
         $uri = $this->uri->withHost('local');
         $this->assertInstanceOf(Uri::class, $uri);
         $this->assertEquals('local', $uri->getHost());
-        $this->assertEquals($uri->getAuthority(), 'local' );
+        $this->assertEquals($uri->getAuthority(), 'local');
     }
 
 
@@ -125,9 +123,9 @@ class UriTest extends TestCase
      * @return void
      */
     public function testPort()
-    {   
+    {
         //without especification
-        $this->assertEquals(null ,$this->uri->getPort());
+        $this->assertEquals(null, $this->uri->getPort());
 
         //with especification
         $this->uri->withPort(443);
@@ -143,7 +141,7 @@ class UriTest extends TestCase
      * @return void
      */
     public function testPath()
-    {   
+    {
         //Check home as '/' Path
         $this->assertEquals('/', $this->uri->getPath());
 
@@ -162,11 +160,11 @@ class UriTest extends TestCase
      * @return void
      */
     public function testFragment()
-    {   
+    {
         //Check Fragment ''
         $this->assertEquals('', $this->uri->getFragment());
 
-        //Check Fragment test as '#test' 
+        //Check Fragment test as '#test'
         $this->uri->withFragment('test');
         $this->assertInstanceOf(Uri::class, $this->uri);
         $this->assertEquals('test', $this->uri->getFragment());
@@ -179,14 +177,12 @@ class UriTest extends TestCase
      * @return void
      */
     public function testQuery()
-    {   
-        //Check with empty query string 
+    {
+        //Check with empty query string
         $this->assertEquals('', $this->uri->getQuery());
 
-        //Check with 'test=1234' query string 
+        //Check with 'test=1234' query string
         $this->uri->withQuery('test=1234&');
         $this->assertEquals('test=1234', $this->uri->getQuery());
     }
-
-
 }

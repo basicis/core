@@ -13,7 +13,7 @@ class UploadedFileTest extends TestCase
 {
     private $uploadedFile;
 
-    public function  __construct() 
+    public function __construct()
     {
         parent::__construct();
         $streamFactory = new StreamFactory();
@@ -27,7 +27,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetStream()
     {
-        $this->assertInstanceof(Stream::class,$this->uploadedFile->getStream());
+        $this->assertInstanceof(Stream::class, $this->uploadedFile->getStream());
     }
 
     /**
@@ -39,7 +39,7 @@ class UploadedFileTest extends TestCase
     {
         $path = 'php://temp/test';
         $this->uploadedFile->moveTo($path);
-        $this->assertEquals(false, file_exists($path) );
+        $this->assertEquals(false, file_exists($path));
     }
     
     /**
@@ -57,7 +57,7 @@ class UploadedFileTest extends TestCase
      *
      * @return void
      */
-    public function testGetError() 
+    public function testGetError()
     {
         $this->assertEquals(0, $this->uploadedFile->getError());
     }
@@ -69,7 +69,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientFilename()
     {
-        $this->assertEquals(null,$this->uploadedFile->getClientFilename());
+        $this->assertEquals(null, $this->uploadedFile->getClientFilename());
     }
     
     /**
@@ -79,7 +79,6 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientMediaType()
     {
-        $this->assertEquals(null,$this->uploadedFile->getClientMediaType());
+        $this->assertEquals(null, $this->uploadedFile->getClientMediaType());
     }
-
 }

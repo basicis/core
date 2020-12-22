@@ -1,5 +1,6 @@
 <?php
 namespace Test\Message\Http;
+
 use PHPUnit\Framework\TestCase;
 use Basicis\Http\Message\ResponseFactory;
 use Basicis\Http\Message\Response;
@@ -7,7 +8,7 @@ use Basicis\Http\Message\Response;
 /**
  *  classTest\Http\Message\ResponseFactoryTest
  */
-class ResponseFactoryTest extends TestCase 
+class ResponseFactoryTest extends TestCase
 {
     /**
      * testCreateResponse function
@@ -17,6 +18,6 @@ class ResponseFactoryTest extends TestCase
     public function testCreateResponse()
     {
         $factory = new ResponseFactory() ;
-        $this->assertInstanceOf(Response::class, $factory->createResponse(200) );
+        $this->assertInstanceOf(Response::class, $factory->createResponse(200));
     }
 }

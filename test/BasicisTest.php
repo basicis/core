@@ -224,7 +224,8 @@ class BasicisTest extends TestCase
         $tokenString = $tokenObj->create($user);
 
         //Setting this string token to a instanceof ServerRequestInterface in the Basicis App
-        //In the actual operation of the application, it must reach the same via http header in the format 'Authorization: Bearer <You-access-token-here>'
+        //In the actual operation of the application,
+        //it must reach the same via http header in the format 'Authorization: Bearer <You-access-token-here>'
         $this->app->setRequest($this->app->request()->withHeader("authorization", "Bearer ".$tokenString));
         
         //Exec tests assertions

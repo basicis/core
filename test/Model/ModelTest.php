@@ -84,5 +84,4 @@ class ModelTest extends TestCase
         $this->assertEquals(true, is_array($this->model->__toArray()));
         $this->assertEquals(true, is_string($this->model->__toString()));
     }
-
 }

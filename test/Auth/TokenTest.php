@@ -5,8 +5,6 @@ use PHPUnit\Framework\TestCase;
 use Basicis\Auth\Token;
 use Basicis\Auth\Auth as User;
 
-
-
 /**
  * Class TokenTest
  */
@@ -86,7 +84,7 @@ class TokenTest extends TestCase
     {
         $tokenDecode =  $this->tokenObj->decode($this->token);
         if ($tokenDecode !== null) {
-          return $this->assertEquals("my_username", $tokenDecode->usr->username);
+            return $this->assertEquals("my_username", $tokenDecode->usr->username);
         }
         $this->assertEquals("my_username", null);
     }
@@ -99,7 +97,6 @@ class TokenTest extends TestCase
      */
     public function testCheck()
     {
-      $this->assertEquals(true, $this->tokenObj->check($this->token));
+        $this->assertEquals(true, $this->tokenObj->check($this->token));
     }
-
 }
