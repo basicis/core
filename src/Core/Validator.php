@@ -14,35 +14,30 @@ class Validator
 {
     /**
      * $valid variable
-     *
      * @var bool
      */
     public $valid;
 
     /**
      * $data variable
-     *
      * @var mixed
      */
      public $data;
 
     /**
      * $class variable
-     *
      * @var string
      */
     public $class;
 
     /**
      * $valid variable
-     *
      * @var array
      */
     public $errors=[];
 
     /**
      * Function __construct
-     *
      * @param string $class - Classe name with namespace
      */
     public function __construct(string $class = null)
@@ -54,7 +49,46 @@ class Validator
 
     /**
      * Function validate
+     * Validate a string or array as first param, with regex as second params
+     * > Validations
+     * - bool
+     * - boolean
+     * - compareHash
+     * - confirmPass
+     * - email
+     * - endWith
+     * - execMethod
+     * - exists
+     * - float
+     * - flt
+     * - has
+     * - hasKey
+     * - int
+     * - integer
+     * - isNull
+     * - maxCount
+     * - maxLen
+     * - minCount
+     * - minLen
+     * - min
+     * - max
+     * - noExists
+     * - noIsNull
+     * - startWith
+     * - str
+     * - string
+     * - url
+     * > Using Validations
+     * ```php
+     * $result = Validator::validate("My Text", "string|minLen:6");
+     * //$result = true;
      *
+     * $result = Validator::validate("My Text", "string|minLen:2|maxLen:4");
+     * //$result = false;
+     *
+     * * $result = Validator::validate([ "id" => 10, name => "Marie" ], ["id" => "int|minCount:1"]);
+     * //$result = true;
+     * ```
      * @param  string|array $data
      * @param  string|array $validations
      * @param  string       $class
@@ -74,7 +108,6 @@ class Validator
 
     /**
      * Function validString
-     *
      * @param  string $data        - Given to be validated
      * @param  string $validations - All validations
      * @return void
@@ -286,6 +319,7 @@ class Validator
         ] ;
     }
 
+
     /**
      * Function noexists
      *
@@ -363,6 +397,7 @@ class Validator
         ];
     }
 
+
     /**
      * Function maxcount
      *
@@ -381,6 +416,42 @@ class Validator
             'valid' => false ,
             'error' =>  'The maximum value count must not be greater than '.$max.'!'
         ];
+    }
+
+    /**
+     * Function min
+     *
+     * @param string|array $arg
+     *
+     * @return object
+     */
+    public function min($arg) : object
+    {
+        if ($this->string($arg)->valid) {
+            return $this->minLen($arg);
+        }
+
+        if ($this->int($arg)->valid) {
+            return $this->minCount($arg);
+        }
+    }
+
+    /**
+     * Function max
+     *
+     * @param string|array $arg
+     *
+     * @return object
+     */
+    public function max($arg) : object
+    {
+        if ($this->string($arg)->valid) {
+            return $this->maxLen($arg);
+        }
+
+        if ($this->int($arg)->valid) {
+            return $this->maxCount($arg);
+        }
     }
 
     /**

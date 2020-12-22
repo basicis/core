@@ -9,7 +9,7 @@ use Basicis\Http\Message\Request;
  * RequestException class
  * Exception for when a request failed.
  *
- * Examples:
+ * Ex:
  *      - Request is invalid (e.g. method is missing)
  *      - Runtime request errors (e.g. the body stream is not seekable)
  *
@@ -25,7 +25,6 @@ class RequestException extends ClientException implements RequestExceptionInterf
      * Function getRequest
      * Returns the request.
      * The request object MAY be a different object from the one passed to ClientInterface::sendRequest()
-     *
      * @return RequestInterface
      */
     public function getRequest(): RequestInterface

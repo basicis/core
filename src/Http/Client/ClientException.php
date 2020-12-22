@@ -8,8 +8,7 @@ use Basicis\Exceptions\BasicisException;
 /**
  * ClientException class
  * Every HTTP client related exception MUST implement this interface.
- * - ClientException extends Basicis\Core\Exception
- *
+ * ClientException extends Basicis\Core\Exception
  * @category Basicis/Http/Client
  * @package  Basicis/Http/Client
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -20,14 +19,12 @@ class ClientException extends BasicisException implements ClientExceptionInterfa
 {
     /**
      * $request variable
-     *
      * @var Request
      */
     protected $request;
 
     /**
      * Function setRequest
-     *
      * @param Request $request
      * @return ClientException
      */

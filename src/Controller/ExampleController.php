@@ -7,7 +7,6 @@ use Basicis\Router\Route;
 /**
  * ExampleController Class - Extends Controller and implements ControllerInterface,
  * all controller classes extend from this
- *
  * @category Basicis/Controller
  * @package  Basicis/Controller
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -18,7 +17,6 @@ class ExampleController extends Controller
 {
     /**
      * Function index
-     *
      * @param      App    $app
      * @param      object $args
      * @return     void
@@ -28,5 +26,4 @@ class ExampleController extends Controller
     {
         return $app->json(["test" => "Teste Ok!"], 201);
     }
-
 }

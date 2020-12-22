@@ -20,21 +20,18 @@ class Client implements ClientInterface
 {
     /**
      * $data variable
-     *
      * @var array
      */
     private $data;
 
     /**
      * $content variable
-     *
      * @var array
      */
     private $context;
 
     /**
      * $request variable
-     *
      * @var RequestInterface
      */
     private $request;
@@ -42,7 +39,6 @@ class Client implements ClientInterface
     /**
      * Funtion sendRequest
      * Sends a PSR-7 request and returns a PSR-7 response.
-     *
      * @param RequestInterface $request
      * @return ResponseInterface
      * @throws ClientException If an error happens while processing the request.
@@ -76,7 +72,6 @@ class Client implements ClientInterface
      * Function createContext
      * Creates an http | https context with the stream_context_create() function
      *  and returns the resource
-     *
      * @param RequestInterface $request
      * @param array $content
      * @return resource
@@ -86,7 +81,7 @@ class Client implements ClientInterface
         $headers = array_merge(
             $request->getHeaderLines(),
             [
-                'User-Agent: Basicis/Http/Client',
+                'User-Agent: Basicis/Core - Http Client',
                 //'Connection: keep-alive',
             ]
         );
@@ -104,27 +99,23 @@ class Client implements ClientInterface
     }
 
     /**
-     * Function getMethod
-     *
+     * Function send
      * Instance a Request Interface object with the specified $ method,
      * $uri, $data, and $options, and returns the created instance.
-     *
      * @param string $method
      * @param string $uri
      * @param array $data [,$options = []]
      * @return RequestInterface
      */
-    private function getMethod(string $uri, string $method = 'GET', array ...$options) : RequestInterface
+    private function send(string $uri, string $method = 'GET', array ...$options) : RequestInterface
     {
         return new Request($uri, $method, $options);
     }
 
     /**
      * Function get
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data
      * @param array $data [,$options = []]
@@ -132,37 +123,33 @@ class Client implements ClientInterface
      */
     public function get(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'GET', $options));
+        return $this->sendRequest($this->send($uri, 'GET', $options));
     }
 
     /**
      * Function post
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function post(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'POST', $options));
+        return $this->sendRequest($this->send($uri, 'POST', $options));
     }
 
     /**
      * Function path
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function path(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'PATH', $options));
+        return $this->sendRequest($this->send($uri, 'PATH', $options));
     }
 
     /**
@@ -177,96 +164,84 @@ class Client implements ClientInterface
      */
     public function put(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'PUT', $options));
+        return $this->sendRequest($this->send($uri, 'PUT', $options));
     }
 
     /**
      * Function delete
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function delete(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'DELETE', $options));
+        return $this->sendRequest($this->send($uri, 'DELETE', $options));
     }
 
     /**
      * Function options
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function options(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'OPTIONS', $options));
+        return $this->sendRequest($this->send($uri, 'OPTIONS', $options));
     }
 
     /**
      * Function head
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function head(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'HEAD', $options));
+        return $this->sendRequest($this->send($uri, 'HEAD', $options));
     }
 
      /**
      * Function purge
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function purge(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'PURGE', $options));
+        return $this->sendRequest($this->send($uri, 'PURGE', $options));
     }
 
      /**
      * Function trace
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function trace(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'TRACE', $options));
+        return $this->sendRequest($this->send($uri, 'TRACE', $options));
     }
 
     /**
      * Function connect
-     *
      * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
      * and returns a ResponseInterface instance.
-     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
      */
     public function connect(string $uri, array ...$options) : ResponseInterface
     {
-        return $this->sendRequest($this->getMethod($uri, 'CONNECT', $options));
+        return $this->sendRequest($this->send($uri, 'CONNECT', $options));
     }
 }

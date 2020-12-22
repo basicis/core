@@ -39,7 +39,6 @@ abstract class Model implements ModelInterface
 
     /**
      * $protecteds variable
-     *
      * @var array
      */
     protected $protecteds = [];
@@ -48,7 +47,6 @@ abstract class Model implements ModelInterface
 
      /**
       * Function function
-      *
       * @param array|int|null $data
       */
     public function __construct($data = null)
@@ -89,10 +87,9 @@ abstract class Model implements ModelInterface
 
 
     /**
-     * Function setCreated.
+     * Function setCreated
      * Set entity creation timestamp
      * @param string $created
-     *
      * @return Model
      */
     public function setCreated(string $created = null) : Model
@@ -119,9 +116,8 @@ abstract class Model implements ModelInterface
 
     /**
      * Function setUpdated
-     * Return entity updated timestamp
+     * Set entity updated timestamp
      * @param string $updated
-     *
      * @return User
      */
     public function setUpdated(string $updated = null) : Model
@@ -136,8 +132,8 @@ abstract class Model implements ModelInterface
 
 
     /**
-     * Get updated.
-     *
+     * Function getUpdated
+     * Return entity updated timestamp
      * @return \DateTime
      */
     public function getUpdated() : \DateTime

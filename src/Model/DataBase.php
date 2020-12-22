@@ -27,7 +27,6 @@ class DataBase
 
     /**
      * Function __construct
-     *
      * @return void
      */
     public function __construct(array $entityPaths = [], $isDevMode = true)
@@ -38,8 +37,13 @@ class DataBase
     }
 
 
-
-    private function isUrl(string $url)
+    /**
+     * Function isUrl
+     * Check if string is a database url
+     * @param string $url
+     * @return bool
+     */
+    public function isUrl(string $url)
     {
         return preg_match(
             "/[a-z_]\:\/\/[a-zA-Z0-9.:][a-zA-Z0-9.@][a-zA-Z0-9.:0-9\/a-zA-Z0-9.]/",
@@ -47,7 +51,13 @@ class DataBase
         );
     }
 
-    private function isPath(string $path)
+    /**
+     * Function isPath
+     * Check if string is a database path
+     * @param string $url
+     * @return bool
+     */
+    public function isPath(string $path)
     {
         return preg_match(
             "/[a-zA-Z0-9\/]\.[a-z0-9]/",

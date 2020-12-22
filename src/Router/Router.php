@@ -20,7 +20,6 @@ class Router
 {
     /**
      * $routes variable
-    *
      * @var array
      */
     private $routes;
@@ -29,7 +28,6 @@ class Router
 
     /**
      * $method variable
-     *
      * @var string
      */
     private $method;
@@ -38,7 +36,6 @@ class Router
 
     /**
      * $path variable
-     *
      * @var string
      */
     private $path;
@@ -46,7 +43,6 @@ class Router
     
     /**
      * $response variable
-     *
      * @var ResponseInterface
      */
     private $response;
@@ -55,7 +51,6 @@ class Router
 
     /**
      * Function __constructs
-     *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @return void
      */
@@ -69,7 +64,7 @@ class Router
 
     /**
     * Function setRoute
-    *
+    * Set a route for router
     * @param string|array $url = "/"
     * @param string|array $method = "GET"
     * @param string|\Clousure $callback = null
@@ -92,7 +87,6 @@ class Router
     /**
      * Function setRouteByAnnotation
      * Receives a class as an argument, and works with the comment blocks as @Route
-     *
      * @param string $annotation
      * @param string $callback
      * @return void
@@ -103,7 +97,7 @@ class Router
         $method = "GET";
         $middlewares = null;
         $route = str_replace("@", '', $annotation);
-        $routeArray = explode('","', str_replace([" ", "@Route(", ")"],[""], $annotation));
+        $routeArray = explode('","', str_replace([" ", "@Route(", ")"], [""], $annotation));
        
         if (isset($routeArray[0])) {
             $url = explode(',', str_replace('"', "", $routeArray[0]));
@@ -124,7 +118,7 @@ class Router
 
     /**
      * Function getRoute
-     *
+     * Get route requested
      * @param string $url
      * @param string $method = 'GET'
      * @return Route|null
@@ -147,7 +141,7 @@ class Router
 
     /**
      * Function getRoutes
-     *
+     * Get a array with all routes into instance of router
      * @return array|Route[]
      */
     public function getRoutes() : array
@@ -159,7 +153,7 @@ class Router
 
    /**
     * Function hasRoute
-    *
+    * Check if route match exists for name and method
     * @param string $name
     * @param string $method
     * @return boolean
@@ -177,7 +171,7 @@ class Router
 
     /**
      * Function getResponse
-     *
+     * Get a ResponseInterface Object or router run
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function getResponse() : ResponseInterface
@@ -187,7 +181,7 @@ class Router
 
     /**
      * Function getResponse
-     *
+     * Set a ServerRequestInterface Object for router run
      * @return \Psr\Http\Message\ServerRequestInterface
      */
     public function setRequest(ServerRequestInterface $request) : Router
@@ -201,7 +195,7 @@ class Router
     
     /**
      * Function findByRegex
-     *
+     * Find a route by regular expression
      * @param string $url
      * @return array|null
      */
@@ -260,7 +254,7 @@ class Router
 
     /**
      * Function findByName
-     *
+     * Find a route by name/url
      * @param string $url
      * @return Array
      */
@@ -289,7 +283,7 @@ class Router
 
     /**
      * Function findByMethod
-     *
+     * Find all routes by method
      * @param string $url
      * @param array $routes
      * @return array
@@ -316,7 +310,7 @@ class Router
 
     /**
      * Function findByCount
-     *
+     * Find all routes by count spaces bar "/"
      * @param string $url
      * @param array $routes
      * @return Route[]
@@ -346,7 +340,7 @@ class Router
 
     /**
      * Function extractArgRegex
-     *
+     * Extract a argument regex of route name part
      * @param string $routeNamePart
      *
      * @return string|null
@@ -360,8 +354,8 @@ class Router
 
 
     /**
-     * function extractArgId
-     *
+     * Function extractArgId
+     * Extract a argument id/name of route name  part
      * @param string $routeNamePart
      *
      * @return string|null
@@ -375,7 +369,8 @@ class Router
 
 
     /**
-     * group function alias for routerGroup
+     * Function group
+     * A alias for routerGroup
      *
      * @param array $url
      * @param string|\Closure $callback
@@ -388,8 +383,8 @@ class Router
     }
 
     /**
-     * routerGroup function
-     *
+     * Function routerGroup
+     * Set routes one way by group
      * @param array $url
      * @param string|\Closure $callback
      * @param string|array $middlewares

@@ -17,7 +17,6 @@ interface AuthInterface
     /**
      * Function getId
      * Return self id
-     *
      * @return mixed
      */
     public function getId() : ?int;
@@ -25,7 +24,6 @@ interface AuthInterface
     /**
      * Function getUsername
      * Return self username
-     *
      * @return string
      */
     public function getUsername() : ?string;
@@ -33,7 +31,6 @@ interface AuthInterface
     /**
      * Function getRole
      * Return self role
-     *
      * @return int
      */
     public function getRole() : int;
@@ -50,7 +47,6 @@ interface AuthInterface
      * Function checkPass
      * Check Auth password key
      * @param string $passKey
-     *
      * @return bool
      */
     public function checkPass(string $passKey) : bool;

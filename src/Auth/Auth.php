@@ -83,8 +83,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function getUsername
-     * Get Auth username key
-     *
+     * Get Auth username
      * @return string|null
      */
     public function getUsername() : ?string
@@ -95,9 +94,8 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function setUsername
-     * Set Auth username key
+     * Set Auth username
      * @param string $username
-     *
      * @return Auth
      */
     public function setUsername(string $username) : Auth
@@ -110,8 +108,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function getEmail
-     * Get Auth email key
-     *
+     * Get Auth email
      * @return string|null
      */
     public function getEmail() : ?string
@@ -122,9 +119,8 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function setEmail
-     * Set Auth email key
+     * Set Auth email
      * @param string $email
-     *
      * @return Auth
      */
     public function setEmail(string $email) : Auth
@@ -143,7 +139,6 @@ class Auth extends Model implements AuthInterface
      * Function setPass
      * Set Auth password key
      * @param string $passKey
-     *
      * @return Auth
      */
     public function setPass(string $passKey) : Auth
@@ -158,7 +153,6 @@ class Auth extends Model implements AuthInterface
      * Function checkPass
      * Check Auth password key
      * @param string $passKey
-     *
      * @return bool
      */
     public function checkPass(string $passKey) : bool
@@ -182,7 +176,6 @@ class Auth extends Model implements AuthInterface
     /**
      * Function getRoleName
      * Get role permission Name
-     *
      * @return string|null
      */
     public function getRoleName() : ?string
@@ -198,7 +191,6 @@ class Auth extends Model implements AuthInterface
      * Function setRole
      * Set role permission ID includes is Default roles permissions IDs 'DEFAULT_ROLES' or optional > 5
      * @param int $roleId
-     *
      * @return Auth
      */
     public function setRole(int $roleId) : Auth
@@ -218,7 +210,6 @@ class Auth extends Model implements AuthInterface
      * @param string $appKey - Basicis AppKey
      * @param string $expiration - Expires at specified monent
      * @param string $nobefore - No use Before of this moment
-     *
      * @return string|null
      */
     public static function login(
@@ -248,7 +239,6 @@ class Auth extends Model implements AuthInterface
      * Function getUser
      * Get a Auth User by token and appKey
      * @param string $token
-     *
      * @return Auth|null
      */
     public static function getUser(string $token, string $appKey) : ?Auth

@@ -5,7 +5,6 @@ use Basicis\Basicis as App;
 
 /**
  * ControllerInterface, all controller classes implements from this
- *
  * @category Basicis/Controller
  * @package  Basicis/Controller
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -16,7 +15,6 @@ interface ControllerInterface
 {
     /**
      * All controller classes must implement
-     *
      * @return void
      */
     public function index(App $app, object $args);

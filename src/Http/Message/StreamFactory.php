@@ -58,7 +58,7 @@ class StreamFactory implements StreamFactoryInterface
             if (is_resource($resource)) {
                 return new Stream($resource, ['mode' => $mode]);
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new RuntimeException("The file $filename cannot be opened.", 0, $e);
         }
         return $this->createStream("");
