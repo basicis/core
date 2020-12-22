@@ -187,7 +187,10 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $this->deleteItems();
         $this->commit();
-        return unlink($this->cacheFilePath);
+        if (file_exists($this->cacheFilePath)) {
+            return unlink($this->cacheFilePath);
+        }
+        return false;
     }
 
 
@@ -308,8 +311,12 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $this->checkItensHit();
         $poolSerialized = $this->serialize();
-        $poolStream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath);
-        
+        $poolStream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "w+");
+
+        if ($this->cacheFilePath !== $poolStream->getMetadata("uri")) {
+            $this->cacheFilePath = $poolStream->getMetadata("uri");
+        }
+
         if ($poolStream instanceof StreamInterface && $poolStream->isWritable()) {
             $isWrite = $poolStream->write($poolSerialized) === strlen($poolSerialized);
             $isSave = $isWrite && file_exists($this->cacheFilePath);
@@ -333,6 +340,16 @@ class CacheItemPool implements CacheItemPoolInterface
             }
         }
         return $this;
+    }
+
+    /**
+     * Function getFilePath
+     * Get this pool file path
+     * @return string
+     */
+    public function getFilePath() : string
+    {
+        return $this->cacheFilePath;
     }
 
     /**
