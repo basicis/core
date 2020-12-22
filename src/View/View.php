@@ -37,7 +37,6 @@ class View
      * @param string $name
      * @param string $path
      * @param array $data
-     *
      * @return string
      */
     private function extractTemplate(string $name, string &$path, &$data = []) : string
@@ -125,7 +124,6 @@ class View
      * Get a string result os template with optional $data array
      * @param string $name
      * @param array $data
-     *
      * @return string|null
      */
     public function getView(string $name, $data = []) : ?string
