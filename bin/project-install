@@ -1,0 +1,24 @@
+<?php
+// App config files
+$configFiles = [
+    "spath" => "vendor/basicis/core/config/",
+    "dpath" => "config/",
+    "files" => [
+      "app-config.php",
+      "cli-config.php",
+      "db-config.php"
+    ]
+];
+
+foreach ($configFiles["files"] as $file) {
+    $src = $configFiles["spath"].$file;
+    $dst = $configFiles["dpath"].$file;
+    if (!file_exists($dst)) {
+        copy($src, $dst);
+    }
+}
+
+$dst = '.env.local';
+if (!file_exists($dst)) {
+    copy('.env.example', $dst);
+}

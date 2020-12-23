@@ -404,17 +404,22 @@ class Basicis extends RequestHandler
         $testEnv = self::path().'.env.test';
         $localEnv = self::path().'.env.local';
         $defaultEnv = self::path().'.env';
-
-        if (file_exists($defaultEnv)) {
-            $dotenv->load($defaultEnv);
-            return true;
-        } elseif (file_exists($localEnv)) {
-            $dotenv->load($localEnv);
-            return true;
-        } elseif (file_exists($testEnv)) {
+        
+        if (file_exists($testEnv)) {
             $dotenv->load($testEnv);
             return true;
         }
+
+        if (file_exists($localEnv)) {
+            $dotenv->load($localEnv);
+            return true;
+        }
+        
+        if (file_exists($defaultEnv)) {
+            $dotenv->load($defaultEnv);
+            return true;
+        }
+
         return false;
     }
 
