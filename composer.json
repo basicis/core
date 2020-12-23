@@ -42,11 +42,7 @@
         "dev:start": "bash vendor/bin/server start",
         "dev:stop": "bash vendor/bin/server stop",
         "dev": "composer dev:start",
-        "test": "vendor/bin/phpunit --do-not-cache-result --no-logging test",
-        "auto-test": "bash vendor/bin/test",
-        "autotest": "composer auto-test",
-        "phpcs": "vendor/bin/phpcs --standard=PSR2 src/",
-        "phpcs-test": "vendor/bin/phpcs --standard=PSR2 test/",
+        "test": "bash .github/scripts/test.sh",
         "phpdoc": "vendor/bin/phpdoc-md",
         "doctrine": "vendor/bin/doctrine",
         "doctrinem": "vendor/bin/doctrine-migrations"
@@ -56,6 +52,7 @@
     },
     "bin": [
         "bin/server",
-        "bin/test"
+        "bin/test",
+        "bin/project-install"
     ]
 }

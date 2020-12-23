@@ -1,5 +1,6 @@
-<?php 
+<?php
 namespace Test\Core;
+
 use PHPUnit\Framework\TestCase;
 use Basicis\Basicis;
 use Basicis\Core\Log;
@@ -8,8 +9,8 @@ use Basicis\Core\Log;
  * Class LogTest
  */
 
- class LogTest extends TestCase
- {  
+class LogTest extends TestCase
+{
     /**
      * log variable
      *
@@ -45,7 +46,7 @@ use Basicis\Core\Log;
      */
     public function testInterpolate()
     {
-        $this->assertEquals('Menssagem Teste ok!' , $this->log->interpolate('Menssagem {test} ok!', ['test' => 'Teste']) );
+        $this->assertEquals('Menssagem Teste!', $this->log->interpolate('Menssagem {test}!', ['test' => 'Teste']));
     }
 
     /**
@@ -55,7 +56,7 @@ use Basicis\Core\Log;
      */
     public function testFormatMessage()
     {
-        $this->assertEquals(Date('Y/m/d').' | Menssagem!' , $this->log->formatMessage('debug', 'Menssagem!', 'Y/m/d') );
+        $this->assertEquals(Date('Y/m/d').' | Menssagem!', $this->log->formatMessage('debug', 'Menssagem!', 'Y/m/d'));
     }
     
 
@@ -72,13 +73,8 @@ use Basicis\Core\Log;
                 "level" => ucfirst('debug'),
                 "message" => 'Menssagem!',
                 "context" => null
-            ]
-            , 
-            $this->log->formatMessageToArray('debug', 'Menssagem!', 'Y/m/d') 
+            ],
+            $this->log->formatMessageToArray('debug', 'Menssagem!', 'Y/m/d')
         );
     }
-
-
-
-
- }
+}

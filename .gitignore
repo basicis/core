@@ -1,7 +1,7 @@
 vendor/
+cache
 .env*
 !.env.example
-!.env.test
 src/controllers/
 src/middlewares/
 src/routes/

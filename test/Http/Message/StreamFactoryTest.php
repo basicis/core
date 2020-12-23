@@ -1,21 +1,23 @@
 <?php
 namespace Test\Message\Http;
+
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Basicis\Http\Message\StreamFactory;
 
-
 /**
  *  classTest\Http\Message\StreamFactoryTest
  */
-class StreamFactoryTest extends TestCase 
+class StreamFactoryTest extends TestCase
 {
     private $streamFactory;
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
         $this->streamFactory = new StreamFactory();
     }
+
     /**
      * testCreateStream function
      *
@@ -34,7 +36,7 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromFile()
     {
         $this->assertinstanceOf(
-            StreamInterface::class, 
+            StreamInterface::class,
             $this->streamFactory->createStreamFromFile('php://temp')
         );
     }
@@ -47,9 +49,8 @@ class StreamFactoryTest extends TestCase
     public function testCreateStreamFromResource()
     {
         $this->assertinstanceOf(
-            StreamInterface::class, 
+            StreamInterface::class,
             $this->streamFactory->createStreamFromResource(fopen('php://temp', 'r'))
         );
     }
 }
-

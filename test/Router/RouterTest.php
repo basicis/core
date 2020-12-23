@@ -7,7 +7,6 @@ use Basicis\Router\Route;
 use Basicis\Http\Message\ServerRequestFactory;
 use Basicis\Basicis as App;
 
-
  /**
  * Class Test\RouterTest
  *
@@ -78,8 +77,8 @@ class RouterTest extends TestCase
     * @return void
     */
     public function testGetRouteName()
-    {   
-        $this->assertEquals("/",  $this->route->getName());
+    {
+        $this->assertEquals("/", $this->route->getName());
     }
 
 
@@ -90,7 +89,7 @@ class RouterTest extends TestCase
     */
     public function testGetRouteMethod()
     {
-        $this->assertEquals("GET",  $this->route->getMethod());
+        $this->assertEquals("GET", $this->route->getMethod());
     }
 
     /**
@@ -103,5 +102,4 @@ class RouterTest extends TestCase
         $this->assertEquals(true, $this->router->hasRoute("/", "GET"));
         $this->assertEquals(true, $this->router->hasRoute("/test", "GET"));
     }
-
 }
