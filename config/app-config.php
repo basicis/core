@@ -20,7 +20,6 @@ require_once "../vendor/autoload.php";
 use Basicis\Basicis;
 use Basicis\Http\Message\Uri;
 use Basicis\Http\Message\ServerRequestFactory;
-use Basicis\cache\CacheItemPool;
 
 /**
  * $app variable
@@ -29,24 +28,6 @@ use Basicis\cache\CacheItemPool;
  */
 
 Basicis::loadEnv();
-$cache = new CacheItemPool(Basicis::path(), "app-main");
-
-if ($cache->hasItem("app")) {
-    return $cache->getItem("app")->get()->setRequest(
-        //Creating ServerRequest and Uri into this
-        ServerRequestFactory::create(
-          $_SERVER['REQUEST_METHOD'],
-          (new Uri())
-              ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0] ?? "http")
-              ->withHost($_SERVER['HTTP_HOST'] ?? "localhost")
-              ->withPort($_SERVER['SERVER_PORT'] ?? null)
-              ->withPath($_SERVER['REQUEST_URI'])
-        )
-        ->withHeaders(getallheaders())
-        ->withUploadedFiles($_FILES)
-        ->withCookieParams($_COOKIE)
-    );
-}
 
 $app = Basicis::createApp(
     //Creating ServerRequest and Uri into this
@@ -136,5 +117,4 @@ $app->setViewFilters([
 /**
  * Return the Basicis $app instance created for be imported and run on public/index.php file
  */
-$cache->additem("app", $app, "10 minutes")->commit();
 return $app;
