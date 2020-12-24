@@ -19,10 +19,10 @@ class RouterFactory
      * Function create
      * Create an instance of  Basicis\Router\Router
      * @param string $filesPath
-     * @param ServerRequestInterface $request
+     * @param ServerRequestInterface|null $request
      * @return Router
      */
-    public static function create(ServerRequestInterface $request) : Router
+    public static function create(ServerRequestInterface $request = null) : Router
     {
         //Starting Router Pool, Loading files and get Route Object
         return new Router($request);

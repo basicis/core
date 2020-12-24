@@ -285,6 +285,14 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getParsedBody()
     {
+        if (is_object($this->parsedBody)) {
+            return (array) $this->parsedBody;
+        }
+
+        if (is_string($this->parsedBody)) {
+            return  [$this->parsedBody];
+        }
+
         return $this->parsedBody;
     }
 
@@ -306,7 +314,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
      *
-     * @param  null|array|object $data The deserialized body data. This will
+     * @param  null|string|array|object $data The deserialized body data. This will
      *                                 typically be in an array or object.
      * @return static
      * @throws InvalidArgumentException if an unsupported argument type is
@@ -315,17 +323,21 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function withParsedBody($data) : ServerRequest
     {
         if ($data === null) {
-            throw new InvalidArgumentException('An unsupported argument type isprovided.');
+            throw new InvalidArgumentException('An unsupported argument type is provided.');
         }
-        
-        foreach (explode('&', $data) as $value) {
-            $queryItemEx = explode('=', $value);
+        if (is_string($data)) {
+            foreach (explode('&', $data) as $value) {
+                $queryItemEx = explode('=', $value);
 
-            if (is_array($queryItemEx) && (count($queryItemEx) >= 2)) {
-                $this->parsedBody[$queryItemEx[0]] = $queryItemEx[1];
+                if (is_array($queryItemEx) && (count($queryItemEx) >= 2)) {
+                    $this->parsedBody[$queryItemEx[0]] = $queryItemEx[1];
+                }
             }
         }
 
+        if (is_array($data) | is_object($data)) {
+            $this->parsedBody = $data;
+        }
         return  $this;
     }
 

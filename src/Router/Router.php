@@ -51,13 +51,15 @@ class Router
 
     /**
      * Function __constructs
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ServerRequestInterface|null $request
      * @return void
      */
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(ServerRequestInterface $request = null)
     {
         $this->routes = [];
-        return $this->setRequest($request);
+        if ($request !== null) {
+            return $this->setRequest($request);
+        }
     }
 
 
@@ -364,64 +366,5 @@ class Router
     {
         $explode = explode('}', $routeNamePart);
         return (count($explode) > 1)? str_replace(['{', ':'], '', $explode[0]) : null;
-    }
-
-
-
-    /**
-     * Function group
-     * A alias for routerGroup
-     *
-     * @param array $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @return void
-     */
-    public function group(array $url, object $callback = null, $middlewares = null)
-    {
-        $this->routerGroup($url, $callback, $middlewares);
-    }
-
-    /**
-     * Function routerGroup
-     * Set routes one way by group
-     * @param array $url
-     * @param string|\Closure $callback
-     * @param string|array $middlewares
-     * @throws InvalidArgumentException for invalid callback is null
-     * @return void
-     */
-    private function routerGroup(array $url, $callback = null, $middlewares = null)
-    {
-        if (is_null($callback)) {
-            throw new InvalidArgumentException("Invalid callback is null");
-            return $this;
-        }
-
-        foreach ($url as $urlKey => $urlValue) {
-            if (isset($urlValue['url'])) {
-                if (is_array($urlValue['url'])) {
-                    foreach ($urlValue['url'] as $urlValue_item) {
-                        $this->setRoute(
-                            $urlValue_item,
-                            isset($urlValue['method']) ?  $urlValue['method'] : 'GET',
-                            isset($urlValue['callback']) ? $urlValue['callback'] : $callback,
-                            isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares
-                        );
-                    }
-                } else {
-                    $this->setRoute(
-                        $urlValue['url'],
-                        isset($urlValue['method']) ?  $urlValue['method'] : 'GET',
-                        isset($urlValue['callback']) ? $urlValue['callback'] : $callback,
-                        isset($urlValue['middlewares']) ? $urlValue['middlewares'] : $middlewares
-                    );
-                }
-            } elseif (is_string($urlValue)) {
-                $this->setRoute($urlValue, 'GET', $callback, $middlewares);
-            }
-        }
-
-        return $this;
     }
 }

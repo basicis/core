@@ -1,5 +1,5 @@
 vendor/
-cache
+cache/
 .env*
 !.env.example
 src/controllers/
