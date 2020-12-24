@@ -196,8 +196,7 @@ class BasicisTest extends TestCase
     public function testGetRoute()
     {
         $this->assertEquals(null, $this->app->getRoute());
-        
-        $this->app->get("/", function () {
+        $this->app->setRoute("/", "get", function () {
             return $app->response(200);
         });
 

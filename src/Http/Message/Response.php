@@ -238,4 +238,14 @@ class Response extends Message implements ResponseInterface
     {
         return  $this->reasonPhrase ?? Response::CODE_LIST[$this->getStatusCode()];
     }
+
+    /**
+     * Function isValid
+     * Check if response status code is valid, it is in the array const CODE_LIST
+     * @return bool
+     */
+    public function isValid() : bool
+    {
+        return in_array($this->getStatusCode(), Response::CODE_LIST);
+    }
 }

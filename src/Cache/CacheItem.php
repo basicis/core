@@ -2,6 +2,7 @@
 namespace Basicis\Cache;
 
 use Psr\Cache\CacheItemInterface;
+use function Opis\Closure\SerializableClosure;
 
 /**
  * CacheItem class, defines an interface for interacting with objects inside a cache.
@@ -135,7 +136,12 @@ class CacheItem implements CacheItemInterface
     public function get()
     {
         if ($this->isHit()) {
-            return unserialize($this->value);
+            try {
+                return unserialize($this->value);
+            } catch (\Exception $e) {
+                $wrapper = unserialize($this->value);
+                return $wrapper->getClosure();
+            }
         }
         return null;
     }
@@ -173,7 +179,12 @@ class CacheItem implements CacheItemInterface
      */
     public function set($value) : CacheItem
     {
-        $this->value = serialize($value);
+        try {
+            $this->value = serialize($value);
+        } catch (\Exception $e) {
+            $wrapper = new SerializableClosure($value);
+            $this->value = serialize($wrapper);
+        }
         return $this;
     }
 

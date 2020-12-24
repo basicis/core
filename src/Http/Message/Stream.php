@@ -232,7 +232,6 @@ class Stream implements StreamInterface
         if (!$this->isValidResource()) {
             throw new RuntimeException('Stream is detached.');
         }
-
         return feof($this->resource);
     }
 

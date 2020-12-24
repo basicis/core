@@ -20,6 +20,7 @@ require_once "../vendor/autoload.php";
 use Basicis\Basicis;
 use Basicis\Http\Message\Uri;
 use Basicis\Http\Message\ServerRequestFactory;
+use Basicis\cache\CacheItemPool;
 
 /**
  * $app variable
@@ -28,6 +29,25 @@ use Basicis\Http\Message\ServerRequestFactory;
  */
 
 Basicis::loadEnv();
+$cache = new CacheItemPool(Basicis::path(), "app-main");
+
+if ($cache->hasItem("app")) {
+    return $cache->getItem("app")->get()->setRequest(
+        //Creating ServerRequest and Uri into this
+        ServerRequestFactory::create(
+          $_SERVER['REQUEST_METHOD'],
+          (new Uri())
+              ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0] ?? "http")
+              ->withHost($_SERVER['HTTP_HOST'] ?? "localhost")
+              ->withPort($_SERVER['SERVER_PORT'] ?? null)
+              ->withPath($_SERVER['REQUEST_URI'])
+        )
+        ->withHeaders(getallheaders())
+        ->withUploadedFiles($_FILES)
+        ->withCookieParams($_COOKIE)
+    );
+}
+
 $app = Basicis::createApp(
     //Creating ServerRequest and Uri into this
     ServerRequestFactory::create(
@@ -46,7 +66,8 @@ $app = Basicis::createApp(
       "appDescription" => $_ENV['APP_DESCRIPTION'],
       "mode" => $_ENV['APP_ENV'],
       "timezone" => $_ENV["APP_TIMEZONE"],
-      "appKey" => $_ENV['APP_KEY']
+      "appKey" => $_ENV['APP_KEY'],
+      //"enableCache" => true, //defalut false
     ]
 );
 
@@ -115,4 +136,5 @@ $app->setViewFilters([
 /**
  * Return the Basicis $app instance created for be imported and run on public/index.php file
  */
+$cache->additem("app", $app, "10 minutes")->commit();
 return $app;

@@ -40,20 +40,23 @@ class CacheItemPool implements CacheItemPoolInterface
      * Function __construct
      * Receives a cacheFilePath path as param or null
      * @param string|null $cacheFilePath
+     * @param string|null $cacheFileName
      * If cacheFilePath is null, default path is defined the app path
      */
-    public function __construct(string $cacheFilePath = null)
+    public function __construct(string $cacheFilePath = null, string $cacheFileName = "app-features")
     {
+        $this->cacheFilePath = $cacheFilePath;
         if ($cacheFilePath === null) {
-            $this->cacheFilePath = sprintf("%s%s", App::path(), "cache");
+            $this->cacheFilePath = App::path();
         }
 
-        if ($cacheFilePath !== null) {
-            $this->cacheFilePath = $cacheFilePath.(preg_match("/\/^/", $cacheFilePath) ? "cache" : "/cache");
+        if (!preg_match("/\/$/", $this->cacheFilePath)) {
+                $this->cacheFilePath .= "/";
         }
+        $this->cacheFilePath .= $cacheFileName;
 
         $this->load();
-        $this->checkItensHit();
+        $this->checkExpiredItems();
     }
 
 
@@ -75,7 +78,10 @@ class CacheItemPool implements CacheItemPoolInterface
             throw new InvalidArgumentException("The key string '$key' is not a legal value.");
             return $this;
         }
-        $this->items[$key] = new CacheItem($key, $value, $expiration, $time);
+
+        if (!array_key_exists($key, $this->items)) {
+            $this->items[$key] = new CacheItem($key, $value, $expiration, $time);
+        }
         return $this;
     }
 
@@ -309,7 +315,7 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function commit() : bool
     {
-        $this->checkItensHit();
+        $this->checkExpiredItems();
         $poolSerialized = $this->serialize();
         $poolStream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "w+");
 
@@ -328,11 +334,11 @@ class CacheItemPool implements CacheItemPoolInterface
     }
 
     /**
-     * Function checkItensHit
+     * Function checkExpiredItems
      * Check if items on is hitable and remove
      * @return CacheItemPool
      */
-    public function checkItensHit() : CacheItemPool
+    public function checkExpiredItems() : CacheItemPool
     {
         foreach ($this->items as $item) {
             if (!$item->isHit()) {

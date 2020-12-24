@@ -1,0 +1,15 @@
+<?php
+$files = [
+    "storage/basicis.db",
+    "bin/basicis.db",
+    ".env.test",
+    "cache/app-main",
+    "cache/app-features"
+];
+
+foreach ($files as $file) {
+    if(file_exists($file)) {
+        unlink($file);
+    }
+}
+return 0;
