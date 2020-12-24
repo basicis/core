@@ -29,8 +29,6 @@ Get a ResponseInterface Object or router run|
 Get route requested|
 |[getRoutes](#routergetroutes)|Function getRoutes
 Get a array with all routes into instance of router|
-|[group](#routergroup)|Function group
-A alias for routerGroup|
 |[hasRoute](#routerhasroute)|Function hasRoute
 Check if route match exists for name and method|
 |[setRequest](#routersetrequest)|Function getResponse
@@ -48,7 +46,7 @@ Receives a class as an argument, and works with the comment blocks as @Route|
 **Description**
 
 ```php
-public __construct (\Psr\Http\Message\ServerRequestInterface $request)
+public __construct (\Psr\Http\Message\ServerRequestInterface|null $request)
 ```
 
 Function __constructs 
@@ -57,7 +55,7 @@ Function __constructs
 
 **Parameters**
 
-* `(\Psr\Http\Message\ServerRequestInterface) $request`
+* `(\Psr\Http\Message\ServerRequestInterface|null) $request`
 
 **Return Values**
 
@@ -309,35 +307,6 @@ Get a array with all routes into instance of router
 **Return Values**
 
 `array|\Route[]`
-
-
-
-
-<hr />
-
-
-### Router::group  
-
-**Description**
-
-```php
-public group (array $url, string|\Closure $callback, string|array $middlewares)
-```
-
-Function group
-A alias for routerGroup 
-
- 
-
-**Parameters**
-
-* `(array) $url`
-* `(string|\Closure) $callback`
-* `(string|array) $middlewares`
-
-**Return Values**
-
-`void`
 
 
 

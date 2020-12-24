@@ -31,6 +31,8 @@ Basicis\Http\Message\Message
 Gets the response reason phrase associated with the status code.|
 |[getStatusCode](#responsegetstatuscode)|Function getStatusCode
 Gets the response status code.|
+|[isValid](#responseisvalid)|Function isValid
+Check if response status code is valid, it is in the array const CODE_LIST|
 |[withStatus](#responsewithstatus)|Function withStatus
 Return an instance with the specified status code and, optionally, reason phrase.|
 
@@ -155,6 +157,33 @@ to understand and satisfy the request.
 `int`
 
 > Status code.
+
+
+<hr />
+
+
+### Response::isValid  
+
+**Description**
+
+```php
+public isValid (void)
+```
+
+Function isValid
+Check if response status code is valid, it is in the array const CODE_LIST 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`bool`
+
+
 
 
 <hr />

@@ -452,7 +452,7 @@ updated cookie values.
 **Description**
 
 ```php
-public withParsedBody (null|array|object $data)
+public withParsedBody (null|string|array|object $data)
 ```
 
 Function withParsedBody
@@ -475,7 +475,7 @@ updated body parameters.
 
 **Parameters**
 
-* `(null|array|object) $data`
+* `(null|string|array|object) $data`
 : The deserialized body data. This will  
 typically be in an array or object.  
 

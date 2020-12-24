@@ -22,7 +22,7 @@ Create an instance of  Basicis\Router\Router|
 **Description**
 
 ```php
-public static create (string $filesPath, \ServerRequestInterface $request)
+public static create (string $filesPath, \ServerRequestInterface|null $request)
 ```
 
 Function create
@@ -33,7 +33,7 @@ Create an instance of  Basicis\Router\Router
 **Parameters**
 
 * `(string) $filesPath`
-* `(\ServerRequestInterface) $request`
+* `(\ServerRequestInterface|null) $request`
 
 **Return Values**
 
