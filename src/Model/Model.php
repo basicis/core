@@ -44,7 +44,6 @@ abstract class Model implements ModelInterface
     protected $protecteds = [];
 
 
-
      /**
       * Function function
       * @param array|int|null $data

@@ -1,7 +1,8 @@
 <?php
 $files = [
-    "storage/basicis.db",
-    "bin/basicis.db",
+    "test.db",
+    "storage/test.db",
+    "bin/test.db",
     ".env.test",
     "cache",
 ];

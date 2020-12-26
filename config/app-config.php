@@ -62,6 +62,7 @@ $app->setControllers([
   // Ex: $app->controller("keyContName@method", [object|array|null] $args)
   "home" => "App\\Controllers\\Home",
   "storage" => "App\\Controllers\\Storage",
+  "example" => "App\\Controllers\\Example",
   //"App\\Controllers\\Storage",
   //...
 ]);

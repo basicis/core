@@ -827,14 +827,14 @@ class Basicis extends RequestHandler
     /**
      * Function getResponse
      * Get current response of app
-     * @param  int    $code
+     * @param  int|null $code
      * @param  string $reasonPhrase
      * @return ResponseInterface
      */
-    public function getResponse(int $code = 200, string $reasonPhrase = "") : ResponseInterface
+    public function getResponse($code = 200, $reasonPhrase = null) : ResponseInterface
     {
         if ($this->response !== null && $code !== null) {
-            $this->response->withStatus($code, $reasonPhrase);
+            $this->response->withStatus($code, $reasonPhrase ?? "");
         }
         
         if ($this->response === null) {

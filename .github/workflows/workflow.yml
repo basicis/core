@@ -1,4 +1,4 @@
-name: Run Unit Test, Code Test, Generate and Deploy Documentation 
+name: Run Unit and code Testing, Generate and deploy documentation 
 on:
   pull_request:
     branchs: 
@@ -13,7 +13,7 @@ jobs:
       - name: Composer 🔧	
         uses: php-actions/composer@v1
 
-      - name: PHPUnit Tests 🧪
+      - name: PHPUnit Tests ⌛
         run: |
           composer test
   deploy:
