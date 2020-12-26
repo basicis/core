@@ -3,8 +3,7 @@ $files = [
     "storage/basicis.db",
     "bin/basicis.db",
     ".env.test",
-    "cache/app-main",
-    "cache/app-features"
+    "cache",
 ];
 
 foreach ($files as $file) {

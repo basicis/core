@@ -757,8 +757,7 @@ class Basicis extends RequestHandler
     {
         $this->enableCache = $enable;
         if ($enable) {
-            $this->cache = new CacheItemPool(self::path());
-            $this->cache->checkExpiredItems();
+            $this->cache = new CacheItemPool(self::path()."cache/"); //self::path()
         }
         return $this;
     }
@@ -832,9 +831,16 @@ class Basicis extends RequestHandler
      * @param  string $reasonPhrase
      * @return ResponseInterface
      */
-    public function getResponse(int $code = null, string $reasonPhrase = null) : ResponseInterface
+    public function getResponse(int $code = 200, string $reasonPhrase = "") : ResponseInterface
     {
-        return ($code !== null) ? $this->response->withStatus($code) : $this->response;
+        if ($this->response !== null && $code !== null) {
+            $this->response->withStatus($code, $reasonPhrase);
+        }
+        
+        if ($this->response === null) {
+            $this->response = ResponseFactory::create($code ?? 200, $reasonPhrase);
+        }
+        return $this->response;
     }
 
 
@@ -1143,42 +1149,42 @@ class Basicis extends RequestHandler
      * Function clientFileDownload
      * Send a file in the body of the http response to the client
      * @param string $filename
+     * @param bool $forced
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function clientFileDownload(string $filename = null) : ResponseInterface
+    public function clientFileDownload(string $filename = null, bool $forced = false) : ResponseInterface
     {
         //If file exists, this no is null
         if ($filename !== null) {
             $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
-                return $this->response->withHeaders(
-                    [
-                            "Content-Type" => \MimeType\MimeType::getType($filename),
-                            "Content-disposition" => ["attachment", "filename=".basename($filename)]
-                        ]
-                )
-                    ->withBody($file)
-                    ->withStatus(200, "Ok, working as expected!");
-            }
+                $headers = [
+                    "Content-Type" => \MimeType\MimeType::getType($filename),
+                    "Content-disposition" => ["filename=".basename($filename)]
+                ];
 
+                if ($forced) {
+                    $headers["Content-disposition"] = array_unshift($headers["Content-disposition"], "attachment");
+                }
+                return $this->response->withHeaders($headers)->withStatus(200)->withBody($file);
+            }
             return $this->response->withStatus(404, "File not found!");
         }
-
         return $this->response->withStatus(500, "Development error, Filename must not be null.");
     }
 
 
 
     /**
-     * Function clientFileupload
+     * Function clientFileUpload
      * Upload one or more files in the body of the http server request from the client
      * @param UploadedFileInterface $infile
      * @param string $outfile
      *
      * @return array|null
      */
-    public function clientFileupload(UploadedFileInterface $infile, string $outfile = null) : ?array
+    public function clientFileUpload(UploadedFileInterface $infile, string $outfile = null) : ?array
     {
         if ($infile instanceof UploadedFileInterface) {
             //move file to path
@@ -1335,6 +1341,7 @@ class Basicis extends RequestHandler
             foreach ($response->getHeaders() as $name => $value) {
                 header($response->getHeaderLine($name), true);
             }
+
             $size = $stream->write($response->getBody());
             $response->getBody()->close();
         }
@@ -1435,7 +1442,7 @@ class Basicis extends RequestHandler
 
         //Before middlewares and Router Engining
         $this->handleBeforeMiddlewares()->handleRouterEngining();
-        
+            
         //After middlewares
         if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
             $this->handleAfterMiddlewares();
@@ -1443,7 +1450,7 @@ class Basicis extends RequestHandler
 
         //Errors occurred during the execution of the application according to http response
         $this->handleError();
-
+        
         //Set response body
         return self::output($this->request, $this->response, $this->getResourceOutput());
     }

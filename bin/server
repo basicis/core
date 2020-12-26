@@ -1,18 +1,86 @@
 #!/bin/bash
-if [ -z $1 ]; then
-    echo "Warning: Enter argument start | stop for Basicis Dev Server"
+DEFAULT_HOST=0.0.0.0
+DEFAULT_PORT=8010
+PORT=${DEFAULT_PORT}
+HOST=${DEFAULT_HOST}
+
+function help() {
+    echo -e "\n✨ Basicis Dev Server ✨\n"
+    echo "Usage:"
+    echo " server [<option> <option-argument>] <command>"
+    echo "Options:"
+    echo " -h <host> : Set development server bind hostname or ip"
+    echo " -p <port> : Set development server bind port"
+    echo "Commands:"
+    echo " start : Start development server"
+    echo " stop : Stop development server"
+}
+
+
+function serverInfo() {
+    echo -e "*~ Basicis Dev Server 🚀 ~*\n"
+    echo " ▪ Host $HOST ✔ "
+    echo " ▪ Port $PORT ✔ "
+}
+
+function start() {
+    stop
+    echo -e " ▪ Starting on Address http://$HOST:$PORT ✔ \n"
+    php -S ${HOST}:${PORT} -t public/
+}
+
+function stop() {
+    serverInfo
+    pid=$(pgrep -f "php -S $HOST:$PORT -t public/")
+    if [ -n "$pid" ]; then
+        echo " ▪ Stopping previously started process ✔ "
+        kill $pid
+    fi    
+}
+
+
+if [ -z "$1" ]; then
+    #Run help
+    help
 else
-    if [ $1 = "start" ] ; then
-       echo "Starting Basicis Dev Server on http://localhost:8010"
-       php -S 0.0.0.0:8010 -t public/
+    if [ ! -z $1 ] ; then
+        if [ $1 == "-h" ] && [ ! -z $2 ]; then
+            HOST=$2
+        fi
+        if [ $1 == "-p" ] && [ ! -z $2 ]; then
+            PORT=$2
+        fi
+        if [ $1 == "start" ]; then
+            start && exit
+        fi
+        if [ $1 == "stop" ]; then
+            stop && exit
+        fi
+    fi 
+
+    if [ ! -z $3 ] ; then
+        if [ $3 == "-h" ] &&  [ ! -z $4 ]; then
+            HOST=$4
+        fi
+        if [ $3 == "-p" ] && [ ! -z $4 ]; then
+            PORT=$4
+        fi
+        if [ $3 == "start" ]; then
+            start && exit
+        fi
+        if [ $3 == "stop" ]; then
+            stop && exit
+        fi
     fi
 
-    if [ $1 = "stop" ]; then
-        pid=$(pgrep -f "php -S 0.0.0.0:8010 -t public/")
-        if [ ! -z $pid ]; then
-            kill $pid
-            echo "Stoping Basicis Dev Server..."
-        fi    
-    fi    
+    if [ ! -z $5 ] ; then
+        if [ $5 == "start" ]; then
+            start && exit
+        fi
+        if [ $5 == "stop" ]; then
+            start && exit
+        fi
+    fi
 
+    #help
 fi

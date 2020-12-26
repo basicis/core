@@ -17,19 +17,19 @@
  */
 
 require_once "../vendor/autoload.php";
-use Basicis\Basicis;
+use Basicis\Basicis as App;
 use Basicis\Http\Message\Uri;
 use Basicis\Http\Message\ServerRequestFactory;
+
+/** Loading Enviroment variables */
+App::loadEnv();
 
 /**
  * $app variable
  * Create an instance of Basicis\Basicis and setting arguments
- * @var Basicis $app
+ * @var App $app
  */
-
-Basicis::loadEnv();
-
-$app = Basicis::createApp(
+$app = App::createApp(
     //Creating ServerRequest and Uri into this
     ServerRequestFactory::create(
         $_SERVER['REQUEST_METHOD'],
@@ -48,7 +48,7 @@ $app = Basicis::createApp(
       "mode" => $_ENV['APP_ENV'],
       "timezone" => $_ENV["APP_TIMEZONE"],
       "appKey" => $_ENV['APP_KEY'],
-      //"enableCache" => true, //defalut false
+      "enableCache" => true, //defalut false
     ]
 );
 
@@ -75,6 +75,7 @@ $app->setControllers([
 $app->setBeforeMiddlewares([
   //key no is required
   "App\\Middlewares\\BeforeExample",
+  "App\\Middlewares\\Example"
   //...
 ]);
 
