@@ -1,5 +1,5 @@
 
-# Basicis | Core
+# Basicis - Core
 
 <p align="center">
     <img width="160" src="public/img/logo.png"/>
