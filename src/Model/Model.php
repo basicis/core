@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Basicis\Model\ModelInteface;
 use Basicis\Model\DataBase;
 use Basicis\Basicis as App;
+use Basicis\Core\Validator;
 
 /**
  *  Model class
@@ -42,7 +43,6 @@ abstract class Model implements ModelInterface
      * @var array
      */
     protected $protecteds = [];
-
 
 
      /**
@@ -178,6 +178,8 @@ abstract class Model implements ModelInterface
             try {
                 $manager->persist($this);
                 $manager->flush();
+            } catch (\PDOException $e) {
+                throw new \PDOException();
             } catch (\Exception $e) {
                 throw new \Exception(
                     sprintf(
@@ -185,7 +187,9 @@ abstract class Model implements ModelInterface
                         "Database connection error on save $modelClass!",
                         $e->getMessage(),
                         $e->getCode()
-                    )
+                    ),
+                    $e->getCode(),
+                    $e
                 );
             }
         }
@@ -213,7 +217,9 @@ abstract class Model implements ModelInterface
                         "Database connection error on delete ".get_called_class()."!",
                         $e->getMessage(),
                         $e->getCode()
-                    )
+                    ),
+                    $e->getCode(),
+                    $e
                 );
                 return false;
             }
@@ -241,7 +247,9 @@ abstract class Model implements ModelInterface
                         "Database connection error on search ".get_called_class()."!",
                         $e->getMessage(),
                         $e->getCode()
-                    )
+                    ),
+                    $e->getCode(),
+                    $e
                 );
                 return null;
             }
@@ -273,7 +281,9 @@ abstract class Model implements ModelInterface
                         "Database connection error on search ".get_called_class()."!",
                         $e->getMessage(),
                         $e->getCode()
-                    )
+                    ),
+                    $e->getCode(),
+                    $e
                 );
                 return null;
             }
@@ -306,7 +316,9 @@ abstract class Model implements ModelInterface
                         "Database connection error on search ".get_called_class()."!",
                         $e->getMessage(),
                         $e->getCode()
-                    )
+                    ),
+                    $e->getCode(),
+                    $e
                 );
                 return null;
             }
@@ -337,7 +349,9 @@ abstract class Model implements ModelInterface
                         "Database connection error on search ".get_called_class()."!",
                         $e->getMessage(),
                         $e->getCode()
-                    )
+                    ),
+                    $e->getCode(),
+                    $e
                 );
                 return null;
             }
@@ -346,6 +360,22 @@ abstract class Model implements ModelInterface
             }
         }
         return null;
+    }
+
+    /**
+     * Function all
+     * Find all entities, and return a array or null
+     * @return array|null
+     */
+    public static function allToArray() : ?array
+    {
+        $entities = self::all();
+        if ($entities !== null) {
+            foreach (self::all() as $key => $entity) {
+                $entities[$key] = $entity->__toArray();
+            }
+        }
+        return $entities;
     }
 
 
@@ -359,9 +389,8 @@ abstract class Model implements ModelInterface
         $data = [];
         $props = \array_keys(\get_object_vars($this));
         foreach ($props as $prop) {
-            $method = "get".ucfirst($prop);
-            if (method_exists($this, $method) && !in_array($prop, $this->protecteds)) {
-                $data[$prop] = $this->$method();
+            if (!in_array($prop, $this->protecteds)) {
+                $data[$prop] = $this->$prop;
                 if ($prop instanceof Model) {
                     $data[$prop] = $this->$prop->__toArray();
                 }

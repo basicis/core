@@ -1,4 +1,4 @@
-name: Unit Testing, Generate and Deploy Documentation 
+name: Run Unit and code Testing, Generate and deploy documentation 
 on:
   pull_request:
     branchs: 
@@ -13,9 +13,9 @@ jobs:
       - name: Composer 🔧	
         uses: php-actions/composer@v1
 
-      - name: PHPUnit Tests 🧪
+      - name: PHPUnit Tests ⌛
         run: |
-          bash $GITHUB_WORKSPACE/.github/scripts/test.sh
+          composer test
   deploy:
     runs-on: ubuntu-18.04
     needs: test
@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Documentation Build 🛠️
         run: |
-          bash $GITHUB_WORKSPACE/.github/scripts/deploy.sh
+          composer deploy
 
       - name: Deploy Documentation on Github Pages  🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1

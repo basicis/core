@@ -17,38 +17,19 @@
  */
 
 require_once "../vendor/autoload.php";
-use Basicis\Basicis;
+use Basicis\Basicis as App;
 use Basicis\Http\Message\Uri;
 use Basicis\Http\Message\ServerRequestFactory;
-use Basicis\cache\CacheItemPool;
+
+/** Loading Enviroment variables */
+App::loadEnv();
 
 /**
  * $app variable
  * Create an instance of Basicis\Basicis and setting arguments
- * @var Basicis $app
+ * @var App $app
  */
-
-Basicis::loadEnv();
-$cache = new CacheItemPool(Basicis::path(), "app-main");
-
-if ($cache->hasItem("app")) {
-    return $cache->getItem("app")->get()->setRequest(
-        //Creating ServerRequest and Uri into this
-        ServerRequestFactory::create(
-          $_SERVER['REQUEST_METHOD'],
-          (new Uri())
-              ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0] ?? "http")
-              ->withHost($_SERVER['HTTP_HOST'] ?? "localhost")
-              ->withPort($_SERVER['SERVER_PORT'] ?? null)
-              ->withPath($_SERVER['REQUEST_URI'])
-        )
-        ->withHeaders(getallheaders())
-        ->withUploadedFiles($_FILES)
-        ->withCookieParams($_COOKIE)
-    );
-}
-
-$app = Basicis::createApp(
+$app = App::createApp(
     //Creating ServerRequest and Uri into this
     ServerRequestFactory::create(
         $_SERVER['REQUEST_METHOD'],
@@ -67,7 +48,7 @@ $app = Basicis::createApp(
       "mode" => $_ENV['APP_ENV'],
       "timezone" => $_ENV["APP_TIMEZONE"],
       "appKey" => $_ENV['APP_KEY'],
-      //"enableCache" => true, //defalut false
+      "enableCache" => true, //defalut false
     ]
 );
 
@@ -81,6 +62,7 @@ $app->setControllers([
   // Ex: $app->controller("keyContName@method", [object|array|null] $args)
   "home" => "App\\Controllers\\Home",
   "storage" => "App\\Controllers\\Storage",
+  "example" => "App\\Controllers\\Example",
   //"App\\Controllers\\Storage",
   //...
 ]);
@@ -94,6 +76,7 @@ $app->setControllers([
 $app->setBeforeMiddlewares([
   //key no is required
   "App\\Middlewares\\BeforeExample",
+  "App\\Middlewares\\Example"
   //...
 ]);
 
@@ -136,5 +119,4 @@ $app->setViewFilters([
 /**
  * Return the Basicis $app instance created for be imported and run on public/index.php file
  */
-$cache->additem("app", $app, "10 minutes")->commit();
 return $app;

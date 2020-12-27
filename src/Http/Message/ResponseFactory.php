@@ -44,6 +44,6 @@ class ResponseFactory implements ResponseFactoryInterface
      */
     public static function create(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
-        return (new ResponseFactory())->createResponse($code, $reasonPhrase);
+        return (new ResponseFactory())->createResponse($code, $reasonPhrase ?? "");
     }
 }

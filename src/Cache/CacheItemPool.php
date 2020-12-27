@@ -36,14 +36,15 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     private $cacheFilePath;
 
+    private $stream;
+
     /**
      * Function __construct
      * Receives a cacheFilePath path as param or null
      * @param string|null $cacheFilePath
-     * @param string|null $cacheFileName
      * If cacheFilePath is null, default path is defined the app path
      */
-    public function __construct(string $cacheFilePath = null, string $cacheFileName = "app-features")
+    public function __construct(string $cacheFilePath = null)
     {
         $this->cacheFilePath = $cacheFilePath;
         if ($cacheFilePath === null) {
@@ -53,8 +54,10 @@ class CacheItemPool implements CacheItemPoolInterface
         if (!preg_match("/\/$/", $this->cacheFilePath)) {
                 $this->cacheFilePath .= "/";
         }
-        $this->cacheFilePath .= $cacheFileName;
 
+        $this->cacheFilePath .= "cache";
+        $this->stream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "w+");
+        
         $this->load();
         $this->checkExpiredItems();
     }
@@ -193,6 +196,7 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $this->deleteItems();
         $this->commit();
+
         if (file_exists($this->cacheFilePath)) {
             return unlink($this->cacheFilePath);
         }
@@ -262,11 +266,9 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function load() : ?CacheItemPool
     {
-        if (file_exists($this->cacheFilePath)) {
-            $stream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "r+");
-            if ($stream instanceof StreamInterface && $stream->isReadable()) {
-                $this->unserialize($stream->getContents());
-                $stream->close();
+        if ($this->stream instanceof StreamInterface && $this->stream->isReadable()) {
+            if ($this->cacheFilePath === $this->stream->getMetadata("uri")) {
+                $this->unserialize($this->stream->getContents());
             }
         }
         return $this;
@@ -315,22 +317,17 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function commit() : bool
     {
+        $isSave = false;
         $this->checkExpiredItems();
-        $poolSerialized = $this->serialize();
-        $poolStream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "w+");
 
-        if ($this->cacheFilePath !== $poolStream->getMetadata("uri")) {
-            $this->cacheFilePath = $poolStream->getMetadata("uri");
+        if ($this->stream instanceof StreamInterface && $this->stream->isWritable()) {
+            if ($this->cacheFilePath === $this->stream->getMetadata("uri")) {
+                $poolSerialized = $this->serialize();
+                $isWrite = $this->stream->write($poolSerialized) === strlen($poolSerialized);
+                $isSave = $isWrite && file_exists($this->cacheFilePath);
+            }
         }
-
-        if ($poolStream instanceof StreamInterface && $poolStream->isWritable()) {
-            $isWrite = $poolStream->write($poolSerialized) === strlen($poolSerialized);
-            $isSave = $isWrite && file_exists($this->cacheFilePath);
-            $poolStream->close();
-            return $isSave;
-        }
-
-        return true;
+        return $isSave;
     }
 
     /**
