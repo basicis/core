@@ -20,6 +20,8 @@ Get Entity Data as Array, without the propreties defined in the array property $
 Get Entity Data as Json, without the propreties defined in the array property $protecteds|
 |[all](#modelall)|Function all
 Find all entities|
+|[allToArray](#modelalltoarray)|Function all
+Find all entities, and return a array or null|
 |[delete](#modeldelete)|Function delete
 Remove data of this entity of database|
 |[find](#modelfind)|Function find
@@ -134,6 +136,33 @@ public static all (void)
 
 Function all
 Find all entities 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`array|null`
+
+
+
+
+<hr />
+
+
+### Model::allToArray  
+
+**Description**
+
+```php
+public static allToArray (void)
+```
+
+Function all
+Find all entities, and return a array or null 
 
  
 

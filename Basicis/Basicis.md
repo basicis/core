@@ -23,7 +23,7 @@ Get the app Auth/User by authorization token, it is receive a class Basicis\Auth
 Get the app CacheItemPool engine instance|
 |[clientFileDownload](#basicisclientfiledownload)|Function clientFileDownload
 Send a file in the body of the http response to the client|
-|[clientFileupload](#basicisclientfileupload)|Function clientFileupload
+|[clientFileUpload](#basicisclientfileupload)|Function clientFileUpload
 Upload one or more files in the body of the http server request from the client|
 |[closure](#basicisclosure)|Function closure
 Instantiate a Closure object and execute|
@@ -212,7 +212,7 @@ Get the app CacheItemPool engine instance
 **Description**
 
 ```php
-public clientFileDownload (string $filename)
+public clientFileDownload (string $filename, bool $forced)
 ```
 
 Function clientFileDownload
@@ -223,6 +223,7 @@ Send a file in the body of the http response to the client
 **Parameters**
 
 * `(string) $filename`
+* `(bool) $forced`
 
 **Return Values**
 
@@ -234,15 +235,15 @@ Send a file in the body of the http response to the client
 <hr />
 
 
-### Basicis::clientFileupload  
+### Basicis::clientFileUpload  
 
 **Description**
 
 ```php
-public clientFileupload (\UploadedFileInterface $infile, string $outfile)
+public clientFileUpload (\UploadedFileInterface $infile, string $outfile)
 ```
 
-Function clientFileupload
+Function clientFileUpload
 Upload one or more files in the body of the http server request from the client 
 
  
@@ -601,7 +602,7 @@ Get app default resource output
 **Description**
 
 ```php
-public getResponse (int $code, string $reasonPhrase)
+public getResponse (int|null $code, string $reasonPhrase)
 ```
 
 Function getResponse
@@ -611,7 +612,7 @@ Get current response of app
 
 **Parameters**
 
-* `(int) $code`
+* `(int|null) $code`
 * `(string) $reasonPhrase`
 
 **Return Values**

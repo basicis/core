@@ -27,6 +27,8 @@ Get Entity Data as Array, without the propreties defined in the array property $
 Get Entity Data as Json, without the propreties defined in the array property $protecteds|
 |all|Function all
 Find all entities|
+|allToArray|Function all
+Find all entities, and return a array or null|
 |delete|Function delete
 Remove data of this entity of database|
 |find|Function find
