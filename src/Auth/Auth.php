@@ -49,7 +49,7 @@ class Auth extends Model implements AuthInterface
 
     /**
      * $pass variable
-     * @ORM\Column(name="pass", length=60, unique=true)
+     * @ORM\Column(name="pass", length=60)
      * @var string
      */
     protected $pass;

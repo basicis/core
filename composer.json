@@ -57,7 +57,7 @@
         "db:drop-forced": "@db:drop --force",
         "db:drop-dump": "@db:drop --dump-sql",
         "test": [
-            "bin/prepare-test",
+            "php bin/prepare-test",
             "touch .env.test",
             "echo APP_ENV=dev > .env.test",
             "echo DB_DRIVER=pdo_sqlite >> .env.test",

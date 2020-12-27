@@ -112,9 +112,6 @@ class DataBase
 
         if (isset($options['url']) && $this->isUrl($options['url'])) {
             $this->config['db'] = array_merge($this->config['db'], $this->extractUrlParams($options['url']));
-            //To-do review
-            //$this->config["db"]['driver'] = $this->extractUrlParams($options['url'])['driver'];
-            //$this->config['db']['url'] = $options['url'];
         }
         
         if (isset($options['path']) &&
@@ -139,7 +136,6 @@ class DataBase
         array $entityPaths,
         bool $isDevMode = true
     ) {
-
         $this->config['orm'] = Setup::createAnnotationMetadataConfiguration(
             $entityPaths, //path to entities
             $isDevMode, //if is dev mode

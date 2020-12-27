@@ -330,7 +330,7 @@ class ServerRequest extends Request implements ServerRequestInterface
                 $queryItemEx = explode('=', $value);
 
                 if (is_array($queryItemEx) && (count($queryItemEx) >= 2)) {
-                    $this->parsedBody[$queryItemEx[0]] = $queryItemEx[1];
+                    $this->parsedBody[$queryItemEx[0]] = urldecode($queryItemEx[1]);
                 }
             }
         }

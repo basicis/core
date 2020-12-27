@@ -956,11 +956,11 @@ class Basicis extends RequestHandler
             //Routing and handle Request
             if ($res->getStatusCode() >= 200 && $res->getStatusCode() <= 206) {
                 //Handles Controller or Closure function
-                try {
+                //try {
                     $res = $this->handle($this->request);
-                } catch (\Exception $e) {
+                /*} catch (\Exception $e) {
                     $res->withStatus(500, $e->getMessage());
-                }
+                }*/
                 $this->response->withStatus($res->getStatusCode(), $res->getReasonPhrase())
                     ->withBody($res->getBody());
             }
@@ -1035,14 +1035,14 @@ class Basicis extends RequestHandler
      * @param int   $statusCode
      * @return ResponseInterface
      */
-    public function json($data = [], int $statusCode = 200) : ResponseInterface
+    public function json($data = [], int $statusCode = null) : ResponseInterface
     {
         $this->response()->withHeader("Content-Type", "application/json; charset=UTF-8");
         $data = [
             "BasicisAPI" => [
                 "meta" => [
-                    "code" => $this->response()->getStatusCode(),
-                    "message" => $this->response()->getReasonPhrase(),
+                    "code" =>  $statusCode ?? $this->response()->getStatusCode(),
+                    "message" => $this->response->getReasonPhrase(),
                     "endpoint" => $this->route ? $this->route->getName() : '/'
                 ],
                 "data" => $data
@@ -1325,7 +1325,7 @@ class Basicis extends RequestHandler
         //Opening output stream
         $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
         $size = 0;
-    
+
         if ($stream->isWritable()) {
             header(
                 sprintf(
@@ -1388,7 +1388,7 @@ class Basicis extends RequestHandler
         //Mergin Route arguments and ServerRequest data, files, cookies...
         $args = (object) array_merge(
             $this->route !== null ? (array) ($this->route->getArguments() ?? []) : [],
-            $request->getServerParams()
+            (array) $request->getParsedBody()
         );
 
         //get callback Closure
@@ -1397,7 +1397,7 @@ class Basicis extends RequestHandler
             try {
                 return $this->closure($callback, $args);
             } catch (InvalidArgumentException $e) {
-                throw $e;
+                throw new InvalidArgumentException($e->getMessage(), 0, $e);
             }
         }
 
@@ -1407,7 +1407,7 @@ class Basicis extends RequestHandler
             try {
                 return $this->controller($callback, $args);
             } catch (InvalidArgumentException $e) {
-                throw $e;
+                throw new InvalidArgumentException($e->getMessage(), 0, $e);
             }
         }
 
@@ -1442,7 +1442,7 @@ class Basicis extends RequestHandler
 
         //Before middlewares and Router Engining
         $this->handleBeforeMiddlewares()->handleRouterEngining();
-            
+    
         //After middlewares
         if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
             $this->handleAfterMiddlewares();
@@ -1450,7 +1450,7 @@ class Basicis extends RequestHandler
 
         //Errors occurred during the execution of the application according to http response
         $this->handleError();
-        
+
         //Set response body
         return self::output($this->request, $this->response, $this->getResourceOutput());
     }
