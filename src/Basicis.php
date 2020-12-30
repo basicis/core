@@ -7,6 +7,8 @@ use Basicis\Auth\Token;
 use Basicis\Core\Log;
 use Basicis\Core\Validator;
 use Basicis\Core\Annotations;
+use Basicis\Model\Model;
+use Basicis\Model\Models;
 use Basicis\Router\RouterFactory;
 use Basicis\Router\Router;
 use Basicis\Router\Route;
@@ -15,6 +17,7 @@ use Basicis\View\View;
 use Basicis\Http\Message\ServerRequest;
 use Basicis\Http\Server\RequestHandler;
 use Basicis\Http\Message\Response;
+use Basicis\Http\Message\Uri;
 use Basicis\Http\Message\ServerRequestFactory;
 use Basicis\Http\Message\ResponseFactory;
 use Basicis\Http\Message\StreamFactory;
@@ -544,6 +547,11 @@ class Basicis extends RequestHandler
      */
     public static function path() : string
     {
+        $cache = new CacheItemPool("php://temp/cache");
+        if ($cache->hasItem("app-root-path")) {
+            return $cache->getItem("app-root-path")->get();
+        }
+
         $path = sprintf("%s/", getcwd());
         $i = 0;
 
@@ -560,6 +568,7 @@ class Basicis extends RequestHandler
             $path .= "/";
         }
 
+        $cache->addItem("app-root-path", $path, "20 minutes")->commit();
         return $path;
     }
 
@@ -802,43 +811,105 @@ class Basicis extends RequestHandler
      * Function setRequest
      * Set current server request of app
      * @param ServerRequestinterface $request
-     *
      * @return Basicis
      */
     public function setRequest(ServerRequestinterface $request) : Basicis
     {
-        $this->router->setRequest($this->request = $request);
+        $this->request = $request->withParsedBody(self::input($this->getResourceInput()));
+        $this->router->setRequest($this->request);
         return $this;
     }
 
+    /**
+     * Function setRequestByArray
+     * Set current server request of app by a array argument
+     * @param array $request
+     * @return Basicis
+     */
+    public function setRequestByArray(array $request) : Basicis
+    {
+        $uri = null;
+        if (isset($request['uri'])) {
+            $uri = new Uri($request['uri']);
+        }
+
+        if ($uri === null) {
+            $port = "";
+            if (isset($request["port"])) {
+                $port = ":".$request["port"];
+            }
+    
+            $query = "";
+            if (isset($request["query"])) {
+                $query = "?".$request["query"];
+            }
+
+            $uri = new Uri(
+                sprintf(
+                    "%s://%s%s%s%s",
+                    $request["protocol"] ?? "http",
+                    $request["host"] ?? "localhost",
+                    $port,
+                    $request["path"] ?? "/",
+                    $query,
+                )
+            );
+        }
+
+        $serverRequest =  ServerRequestFactory::create($request['method'] ?? "GET", $uri)
+                        ->withUploadedFiles($request['files'] ?? [])
+                        ->withCookieParams($request['cookie'] ?? []);
+
+        if (isset($request['headers'])) {
+            $serverRequest->withHeaders($request['headers']);
+        }
+
+        return  $this->setRequest($serverRequest);
+    }
 
     /**
      * Function request
-     * Alias for getRequest
-     * Get current server request of app
+     * Set and/or get current server request of app
      * @return ServerRequestInterface
      */
-    public function request() : ServerRequestInterface
+    public function request(ServerRequestinterface $request = null) : ServerRequestInterface
     {
+        if (($request !== null) && ($request instanceof ServerRequestinterface)) {
+            $this->setRequest($request);
+        }
         return $this->getRequest();
+    }
+
+
+     /**
+     * Function setResponse
+     * Get current response of app
+     * @param  int|null $code
+     * @param  string $reasonPhrase
+     * @return Basicis
+     */
+    public function setResponse($code = null, $reasonPhrase = null) : Basicis
+    {
+        if ($code !== null) {
+            $this->response->withStatus($code, $reasonPhrase);
+        }
+        
+        if ($this->response === null) {
+            $this->response = ResponseFactory::create($code ?? 200, $reasonPhrase);
+        }
+        return $this;
     }
 
 
     /**
      * Function getResponse
      * Get current response of app
-     * @param  int|null $code
-     * @param  string $reasonPhrase
      * @return ResponseInterface
      */
-    public function getResponse($code = 200, $reasonPhrase = null) : ResponseInterface
+    public function getResponse() : ResponseInterface
     {
-        if ($this->response !== null && $code !== null) {
-            $this->response->withStatus($code, $reasonPhrase ?? "");
-        }
-        
         if ($this->response === null) {
-            $this->response = ResponseFactory::create($code ?? 200, $reasonPhrase);
+            return $this->response = ResponseFactory::create();
         }
         return $this->response;
     }
@@ -846,14 +917,18 @@ class Basicis extends RequestHandler
 
     /**
      * Function response
-     * Alias for getResponse, Get current response of app
+     * Set and/or get current server response of app
      * @param  int    $code
      * @param  string $reasonPhrase
      * @return ResponseInterface
      */
     public function response(int $code = null, string $reasonPhrase = null) : ResponseInterface
     {
-        return $this->getResponse($code, $reasonPhrase);
+        if ($code !== null) {
+            return $this->setResponse($code, $reasonPhrase)->getResponse();
+        }
+
+        return $this->getResponse();
     }
 
 
@@ -905,7 +980,7 @@ class Basicis extends RequestHandler
         if (new $class() instanceof Controller) {
             $annotations = new Annotations($class);
             foreach ($annotations->getClass()->getMethods() as $method) {
-                $comment = $annotations->getCommentByTag($method->name, "@Route");
+                $comment = $annotations->getMethodCommentByTag($method->name, "@Route");
                 if ($comment !== null) {
                     $this->router->setRouteByAnnotation($comment, $class.'@'.$method->name);
                 }
@@ -956,11 +1031,7 @@ class Basicis extends RequestHandler
             //Routing and handle Request
             if ($res->getStatusCode() >= 200 && $res->getStatusCode() <= 206) {
                 //Handles Controller or Closure function
-                //try {
-                    $res = $this->handle($this->request);
-                /*} catch (\Exception $e) {
-                    $res->withStatus(500, $e->getMessage());
-                }*/
+                $res = $this->handle($this->request);
                 $this->response->withStatus($res->getStatusCode(), $res->getReasonPhrase())
                     ->withBody($res->getBody());
             }
@@ -1008,14 +1079,14 @@ class Basicis extends RequestHandler
      * ````
      *
      * @param string $text
-     * @param int    $statusCode
+     * @param int|null $statusCode
      * @return ResponseInterface
      */
     public function write(string $text = "", int $statusCode = null) : ResponseInterface
     {
-        $stream = (new StreamFactory)->createStream($text);
-        $this->response->withBody($stream);
-        return $this->response->withStatus($statusCode === null ?  $this->response->getStatusCode() : $statusCode);
+        return $this->getResponse()
+            ->withStatus($statusCode ?? 200)
+            ->withBody((new StreamFactory)->createStream($text));
     }
 
 
@@ -1035,20 +1106,23 @@ class Basicis extends RequestHandler
      * @param int   $statusCode
      * @return ResponseInterface
      */
-    public function json($data = [], int $statusCode = null) : ResponseInterface
+    public function json($data = null, int $statusCode = null) : ResponseInterface
     {
-        $this->response()->withHeader("Content-Type", "application/json; charset=UTF-8");
-        $data = [
-            "BasicisAPI" => [
-                "meta" => [
-                    "code" =>  $statusCode ?? $this->response()->getStatusCode(),
-                    "message" => $this->response->getReasonPhrase(),
-                    "endpoint" => $this->route ? $this->route->getName() : '/'
-                ],
-                "data" => $data
-            ]
+        $this->getResponse()
+            ->withStatus($statusCode ?? $this->getResponse()->getStatusCode())
+            ->withHeader("Content-Type", "application/json; charset=UTF-8");
+
+        $arrayToJson = [
+            "meta" => [
+                "code" =>  $this->getResponse()->getStatusCode(),
+                "message" => $this->getResponse()->getReasonPhrase(),
+                "endpoint" => $this->route ? $this->route->getName() : '/',
+                "method" => $this->route ? $this->route->getMethod() : 'GET'
+            ],
+            "data" => $data
         ];
-        return $this->write(json_encode($data), $statusCode);
+
+        return $this->write(json_encode($arrayToJson), $this->getResponse()->getStatusCode());
     }
 
 
@@ -1090,12 +1164,13 @@ class Basicis extends RequestHandler
         if ($content === null) {
             $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
             $view->setFilters($this->viewFilters);
-            $this->response->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
+            $this->getResponse()->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
             $content = $view->getView($name, $data);
 
             if ($content === null) {
                 $this->write("Template file '$name' not found!", 404);
             }
+
             if ($this->enableCache) {
                 $this->cache->addItem("template@".$name, $content, "2 minutes")->commit();
             }
@@ -1233,27 +1308,55 @@ class Basicis extends RequestHandler
             $callback = str_replace("::", "@", $callback);
             $controller = explode("@", $callback)[0];
             $method = explode("@", $callback)[1] ?? 'index';
-    
+            $args = (object) $args;
+
             try {
                 $controllerObj = $this->getController($controller);
-
+                $result = null;
+                
                 if ($controllerObj instanceof Controller && method_exists($controllerObj, $method)) {
-                    $result = $controllerObj->$method(
-                        $this,
-                        (is_string($args) | is_int($args) ) ? $args : (object) $args
-                    );
-                    if ($result instanceof ResponseInterface) {
-                        return $this->response = $result;
+                    $arguments = [];
+                    $class = $controllerObj->getModelByAnnotation();
+                    $params = (new Annotations($controller))
+                                ->setMethod($method)
+                                ->getMethod()
+                                ->getParameters();
+                        
+                    foreach ($params as $key => $param) {
+                        $type = null;
+                        if ($param->getType() !== null) {
+                            $type = $param->getType()->getName();
+                        }
+                        
+                        if ($key === 0) {
+                            $arguments[$key] = $this;
+                        }
+
+                        if ((class_exists($class) && get_parent_class($class) === "Basicis\Model\Model") && $key >= 1) {
+                            if (isset($args->id) && $type === "Basicis\Model\Model") {
+                                $arguments[$key] = $class::findOneBy(["id" => $args->id]);
+                            }
+
+                            if ($type === "Basicis\Model\Models") {
+                                $arguments[$key] = new Models($class, (array) $args);
+                            }
+                        }
                     }
-                    
-                    return $this->response()->withStatus(200);
+
+                    $arguments[] = $args;
+                    $result = $controllerObj->$method(...$arguments);
                 }
+
+                if ($result instanceof ResponseInterface) {
+                    return $result;
+                }
+                return $this->response()->withStatus(200);
             } catch (InvalidArgumentException $e) {
-                throw $e;
+                return $this->getResponse()->withStatus(500, $e->getMessage());
             }
         }
 
-        return $this->response()->withStatus(500);
+        return $this->getResponse()->withStatus(500);
     }
 
 
@@ -1271,8 +1374,8 @@ class Basicis extends RequestHandler
             //Binding $this == $app, $request , $response and $args
             $callback->bindTo(
                 (object) [
-                "app" => &$this,
-                "args" => (is_string($args) | is_int($args) ) ? $args : (object) $args
+                    "app" => &$this,
+                    "args" => (is_string($args) | is_int($args) ) ? $args : (object) $args
                 ]
             );
             
@@ -1358,21 +1461,24 @@ class Basicis extends RequestHandler
      * Returns a template view with errors occurred during the execution of the application according to http response
      * @return Basicis
      */
-    private function handleError() : Basicis
+    /**
+     * Undocumented function
+     *
+     * @param string $message
+     *
+     * @return Basicis
+     */
+    public function handleError(string $message = null) : Basicis
     {
-        if ($this->response->getStatusCode() > 307 && $this->response->getBody()->getSize() === null) {
-            //todo after middlweare default
-            $this->view(
-                "error",
-                [
-                    "errorMessage" => sprintf(
-                        "%s | %s",
-                        $this->response->getStatusCode(),
-                        $this->response->getReasonPhrase()
-                    )
-                ]
+        if ($message === null) {
+            $message = sprintf(
+                "%s | %s",
+                $this->response->getStatusCode(),
+                $this->response->getReasonPhrase()
             );
         }
+
+        $this->view("error", ["message" => $message]);
         return $this;
     }
    
@@ -1386,10 +1492,18 @@ class Basicis extends RequestHandler
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         //Mergin Route arguments and ServerRequest data, files, cookies...
-        $args = (object) array_merge(
-            $this->route !== null ? (array) ($this->route->getArguments() ?? []) : [],
-            (array) $request->getParsedBody()
-        );
+        $args = null;
+        if ($this->route !== null) {
+            $args = $this->route->getArguments();
+        }
+
+        if ($request->getParsedBody() !== null) {
+            $args = array_merge((array) $request->getParsedBody(), (array) $args);
+        }
+
+        if ($args === (object)[]) {
+            $args = null;
+        }
 
         //get callback Closure
         $callback = $this->route->getCallback();
@@ -1448,8 +1562,10 @@ class Basicis extends RequestHandler
             $this->handleAfterMiddlewares();
         }
 
-        //Errors occurred during the execution of the application according to http response
-        $this->handleError();
+        //If errors occurred during the execution of the application according to http response
+        if ($this->response->getStatusCode() > 307 && $this->response->getBody()->getSize() === null) {
+            $this->handleError();
+        }
 
         //Set response body
         return self::output($this->request, $this->response, $this->getResourceOutput());

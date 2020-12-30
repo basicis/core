@@ -8,3 +8,4 @@ src/routes/
 docs/
 .vscode/
 bin/basicis.db
+test.db

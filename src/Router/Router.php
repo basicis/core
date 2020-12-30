@@ -127,8 +127,8 @@ class Router
      */
     public function getRoute() : ?Route
     {
-        $routes = $this->findByRegex($this->url);
-        $routes = $routes ? $routes : $this->findByName($this->url);
+        $routes = $this->findByName($this->url);
+        $routes = $routes ? $routes : $this->findByRegex($this->url);
 
         if ($routes &&  (count($routes) == 1)) {
             $this->response = ResponseFactory::create(200);
@@ -188,7 +188,7 @@ class Router
      */
     public function setRequest(ServerRequestInterface $request) : Router
     {
-        $this->url = $request->getUri()->getPath();
+        $this->url = urldecode($request->getUri()->getPath());
         $this->method = strtoupper($request->getMethod());
         return $this;
     }
@@ -228,11 +228,11 @@ class Router
                     $arg_regex = $this->extractArgRegex($routeNameExplodeValue);
                     $arg_id = $this->extractArgId($routeNameExplodeValue);
 
-                    if ((($arg_id !== null) && ($arg_regex !== null)) &&
+                    if ((($arg_id !== null && $arg_regex !== null)) &&
                         Validator::validate($urlExplode[$routeNameExplode_key], $arg_regex)) {
                         $urlStartWith .= '/'.$urlExplode[$routeNameExplode_key];
                         $route->setArgument($arg_id, $urlExplode[$routeNameExplode_key]);
-                        
+
                         if (($routeNameExplode_key === count($urlExplode)) && ($url === $urlStartWith)) {
                             return [$route];
                         }
@@ -303,6 +303,10 @@ class Router
                 }
                 $i++;
             }
+        }
+
+        if (count($return) === 0) {
+            $this->response = ResponseFactory::create(405);
         }
 
         return $return;

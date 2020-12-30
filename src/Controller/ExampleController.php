@@ -1,6 +1,7 @@
 <?php
 namespace Basicis\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Basicis\Basicis as App;
 use Basicis\Router\Route;
 
@@ -22,7 +23,7 @@ class ExampleController extends Controller
      * @return     void
      * @Route("/", "GET", "foo_create")
      */
-    public function index($app, $args)
+    public function index(App $app, object $args = null) : ResponseInterface
     {
         return $app->json(["test" => "Teste Ok!"], 201);
     }

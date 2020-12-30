@@ -12,6 +12,7 @@ use \ReflectionMethod;
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Core/Annotations.php
+ * @Annotation
  */
 class Annotations
 {
@@ -104,8 +105,7 @@ class Annotations
      * @param  integer $index
      * @return string|null
      */
-    
-    public function getCommentByTag(string $method, string $tag, int $index = 0) : ?string
+    public function getMethodCommentByTag(string $method, string $tag, int $index = 0) : ?string
     {
         $this->setMethod($method);
         
@@ -113,6 +113,28 @@ class Annotations
             $matches = array();
             $parttern =  "#".$tag.".*#";
             preg_match_all($parttern, $this->getMethod()->getDocComment(), $matches, PREG_PATTERN_ORDER);
+
+            if (isset($matches[0][$index])) {
+                return trim($matches[0][$index]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Function getCommentByTag
+     * Get a documentation bloc line by any tag, and return this line
+     * @param  string  $method
+     * @param  string  $tag
+     * @param  integer $index
+     * @return string|null
+     */
+    public function getClassCommentByTag(string $tag, int $index = 0) : ?string
+    {
+        if (!empty($tag)) {
+            $matches = array();
+            $parttern =  "#".$tag.".*#";
+            preg_match_all($parttern, $this->getClass()->getDocComment(), $matches, PREG_PATTERN_ORDER);
 
             if (isset($matches[0][$index])) {
                 return trim($matches[0][$index]);
