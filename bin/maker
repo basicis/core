@@ -1,0 +1,6 @@
+#!/usr/local/bin/php
+<?php
+require_once "vendor/autoload.php";
+
+//Run Basicis\Console
+return (new Basicis\Console($argv))->run();

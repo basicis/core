@@ -1,0 +1,33 @@
+<?php
+namespace {{namespace}};
+
+use Psr\Http\Message\ResponseInterface;
+use Basicis\Basicis as App;
+use Basicis\Basicis\Controller;
+
+/**
+ * {{class}} Class
+ * Extends Basicis\Controller\Controller and implements Basicis\Controller\ControllerInterface,
+ * all controller classes extend from this
+ * @category {{namespace}}
+ * @package  {{namespace}}
+ * @author   {{author.name}} <https://github.com/{{author.username}}> <{{author.email}}>
+ * @license  https://opensource.org/licenses/MIT MIT License
+ * @link     https://github.com/{{author.username}}/<repository>/blob/<default-branch>/{{path}}{{class}}.php
+ * @Model {{model}}
+ * @IgnoreAnnotation("Model")
+ */
+class {{class}} extends Controller
+{
+    /**
+     * Function index
+     * @param      App    $app
+     * @param      object $args
+     * @return     void
+     * @Route("/{{class|lower}}", "GET", "guest")
+     */
+    public function index(App $app, object $args = null) : ResponseInterface
+    {
+        return $app->json(["test" => "Teste Ok!"], 200);
+    }
+}
