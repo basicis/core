@@ -52,6 +52,8 @@ Find all entities|
 Find all entities, and return a array or null|
 |delete|Function delete
 Remove data of this entity of database|
+|exists|Function exists
+Check if a entity by any column match|
 |find|Function find
 Find a entity by id|
 |findBy|Function findBy
@@ -64,6 +66,8 @@ Return entity created timestamp|
 Return entity ID (unique on system identification)|
 |getManager|Function getManager
 Get a instance of Doctrine ORM EntityManager an return this, or null|
+|getPropertyAnnotation|Function getPropertyAnnotation
+Get a array with property annotations data by prop and tag names, default tag `Column`|
 |getUpdated|Function getUpdated
 Return entity updated timestamp|
 |save|Function save

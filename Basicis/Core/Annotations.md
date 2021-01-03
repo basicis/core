@@ -15,10 +15,12 @@ Describes a Annotations instance, and works with the comment blocks
 Receives a class as an argument, and works with the comment blocks|
 |[getClass](#annotationsgetclass)|Function getClass
 Getting a annotations ReflectionClass|
-|[getCommentByTag](#annotationsgetcommentbytag)|Function getCommentByTag
+|[getClassCommentByTag](#annotationsgetclasscommentbytag)|Function getCommentByTag
 Get a documentation bloc line by any tag, and return this line|
 |[getMethod](#annotationsgetmethod)|Function getMethod
 Getting a annotations ReflectionMethod|
+|[getMethodCommentByTag](#annotationsgetmethodcommentbytag)|Function getCommentByTag
+Get a documentation bloc line by any tag, and return this line|
 |[setClass](#annotationssetclass)|Function setClass
 Setting class for extract annotations|
 |[setMethod](#annotationssetmethod)|Function setMethod
@@ -79,12 +81,12 @@ Getting a annotations ReflectionClass
 <hr />
 
 
-### Annotations::getCommentByTag  
+### Annotations::getClassCommentByTag  
 
 **Description**
 
 ```php
-public getCommentByTag (string $method, string $tag, int $index)
+public getClassCommentByTag (string $method, string $tag, int $index)
 ```
 
 Function getCommentByTag
@@ -128,6 +130,35 @@ Getting a annotations ReflectionMethod
 **Return Values**
 
 `\ReflectionMethod|null`
+
+
+
+
+<hr />
+
+
+### Annotations::getMethodCommentByTag  
+
+**Description**
+
+```php
+public getMethodCommentByTag (string $method, string $tag, int $index)
+```
+
+Function getCommentByTag
+Get a documentation bloc line by any tag, and return this line 
+
+ 
+
+**Parameters**
+
+* `(string) $method`
+* `(string) $tag`
+* `(int) $index`
+
+**Return Values**
+
+`string|null`
 
 
 

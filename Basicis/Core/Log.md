@@ -46,6 +46,8 @@ Format Message line, and return this as array
   "context" => array()
 ];
 ```|
+|[getByDate](#loggetbydate)|Function getByDate
+Get a log file by string date and return a array with contents|
 |[info](#loginfo)|Function info
 Interesting events.|
 |[interpolate](#loginterpolate)|Function interpolate
@@ -309,6 +311,33 @@ Format Message line, and return this as array
 **Return Values**
 
 `string`
+
+
+
+
+<hr />
+
+
+### Log::getByDate  
+
+**Description**
+
+```php
+public getByDate (string $date)
+```
+
+Function getByDate
+Get a log file by string date and return a array with contents 
+
+ 
+
+**Parameters**
+
+* `(string) $date`
+
+**Return Values**
+
+`array|null`
 
 
 

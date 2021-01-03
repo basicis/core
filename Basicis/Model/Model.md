@@ -2,8 +2,6 @@
 
 Model class
 
- @ORM\MappedSuperclass  
-
 ## Implements:
 Basicis\Model\ModelInterface, Stringable
 
@@ -24,6 +22,8 @@ Find all entities|
 Find all entities, and return a array or null|
 |[delete](#modeldelete)|Function delete
 Remove data of this entity of database|
+|[exists](#modelexists)|Function exists
+Check if a entity by any column match|
 |[find](#modelfind)|Function find
 Find a entity by id|
 |[findBy](#modelfindby)|Function findBy
@@ -36,6 +36,8 @@ Return entity created timestamp|
 Return entity ID (unique on system identification)|
 |[getManager](#modelgetmanager)|Function getManager
 Get a instance of Doctrine ORM EntityManager an return this, or null|
+|[getPropertyAnnotation](#modelgetpropertyannotation)|Function getPropertyAnnotation
+Get a array with property annotations data by prop and tag names, default tag `Column`|
 |[getUpdated](#modelgetupdated)|Function getUpdated
 Return entity updated timestamp|
 |[save](#modelsave)|Function save
@@ -207,6 +209,33 @@ Remove data of this entity of database
 <hr />
 
 
+### Model::exists  
+
+**Description**
+
+```php
+public static exists (array $findBy)
+```
+
+Function exists
+Check if a entity by any column match 
+
+ 
+
+**Parameters**
+
+* `(array) $findBy`
+
+**Return Values**
+
+`bool`
+
+
+
+
+<hr />
+
+
 ### Model::find  
 
 **Description**
@@ -362,6 +391,34 @@ Get a instance of Doctrine ORM EntityManager an return this, or null
 **Return Values**
 
 `\EntityManager|null`
+
+
+
+
+<hr />
+
+
+### Model::getPropertyAnnotation  
+
+**Description**
+
+```php
+public static getPropertyAnnotation (string $name, string $tag)
+```
+
+Function getPropertyAnnotation
+Get a array with property annotations data by prop and tag names, default tag `Column` 
+
+ 
+
+**Parameters**
+
+* `(string) $name`
+* `(string) $tag`
+
+**Return Values**
+
+`array|null`
 
 
 

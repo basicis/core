@@ -58,6 +58,7 @@ A ResponseInterface object can be obtained by the getRequest function in the Rou
 Get the app Router engine instance|
 |[getTimezone](#basicisgettimezone)|Function getTimezone
 Getting App Timezone, default "America/Recife"|
+|[handleError](#basicishandleerror)|Undocumented function|
 |[input](#basicisinput)|Function input
 Open a Stream Resource in Read mode and returns its content|
 |[json](#basicisjson)|Function json
@@ -70,10 +71,9 @@ Open a Stream Resource in Recording mode and write a text in it, sending headers
 Return app project root path|
 |[redirect](#basicisredirect)||
 |[request](#basicisrequest)|Function request
-Alias for getRequest
-Get current server request of app|
+Set and/or get current server request of app|
 |[response](#basicisresponse)|Function response
-Alias for getResponse, Get current response of app|
+Set and/or get current server response of app|
 |[run](#basicisrun)|Function run
 Finally execute the app instance passed as parameters to standard input and output for php application,
 by definition the values ​​are respectively "php://input" for input and "php://output" for output.|
@@ -94,10 +94,14 @@ Setting all controller for app|
 Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"]|
 |[setRequest](#basicissetrequest)|Function setRequest
 Set current server request of app|
+|[setRequestByArray](#basicissetrequestbyarray)|Function setRequestByArray
+Set current server request of app by a array argument|
 |[setResourceInput](#basicissetresourceinput)|Function setResourceInput
 Set app default resource input|
 |[setResourceOutput](#basicissetresourceoutput)|Function setResourceOutput
 Set app default resource output|
+|[setResponse](#basicissetresponse)|Function setResponse
+Get current response of app|
 |[setRoute](#basicissetroute)|Function setRoute
 Set a new route in the app router object|
 |[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setMiddlewares
@@ -602,7 +606,7 @@ Get app default resource output
 **Description**
 
 ```php
-public getResponse (int|null $code, string $reasonPhrase)
+public getResponse (void)
 ```
 
 Function getResponse
@@ -612,8 +616,7 @@ Get current response of app
 
 **Parameters**
 
-* `(int|null) $code`
-* `(string) $reasonPhrase`
+`This function has no parameters.`
 
 **Return Values**
 
@@ -700,6 +703,32 @@ Getting App Timezone, default "America/Recife"
 **Return Values**
 
 `string`
+
+
+
+
+<hr />
+
+
+### Basicis::handleError  
+
+**Description**
+
+```php
+public handleError (string $message)
+```
+
+Undocumented function 
+
+ 
+
+**Parameters**
+
+* `(string) $message`
+
+**Return Values**
+
+`\Basicis`
 
 
 
@@ -886,8 +915,7 @@ public request (void)
 ```
 
 Function request
-Alias for getRequest
-Get current server request of app 
+Set and/or get current server request of app 
 
  
 
@@ -914,7 +942,7 @@ public response (int $code, string $reasonPhrase)
 ```
 
 Function response
-Alias for getResponse, Get current response of app 
+Set and/or get current server response of app 
 
  
 
@@ -1185,6 +1213,33 @@ Set current server request of app
 <hr />
 
 
+### Basicis::setRequestByArray  
+
+**Description**
+
+```php
+public setRequestByArray (array $request)
+```
+
+Function setRequestByArray
+Set current server request of app by a array argument 
+
+ 
+
+**Parameters**
+
+* `(array) $request`
+
+**Return Values**
+
+`\Basicis`
+
+
+
+
+<hr />
+
+
 ### Basicis::setResourceInput  
 
 **Description**
@@ -1228,6 +1283,34 @@ Set app default resource output
 **Parameters**
 
 * `(string) $resourceOutput`
+
+**Return Values**
+
+`\Basicis`
+
+
+
+
+<hr />
+
+
+### Basicis::setResponse  
+
+**Description**
+
+```php
+public setResponse (int|null $code, string $reasonPhrase)
+```
+
+Function setResponse
+Get current response of app 
+
+ 
+
+**Parameters**
+
+* `(int|null) $code`
+* `(string) $reasonPhrase`
 
 **Return Values**
 
@@ -1507,7 +1590,7 @@ or `my-custom/path/`, we have the following code to return this view:
 **Description**
 
 ```php
-public write (string $text, int $statusCode)
+public write (string $text, int|null $statusCode)
 ```
 
 Function write
@@ -1524,7 +1607,7 @@ Set a string and status code for write in the http response
 **Parameters**
 
 * `(string) $text`
-* `(int) $statusCode`
+* `(int|null) $statusCode`
 
 **Return Values**
 
