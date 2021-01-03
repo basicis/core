@@ -1,6 +1,7 @@
 <?php
 namespace Basicis\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Basicis\Basicis as App;
 use Basicis\Router\Route;
 
@@ -12,6 +13,8 @@ use Basicis\Router\Route;
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Controller/ExampleController.php
+ * @Model App\Models\Example
+ * @IgnoreAnnotation("Model")
  */
 class ExampleController extends Controller
 {
@@ -20,10 +23,10 @@ class ExampleController extends Controller
      * @param      App    $app
      * @param      object $args
      * @return     void
-     * @Route("/", "GET", "foo_create")
+     * @Route("/", "GET", "guest")
      */
-    public function index($app, $args)
+    public function index(App $app, object $args = null) : ResponseInterface
     {
-        return $app->json(["test" => "Teste Ok!"], 201);
+        return $app->json(["test" => "Teste Ok!"], 200);
     }
 }

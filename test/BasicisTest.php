@@ -154,6 +154,40 @@ class BasicisTest extends TestCase
         $this->assertEquals("America/Recife", $this->app->getTimezone());
     }
 
+    /**
+     * Function testSetRequest
+     *
+     * @return void
+     */
+    public function testSetRequest()
+    {
+        $this->app->setRequest(ServerRequestFactory::create("GET", "/url"));
+        $this->assertEquals("/url", $this->app->getRequest()->getUri()->getPath());
+
+        $this->app->setRequestByArray([
+            "method" => "GET",
+            "uri" => "http://localhost:8080/my-path"
+        ]);
+        $this->assertEquals(
+            "http://localhost:8080/my-path",
+            $this->app->getRequest()->getUri()->__toString()
+        );
+
+        $this->app->setRequestByArray([
+            "method" => "GET",
+            "protocol" => "http",
+            "host" => "localhost",
+            "port" => "8080",
+            "path" => "/my-path2",
+            "headers" => ["test" => "Ok!"]
+            
+        ]);
+        $this->assertEquals(
+            "http://localhost:8080/my-path2",
+            $this->app->getRequest()->getUri()->__toString()
+        );
+        $this->assertEquals("Ok!", $this->app->getRequest()->getHeader("test")[0]);
+    }
 
     /**
      * Function testGetRequest
@@ -172,9 +206,11 @@ class BasicisTest extends TestCase
      */
     public function testGetResponse()
     {
-        $response = $this->app->getResponse(201);
+        $response = $this->app->response(201);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(201, $response->getStatusCode());
+        $this->app->setResponse(200);
+        $this->assertEquals(200, $this->app->getResponse()->getStatusCode());
     }
 
     /**

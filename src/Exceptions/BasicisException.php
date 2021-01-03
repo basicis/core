@@ -2,7 +2,7 @@
 namespace Basicis\Exceptions;
 
 use Psr\Log\LoggerInterface;
-use Basicis\Basicis as App;
+use Basicis\Core\Log;
 
 /**
  * BasicisException Class
@@ -68,21 +68,30 @@ class BasicisException extends \Exception
      * - info
      * - debug
      *
-     * @param  string $level="error"
+     * @param  string|int $level
      * @param  string $message=null
      * @param  array  $context
      * @return BasicisException
      */
-    public function log(string $level = null, $message = null, array $context = []) : BasicisException
+    public function log($level = null, $message = null, array $context = []) : BasicisException
     {
-        if (!in_array($level, $this->levels) | is_null($level)) {
-            $level="error";
+        if (!in_array($level, $this->levels)) {
+            $level = "error";
         }
-        if (is_null($message)) {
+
+        if (is_int($level)) {
+            $level = $this->levels[$level];
+        }
+
+        if ($level === null) {
+            $level = $this->levels[$this->getCode()];
+        }
+
+        if ($message === null) {
             $message = $this->getMessage();
         }
 
-        $context_merge = array_merge(
+        $context_merged = array_merge(
             [
                 "level" => ucfirst($level),
                 "file" => $this->getFile(),
@@ -92,10 +101,10 @@ class BasicisException extends \Exception
             $context
         );
 
-        App::logger()->log(
+        (new Log)->log(
             $level,
             "{level}: $message | With reference code {code}, on line {line} of file {file};\n{context}",
-            $context_merge
+            $context_merged
         );
         return $this;
     }

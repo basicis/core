@@ -1,0 +1,31 @@
+<?php
+namespace {{namespace}};
+
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Basicis\Http\Message\ResponseFactory;
+use Basicis\Http\Server\Middleware;
+
+/**
+ * {{class}} Class
+ * Extends Basicis\Http\Server\Middleware and implements Psr\Http\Server\MiddlewareInterface,
+ * all controller classes extend from this
+ * @category {{namespace}}
+ * @package  {{namespace}}
+ * @author   {{author.name}} <https://github.com/{{author.username}}> <{{author.email}}>
+ * @license  https://opensource.org/licenses/MIT MIT License
+ * @link     https://github.com/{{author.username}}/<repository>/blob/<default-branch>/{{path}}{{class}}.php
+ */
+class {{class}} extends Middleware
+{
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        /**
+         *
+         * Proccess here
+         * All persoal middleware code implementation
+         *
+         */
+        return ResponseFactory::create(200);
+    }
+}

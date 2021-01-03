@@ -1,0 +1,90 @@
+<?php
+namespace App\Models;
+
+use Doctrine\ORM\Mapping as ORM;
+use Basicis\Model\Model;
+use Basicis\Basicis as App;
+use Basicis\Core\Validator;
+
+/**
+ * {{class}} Class
+ * Extends Basicis\Model\Model and implements Basicis\Model\ModelInterface,
+ * all model classes extend from this
+ *
+ * @category {{namespace}}
+ * @package  {{namespace}}
+ * @author   {{author.name}} <https://github.com/{{author.username}}> <{{author.email}}>
+ * @license  https://opensource.org/licenses/MIT MIT License
+ * @link     https://github.com/{{author.username}}/<repository>/blob/<default-branch>/src/<path>
+ * @ORM\Entity
+ * @ORM\Table(name="{{table}}")
+ * https://www.doctrine-project.org/projects/doctrine-orm/en/2.7/reference/annotations-reference.html
+ */
+class {{class}} extends Model
+{
+    /**
+     * $protecteds variable
+     * @var array
+     */
+    protected $protecteds = [];
+
+    /**
+      * @ORM\Column(type="string")
+      * @ORM\GeneratedValue
+      * @var string $name
+      */
+    protected $name;
+
+    /**
+     * $email variable
+     * @ORM\Column(name="email", length=300, unique=true)
+     * @var string
+     */
+    protected $email;
+
+    /**
+     * Function getName
+     * Get example property name
+     * @return string
+     */
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Function setName
+     * Set example property name
+     * @param string $name
+     * @return {{class}}
+     */
+    public function setName(string $name) : {{class}}
+    {
+        $this->name = ucwords($name, " ");
+        return $this;
+    }
+
+    /**
+     * Function getEmail
+     * Get Auth email
+     * @return string|null
+     */
+    public function getEmail() : ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Function setEmail
+     * Set Auth email
+     * @param string $email
+     * @return {{class}}
+     */
+    public function setEmail(string $email) : {{class}}
+    {
+        if (Validator::validate($email, "email")) {
+            $this->email = $email;
+        }
+        return $this;
+    }
+}

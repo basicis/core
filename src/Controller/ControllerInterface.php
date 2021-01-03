@@ -1,6 +1,9 @@
 <?php
 namespace Basicis\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Basicis\Model\Model;
+use Basicis\Model\Models;
 use Basicis\Basicis as App;
 
 /**
@@ -14,8 +17,65 @@ use Basicis\Basicis as App;
 interface ControllerInterface
 {
     /**
-     * All controller classes must implement
-     * @return void
+     * Function index
+     * Default method
+     * @param \Basicis\Basicis $app
+     * @param object $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function index(App $app, object $args);
+    public function index(App $app, object $args = null) : ResponseInterface;
+
+    /**
+     * Function create
+     * Creates a model of the specified class
+     * @param \Basicis\Basicis $app
+     * @param object $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function create(App $app, object $args = null) : ResponseInterface;
+
+    /**
+     * Function update
+     * Update a model of the specified class
+     * @param \Basicis\Basicis $app
+     * @param \Basicis\Model\Model $model
+     * @param object $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function update(App $app, Model $model = null, object $args = null) : ResponseInterface;
+
+    /**
+     * Function delete
+     * Delete a model of the specified class
+     * @param \Basicis\Basicis $app
+     * @param \Basicis\Model\Model $model
+     * @param object $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function delete(App $app, Model $model = null, object $args = null) : ResponseInterface;
+
+    /**
+     * Function find
+     * Find one a model item of the specified class
+     * @param \Basicis\Basicis $app
+     * @param \Basicis\Model\Model $model
+     * @param object $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function find(App $app, Model $model = null, object $args = null) : ResponseInterface;
+
+    /**
+     * Function all
+     * Find all a model items of the specified class
+     * @param \Basicis\Basicis $app
+     * @param Models $models
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function all(App $app, Models $models = null) : ResponseInterface;
 }

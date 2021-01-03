@@ -3,6 +3,8 @@ namespace Basicis\Core;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Basicis\Basicis as App;
+use Basicis\Http\Message\StreamFactory;
 
 /**
  * Log Class
@@ -51,10 +53,10 @@ class Log implements LoggerInterface
     public function __construct(string $path = null, string $email = null)
     {
         if (is_null($path)) {
-            $path = '../';
+            $path = App::path();
         }
 
-        $this->path = $path.'log/'.Date('Y/m/');
+        $this->path = $path.'log/';
 
         if (!is_null($email) && ($email != false)) {
             $this->email = $email;
@@ -208,51 +210,36 @@ class Log implements LoggerInterface
         $this->toFile(LogLevel::DEBUG, $this->interpolate($message, $context));
     }
 
+
     /**
      * Function toFile
-     * Write message in the log file
+     * Write message in the log file as json
      * @param  string $level   - Log level
      * @param  string $message - Text message
      * @return boolean
      */
     private function toFile(string $level, string $message) : bool
     {
-        $filename = $this->path . Date("d") . '.log';
-        if ($this->toFileJson($level, $message)) {
-            return error_log($this->formatMessage($level, $message."\n"), 3, $filename);
+        $path = $this->path.Date('Y/m/');
+        if (!is_dir($path)) {
+            mkdir($path, 0775, true);
         }
-        return false;
-    }
-
-    /**
-     * Function toFileJson
-     * Write message in the log file as json
-     * @param  string $level   - Log level
-     * @param  string $message - Text message
-     * @return boolean
-     */
-    private function toFileJson(string $level, string $message) : bool
-    {
-        if (!is_dir($this->path)) {
-            mkdir($this->path, 0775, true);
-        }
-
-        $filename = $this->path. Date("d"). '.json';
-        $jsonObj = null;
+        $filename = $path.Date('d').'.json';
+        $writed = false;
+        $jsonObj = [];
 
         if (file_exists($filename)) {
-            $jsonObj = json_decode(file_get_contents($filename));
+            $jsonObj = $this->getByDate(Date('Y/m/d'));
         }
 
         $jsonObj[] = $this->formatMessageToArray($level, $message);
-        $jsonRes = fopen($filename, 'w');
-
-        if (is_resource($jsonRes)) {
-            fwrite($jsonRes, json_encode($jsonObj));
-            fclose($jsonRes);
-            return file_exists($filename);
+        $stream = (new StreamFactory)->createStreamFromFile($filename);
+        if ($stream->isWritable()) {
+            $writed = $stream->write(json_encode($jsonObj));
         }
-        return false;
+        $stream->close();
+        
+        return $writed;
     }
 
     /**
@@ -326,5 +313,27 @@ class Log implements LoggerInterface
             "message" => $message,
             "context" => $this->context
         ];
+    }
+
+
+    /**
+     * Function getByDate
+     * Get a log file by string date and return a array with contents
+     * @param string $date
+     *
+     * @return Array|null
+     */
+    public function getByDate(string $date) : ?Array
+    {
+        $filename = $this->path.(new \DateTime($date))->format("Y/m/d").'.json';
+        $logArray = null;
+        if (file_exists($filename)) {
+            $stream = (new StreamFactory)->createStreamFromFile($filename, "r+");
+            if ($stream->isReadable()) {
+                $logArray = json_decode($stream->getContents());
+            }
+            $stream->close();
+        }
+        return $logArray;
     }
 }

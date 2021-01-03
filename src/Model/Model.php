@@ -7,18 +7,25 @@ use Basicis\Model\ModelInteface;
 use Basicis\Model\DataBase;
 use Basicis\Basicis as App;
 use Basicis\Core\Validator;
+use Basicis\Core\Annotations;
+use Basicis\Core\Log;
 
 /**
- *  Model class
+ * Model class
  *
- *  @ORM\MappedSuperclass
+ * @ORM\MappedSuperclass
+ * @category Basicis
+ * @package  Basicis
+ * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
+ * @license  https://opensource.org/licenses/MIT MIT License
+ * @link     https://github.com/basicis/core/blob/master/src/Model/Model.php
  */
 abstract class Model implements ModelInterface
 {
 
     /**
       * @ORM\Id
-      * @ORM\Column(type="integer")
+      * @ORM\Column(type="integer", unique=true)
       * @ORM\GeneratedValue
       * @var int $id
       */
@@ -67,12 +74,9 @@ abstract class Model implements ModelInterface
             }
         }
 
-        if (($data === null)) {
-            $this->setCreated();
-            $this->setUpdated();
-        }
+        $this->setCreated();
+        $this->setUpdated();
     }
-
 
     /**
      * Function getId
@@ -176,21 +180,19 @@ abstract class Model implements ModelInterface
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
             try {
-                $manager->persist($this);
+                $this->setUpdated();
+                
+                if ($this->getId() === null) {
+                    $manager->persist($this);
+                }
+
+                if ($this->getId() !== null) {
+                    $manager->persist($manager->merge($this));
+                }
+
                 $manager->flush();
-            } catch (\PDOException $e) {
-                throw new \PDOException();
             } catch (\Exception $e) {
-                throw new \Exception(
-                    sprintf(
-                        "%s\nMessage: %s\nCode: %s",
-                        "Database connection error on save $modelClass!",
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+                (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
             }
         }
         return $this;
@@ -211,16 +213,7 @@ abstract class Model implements ModelInterface
                 $manager->flush();
                 return true;
             } catch (\Exception $e) {
-                throw new \Exception(
-                    sprintf(
-                        "%s\nMessage: %s\nCode: %s",
-                        "Database connection error on delete ".get_called_class()."!",
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+                (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
                 return false;
             }
         }
@@ -241,16 +234,7 @@ abstract class Model implements ModelInterface
             try {
                 $entities = $manager->getRepository(get_called_class())->findBy($findBy);
             } catch (\Exception $e) {
-                throw new \Exception(
-                    sprintf(
-                        "%s\nMessage: %s\nCode: %s",
-                        "Database connection error on search ".get_called_class()."!",
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+                (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
                 return null;
             }
             if (is_array($entities) && (count($entities) > 0)) {
@@ -275,16 +259,7 @@ abstract class Model implements ModelInterface
             try {
                 $entity = $manager->getRepository($entityClass)->findOneBy($findOneBy);
             } catch (\Exception $e) {
-                throw new \Exception(
-                    sprintf(
-                        "%s\nMessage: %s\nCode: %s",
-                        "Database connection error on search ".get_called_class()."!",
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+                (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
                 return null;
             }
 
@@ -310,16 +285,7 @@ abstract class Model implements ModelInterface
             try {
                 $entity = $manager->find($entityClass, $id);
             } catch (\Exception $e) {
-                throw new \Exception(
-                    sprintf(
-                        "%s\nMessage: %s\nCode: %s",
-                        "Database connection error on search ".get_called_class()."!",
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+                (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
                 return null;
             }
 
@@ -343,16 +309,7 @@ abstract class Model implements ModelInterface
             try {
                 $entities = $manager->getRepository(\get_called_class())->findAll();
             } catch (\Exception $e) {
-                throw new \Exception(
-                    sprintf(
-                        "%s\nMessage: %s\nCode: %s",
-                        "Database connection error on search ".get_called_class()."!",
-                        $e->getMessage(),
-                        $e->getCode()
-                    ),
-                    $e->getCode(),
-                    $e
-                );
+                (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
                 return null;
             }
             if (is_array($entities) && (count($entities) > 0)) {
@@ -380,6 +337,24 @@ abstract class Model implements ModelInterface
 
 
     /**
+     * Function exists
+     * Check if a entity by any column match
+     * @param array $findBy
+     *
+     * @return bool
+     */
+    public static function exists(array $findBy) : bool
+    {
+        $model = get_called_class();
+        $example = self::findOneBy($findBy);
+        if ($example instanceof $model) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * Function __toArray
      * Get Entity Data as Array, without the propreties defined in the array property $protecteds
      * @return array
@@ -389,7 +364,7 @@ abstract class Model implements ModelInterface
         $data = [];
         $props = \array_keys(\get_object_vars($this));
         foreach ($props as $prop) {
-            if (!in_array($prop, $this->protecteds)) {
+            if (!in_array($prop, $this->protecteds) && ($prop !== "protecteds")) {
                 $data[$prop] = $this->$prop;
                 if ($prop instanceof Model) {
                     $data[$prop] = $this->$prop->__toArray();
@@ -407,5 +382,48 @@ abstract class Model implements ModelInterface
     public function __toString() : String
     {
         return json_encode($this->__toArray());
+    }
+
+    /**
+     * Function getPropertyAnnotation
+     * Get a array with property annotations data by prop and tag names, default tag `Column`
+     * @param string $name
+     * @param string $tag
+     *
+     * @return array|null
+     */
+    public static function getPropertyAnnotation(string $name, string $tag = "Column") : ?array
+    {
+        $prop = (new Annotations(get_called_class()))->getClass()->getProperty($name);
+        $tag = "ORM\\$tag";
+
+        if ($prop !== null) {
+            $comment = $prop->getDocComment();
+            if ($comment !== null) {
+                $comment = trim(str_replace(["/**", "*", "/"], "", $comment));
+            }
+
+            $returnString = null;
+            foreach (explode("@", $comment) as $line) {
+                if (str_starts_with($line, $tag)) {
+                    $returnString = trim(str_replace([$tag, "(", ")"], "", $line));
+                }
+            }
+
+            $returnArray = null;
+            foreach (explode(",", $returnString) as $key) {
+                if (count(explode("=", $key)) === 2) {
+                    $tagPropName = explode("=", $key)[0];
+                    $tagPropValue = explode("=", $key)[1];
+                    $returnArray[trim(str_replace('"', '', $tagPropName))] = trim(str_replace('"', '', $tagPropValue));
+                }
+            }
+
+            if ($returnArray === null && $returnString !== null) {
+                $returnArray = [$returnString];
+            }
+            return $returnArray;
+        }
+        return null;
     }
 }

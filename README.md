@@ -2,7 +2,7 @@
 # Basicis - Core
 
 <p align="center">
-    <img width="160" src="public/img/logo.png"/>
+    <img width="160" src="storage/img/logo.png"/>
 </p>
 
 <p align="center">

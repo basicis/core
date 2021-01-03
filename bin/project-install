@@ -22,3 +22,8 @@ $dst = '.env.local';
 if (!file_exists($dst)) {
     copy('.env.example', $dst);
 }
+
+if (!file_exists('maker')) {
+    copy('vendor/basicis/core/bin/maker', 'maker');
+    chmod('maker', 0775);
+}
