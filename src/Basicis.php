@@ -851,7 +851,7 @@ class Basicis extends RequestHandler
                     $request["host"] ?? "localhost",
                     $port,
                     $request["path"] ?? "/",
-                    $query,
+                    $query
                 )
             );
         }
