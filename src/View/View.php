@@ -2,6 +2,7 @@
 namespace Basicis\View;
 
 use Basicis\Basicis as App;
+use Basicis\Exceptions\InvalidArgumentException;
 
 /**
  *  View Class
@@ -16,19 +17,29 @@ class View
     /**
      * @var array $paths
      */
-    private $paths;
+    private $paths = [];
 
     /**
      * Function __construct
      *
      * @param array $paths
      */
-    public function __construct(array $paths = [])
+    public function __construct(array $paths = null)
     {
-        if ($paths !== []) {
-            $this->paths = $paths;
-            $this->view = new \Twig\Environment(new \Twig\Loader\FilesystemLoader($paths));
+        $this->paths = [App::path()."storage/templates/"];
+
+        if ($paths !== null) {
+            $this->paths = array_merge($this->paths, $paths);
+
+            foreach ($this->paths as $key => $path) {
+                if (!is_dir($path)) {
+                    (new InvalidArgumentException("Path $path no is a directory!", 4))->log();
+                    unset($this->paths[$key]);
+                }
+            }
         }
+
+        $this->view = new \Twig\Environment(new \Twig\Loader\FilesystemLoader($this->paths));
     }
 
     /**
@@ -42,52 +53,66 @@ class View
     private function extractTemplate(string $name, string &$path, &$data = []) : string
     {
         $template = "";
-        if (strpos($name, '.') |   strpos($name, ':') | strpos($name, ',')) {
-            $delimiter=null;
-            if (strpos($name, '.')) {
-                $delimiter = ".";
-            } elseif (strpos($name, ':')) {
-                $delimiter = ":";
-            } elseif (strpos($name, ',')) {
-                $delimiter = ",";
-            } elseif (strpos($name, '|')) {
-                $delimiter = "|";
-            } elseif (strpos($name, ';')) {
-                $delimiter = ";";
-            }
-
-            $explode = explode($delimiter, strtolower($name));
-            $template = $explode[0];
-            $content = glob($path.$explode[0].'.*');
-            
-            if (count($content) >= 1) {
-                $template = str_replace($path, '', $content[0]);
-            }
-            unset($content);
-
-            $content = glob($path . $explode[1] .'.*');
-            if (count($content) >= 1) {
-                $data['content'] = str_replace($path, '', $content[0]);
-            }
-
-            if (count($explode) > 2) {
-                $i = 2;
-                while ($i <= count($explode)) {
-                    $content = glob($path . $explode[$i] .'.*');
-                    if (count($content) >= 1) {
-                        $data['content'.$i] = str_replace($path, '', $content[0]);
-                    }
-                    $i++;
-                }
-            }
-        } else {
+        $delimiter = $this->getDelimiter($name);
+        if ($delimiter === null) {
             $content = glob($path . $name .'.*');
             if (count($content) >= 1) {
                 $template = strtolower(str_replace($path, '', $content[0]));
             }
+            return $template;
         }
 
-        return  $template;
+        $explode = explode($delimiter, strtolower($name));
+        $template = $explode[0];
+        $content = glob($path.$explode[0].'.*');
+            
+        if (count($content) >= 1) {
+            $template = str_replace($path, '', $content[0]);
+        }
+        unset($content);
+
+        $content = glob($path . $explode[1] .'.*');
+        if (count($content) >= 1) {
+            $data[$explode[1]] = str_replace($path, '', $content[0]);
+        }
+
+        if (count($explode) > 2) {
+            $i = 2;
+            while ($i <= count($explode)) {
+                $content = glob($path . $explode[$i] .'.*');
+                if (count($content) >= 1) {
+                    $data[$explode[$i]] = str_replace($path, '', $content[0]);
+                }
+                $i++;
+            }
+        }
+
+        return $template;
+    }
+
+    /**
+     * Function getDelimiter
+     * Get delimiter template name
+     * @param string $name
+     * @return string|null
+     */
+    private function getDelimiter(string $name) : ?string
+    {
+        $delimiter = null;
+        if (strpos($name, '|') |   strpos($name, ':') | strpos($name, ',')) {
+            if (strpos($name, ':')) {
+                $delimiter = ":";
+            }
+            
+            if (strpos($name, ',')) {
+                $delimiter = ",";
+            }
+            
+            if (strpos($name, '|')) {
+                $delimiter = "|";
+            }
+        }
+        return  $delimiter;
     }
 
     /**
@@ -107,15 +132,19 @@ class View
      *
      * @param array $filters
      *
-     * @return void
+     * @return View
      */
-    public function setFilters(array $filters)
+    public function setFilters(array $filters) : View
     {
         foreach ($filters as $key => $filter) {
-            if ($filter instanceof \Twig\TwigFunction) {
-                $this->view->addFunction($filter);
+            if (!$filter instanceof \Twig\TwigFunction) {
+                throw new InvalidArgumentException("Filter function not is a instance of \Twig\TwigFunction.", 4);
+                return [];
             }
+
+            $this->view->addFunction($filter);
         }
+        return $this;
     }
 
 
@@ -143,5 +172,27 @@ class View
         }
 
         return null;
+    }
+
+    /**
+     * Function getFunctions
+     * Get all defineds Twig functions
+     * @return array
+     */
+    public function getFunctions() : array
+    {
+        return $this->view->getFunctions();
+    }
+
+    /**
+     * Function hasFunction
+     * Check if has a Twig function named by $name argument
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasFunction(string $name) : bool
+    {
+        return in_array($name, array_keys($this->getFunctions()));
     }
 }

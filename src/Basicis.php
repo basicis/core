@@ -25,6 +25,7 @@ use Basicis\Controller\Controller;
 use Basicis\Controller\ControllerInterface;
 use Basicis\Http\Server\Middleware;
 use Basicis\Exceptions\InvalidArgumentException;
+use Basicis\Exceptions\BasicisException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -383,6 +384,7 @@ class Basicis extends RequestHandler
             $this->middlewares['route'] = $this->filterMiddlewares($middlewares, true);
         } catch (InvalidArgumentException $e) {
             $this->middlewares['route'] = [];
+            (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
         }
         return $this;
     }
@@ -413,6 +415,7 @@ class Basicis extends RequestHandler
             $this->middlewares['before'] = $this->filterMiddlewares($middlewares);
         } catch (InvalidArgumentException $e) {
             $this->middlewares['before'] = [];
+            (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
         }
         return $this;
     }
@@ -442,6 +445,7 @@ class Basicis extends RequestHandler
             $this->middlewares['after'] = $this->filterMiddlewares($middlewares);
         } catch (InvalidArgumentException $e) {
             $this->middlewares['after'] = [];
+            (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
         }
         return $this;
     }
@@ -1085,8 +1089,8 @@ class Basicis extends RequestHandler
     public function write(string $text = "", int $statusCode = null) : ResponseInterface
     {
         return $this->getResponse()
-            ->withStatus($statusCode ?? 200)
-            ->withBody((new StreamFactory)->createStream($text));
+            ->withBody((new StreamFactory)->createStream($text, "w+"))
+            ->withStatus($statusCode ?? 200);
     }
 
 
@@ -1352,6 +1356,7 @@ class Basicis extends RequestHandler
                 }
                 return $this->response()->withStatus(200);
             } catch (InvalidArgumentException $e) {
+                (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
                 return $this->getResponse()->withStatus(500, $e->getMessage());
             }
         }
@@ -1511,7 +1516,7 @@ class Basicis extends RequestHandler
             try {
                 return $this->closure($callback, $args);
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), 0, $e);
+                (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
             }
         }
 
@@ -1521,7 +1526,7 @@ class Basicis extends RequestHandler
             try {
                 return $this->controller($callback, $args);
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), 0, $e);
+                (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
             }
         }
 
@@ -1537,7 +1542,9 @@ class Basicis extends RequestHandler
         
         $this->setRequest(ServerRequestFactory::create($method, $url))
             ->getRequest()->withParsedBody(isset($data) ? $data : []);
-        return $this->handleRouterEngining()->response()->withStatus(307);
+
+        return $this->handleRouterEngining()
+                ->getResponse()->withStatus(307);
     }
 
 

@@ -6,6 +6,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Basicis\Exceptions\BasicisException;
 use Basicis\Exceptions\InvalidArgumentException;
 use Basicis\Exceptions\RuntimeException;
+use Basicis\Basicis as App;
 
 /**
  * StreamFactory class
@@ -30,9 +31,11 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStream(string $content = ''): StreamInterface
     {
-        $stream = new Stream(fopen(tempnam("/tmp", "tmpf"), 'w+', false), ['mode' => 'w+']);
+        $file = tempnam("/tmp", "tmpf");
+        $stream = new Stream(fopen($file, 'w+', false));
         $stream->write($content);
-        return $stream;
+        $stream->close();
+        return $this->createStreamFromFile($file, "r+");
     }
 
     /**

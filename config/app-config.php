@@ -34,10 +34,10 @@ $app = App::createApp(
     ServerRequestFactory::create(
         $_SERVER['REQUEST_METHOD'],
         (new Uri())
-            ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0] ?? "http")
-            ->withHost($_SERVER['HTTP_HOST'] ?? "localhost")
-            ->withPort($_SERVER['SERVER_PORT'] ?? null)
-            ->withPath($_SERVER['REQUEST_URI'])
+        ->withScheme(explode('/', $_SERVER['SERVER_PROTOCOL'])[0] ?? "http")
+        ->withHost($_SERVER['HTTP_HOST'] ?? "localhost")
+        ->withPort($_SERVER['SERVER_PORT'] ?? null)
+        ->withPath($_SERVER['REQUEST_URI'])
     )
     ->withHeaders(getallheaders())
     ->withUploadedFiles($_FILES)
