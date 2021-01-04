@@ -85,6 +85,8 @@ class ModelTest extends TestCase
     {
         $this->assertEquals(true, is_array($this->model->__toArray()));
         $this->assertEquals(true, is_string($this->model->__toString()));
+        var_dump($this->model->__toObject());
+        //$this->assertEquals(true, is_object($this->model->__toObject()));
     }
 
 
