@@ -375,6 +375,16 @@ abstract class Model implements ModelInterface
     }
 
     /**
+     * Function __toObject
+     * Get Entity Data as Object, without the propreties defined in the array property $protecteds
+     * @return object
+     */
+    public function __toObject() : object
+    {
+        return (object) $this->__toArray();
+    }
+
+    /**
      * Function __toString
      * Get Entity Data as Json, without the propreties defined in the array property $protecteds
      * @return String
