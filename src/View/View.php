@@ -30,7 +30,6 @@ class View
 
         if ($paths !== null) {
             $this->paths = array_merge($this->paths, $paths);
-
             foreach ($this->paths as $key => $path) {
                 if (!is_dir($path)) {
                     (new InvalidArgumentException("Path $path no is a directory!", 4))->log();

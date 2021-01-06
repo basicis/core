@@ -177,7 +177,7 @@ class Basicis extends RequestHandler
      */
     public function __construct(ServerRequestInterface $request, array $options = [])
     {
-        $this->enableCache($options["enableCache"] ?? false);
+        $this->enableCache($options["enableCache"] ?? false, self::path()."cache/app");
 
         if ($this->enableCache && $this->cache->hasItem("router")) {
             $this->router = $this->cache->getItem("router")->get();
@@ -571,7 +571,7 @@ class Basicis extends RequestHandler
         if (!preg_match("/\/$/", $path)) {
             $path .= "/";
         }
-
+        
         $cache->addItem("app-root-path", $path, "20 minutes")->commit();
         return $path;
     }
@@ -761,16 +761,20 @@ class Basicis extends RequestHandler
     }
 
 
-     /**
+    /**
      * Function enableCache
      * Enable application cache $enable = true
+     *
+     * @param bool $enable
+     * @param string $cacheFile
+     *
      * @return Basicis
      */
-    public function enableCache(bool $enable = true)  : Basicis
+    public function enableCache(bool $enable = true, string $cacheFile = null)  : Basicis
     {
         $this->enableCache = $enable;
         if ($enable) {
-            $this->cache = new CacheItemPool(self::path()."cache/"); //self::path()
+            $this->cache = new CacheItemPool($cacheFile);
         }
         return $this;
     }
@@ -1089,8 +1093,8 @@ class Basicis extends RequestHandler
     public function write(string $text = "", int $statusCode = null) : ResponseInterface
     {
         return $this->getResponse()
-            ->withBody((new StreamFactory)->createStream($text, "w+"))
-            ->withStatus($statusCode ?? 200);
+                ->withStatus($statusCode ?? 200)
+                ->withBody((new StreamFactory)->createStream($text));
     }
 
 
@@ -1160,26 +1164,19 @@ class Basicis extends RequestHandler
       */
     public function view(string $name, array $data = [], $customPath = "") : ResponseInterface
     {
-        $content = null;
-        if ($this->enableCache && $this->cache->hasItem("template@".$name)) {
-            $content = $this->cache->getItem("template@".$name)->get();
-        }
+        $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
+        $view->setFilters($this->viewFilters);
+        $content = $view->getView($name, $data);
+        $statusCode = 200;
 
         if ($content === null) {
-            $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
-            $view->setFilters($this->viewFilters);
-            $this->getResponse()->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
-            $content = $view->getView($name, $data);
-
-            if ($content === null) {
-                $this->write("Template file '$name' not found!", 404);
-            }
-
-            if ($this->enableCache) {
-                $this->cache->addItem("template@".$name, $content, "2 minutes")->commit();
-            }
+            $content = "Template file '$name' not found!";
+            $statusCode = 404;
         }
-        return $this->write($content);
+
+        return $this->write($content)
+                ->withStatus($statusCode)
+                ->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
     }
 
     /**
@@ -1235,7 +1232,7 @@ class Basicis extends RequestHandler
     public function clientFileDownload(string $filename = null, bool $forced = false) : ResponseInterface
     {
         //If file exists, this no is null
-        if ($filename !== null) {
+        if ($filename !== null && file_exists($filename)) {
             $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
             if ($file->isReadable()) {
                 $headers = [
@@ -1250,7 +1247,7 @@ class Basicis extends RequestHandler
             }
             return $this->response->withStatus(404, "File not found!");
         }
-        return $this->response->withStatus(500, "Development error, Filename must not be null.");
+        return $this->response->withStatus(500, "Invalid filename or file no exists!");
     }
 
 
@@ -1266,22 +1263,23 @@ class Basicis extends RequestHandler
     public function clientFileUpload(UploadedFileInterface $infile, string $outfile = null) : ?array
     {
         if ($infile instanceof UploadedFileInterface) {
-            //move file to path
-            $infile->moveTo($outfile);
+            if (!file_exists($outfile) && touch($outfile)) {
+                //move file to path
+                $infile->moveTo($outfile);
+                //reading file in storage
+                $outfile = (new StreamFactory())->createStreamFromFile($outfile, "r");
 
-            //reading file in storage
-            $outfile = (new StreamFactory())->createStreamFromFile($outfile, "r+");
-
-            //Verify if is uploaded
-            if ($infile->getSize() === $outfile->getSize()) {
-                $data =  [
-                    "name" => str_replace(" ", "", $infile->getClientFilename()),
-                    "size" => $infile->getSize(),
-                    "type" => $infile->getClientMediaType(),
-                ];
-                $infile->getStream()->close();
-                $outfile->close();
-                return $data;
+                //Verify if is uploaded
+                if ($infile->getSize() === $outfile->getSize()) {
+                    $data =  [
+                        "name" => str_replace(" ", "", $infile->getClientFilename()),
+                        "size" => $infile->getSize(),
+                        "type" => $infile->getClientMediaType(),
+                    ];
+                    $infile->getStream()->close();
+                    $outfile->close();
+                    return $data;
+                }
             }
         }
         return null;
@@ -1390,14 +1388,14 @@ class Basicis extends RequestHandler
                 return $this->response = $result;
             }
 
-            return $this->response();
+            return $this->getResponse();
         }
 
         throw new InvalidArgumentException(
             'Expected an instance of \Closure or a with this example:'
-            .' function(App $app, $args){}. Optionals params.'
+            .' function (App $app, $args){}. Optionals params.'
         );
-        return $this->response()->withStatus(500);
+        return $this->getResponse()->withStatus(500);
     }
 
     
@@ -1409,10 +1407,12 @@ class Basicis extends RequestHandler
      */
     public static function input(string $resourceFileName = "php://input"): string
     {
-        //Opening input stream
-        $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'r');
-        $content = $stream->getContents();
-        $stream->close();
+        $content = null;
+        if (file_exists($resourceFileName) | $resourceFileName === "php://input") {
+            $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'r');
+            $content = $stream->getContents();
+            $stream->close();
+        }
         return $content ?? '';
     }
 
@@ -1430,32 +1430,37 @@ class Basicis extends RequestHandler
         ResponseInterface $response,
         string $resourceFileName = "php://output"
     ) : int {
-        //Opening output stream
-        $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
-        $size = 0;
-
-        if ($stream->isWritable()) {
-            header(
-                sprintf(
-                    '%s/%s %s %s',
-                    strtoupper($request->getUri()->getScheme()),
-                    $response->getProtocolVersion(),
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase()
-                ),
-                true
-            );
- 
-            foreach ($response->getHeaders() as $name => $value) {
-                header($response->getHeaderLine($name), true);
-            }
-
-            $size = $stream->write($response->getBody());
-            $response->getBody()->close();
+        if (!file_exists($resourceFileName) && $resourceFileName !== "php://output") {
+            touch($resourceFileName);
         }
 
-        $stream->close();
-        return $size;
+        if (file_exists($resourceFileName) | $resourceFileName === "php://output") {
+            $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
+            $size = 0;
+
+            if ($stream->isWritable()) {
+                header(
+                    sprintf(
+                        '%s/%s %s %s',
+                        strtoupper($request->getUri()->getScheme()),
+                        $response->getProtocolVersion(),
+                        $response->getStatusCode(),
+                        $response->getReasonPhrase()
+                    ),
+                    true
+                );
+    
+                foreach ($response->getHeaders() as $name => $value) {
+                    header($response->getHeaderLine($name), true);
+                }
+                $size = $stream->write($response->getBody());
+                $response->getBody()->close();
+            }
+
+            $stream->close();
+            return $size;
+        }
+        return 0;
     }
 
 
@@ -1541,7 +1546,7 @@ class Basicis extends RequestHandler
         }
         
         $this->setRequest(ServerRequestFactory::create($method, $url))
-            ->getRequest()->withParsedBody(isset($data) ? $data : []);
+            ->getRequest()->withParsedBody($data ?? []);
 
         return $this->handleRouterEngining()
                 ->getResponse()->withStatus(307);

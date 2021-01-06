@@ -1,13 +1,11 @@
 vendor/
 log/
 docs/
-cache
-cache/
 tmp/
 src/controllers/
 src/middlewares/
 src/routes/
-cache
+cache/
 .env*
 !.env.example
 .vscode/
