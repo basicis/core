@@ -551,29 +551,11 @@ class Basicis extends RequestHandler
      */
     public static function path() : string
     {
-        $cache = new CacheItemPool("php://temp/cache");
-        if ($cache->hasItem("app-root-path")) {
-            return $cache->getItem("app-root-path")->get();
+        $path = getcwd();
+        if (str_ends_with($path, "public")) {
+            $path .= "/..";
         }
-
-        $path = sprintf("%s/", getcwd());
-        $i = 0;
-
-        while ($i < 3) {
-            $command = exec('ls '.$path);
-            if ((strpos($command, 'vendor')  >= 0) && (strpos($command, 'vendor') !== false)) {
-                break;
-            }
-            $path .= '../';
-            $i++;
-        }
-
-        if (!preg_match("/\/$/", $path)) {
-            $path .= "/";
-        }
-        
-        $cache->addItem("app-root-path", $path, "20 minutes")->commit();
-        return $path;
+        return $path .= "/";
     }
 
 
@@ -1245,6 +1227,8 @@ class Basicis extends RequestHandler
                 }
                 return $this->response->withHeaders($headers)->withStatus(200)->withBody($file);
             }
+
+            $file->close();
             return $this->response->withStatus(404, "File not found!");
         }
         return $this->response->withStatus(500, "Invalid filename or file no exists!");
