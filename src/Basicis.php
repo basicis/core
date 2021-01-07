@@ -34,9 +34,7 @@ use Dotenv\Dotenv;
 use \Mimey\MimeTypes;
 
 /**
- * Basicis - App
- *
- * Main class Basicis framework
+ * Basicis\Basicis - Main class Basicis framework
  *
  * @category Basicis
  * @package  Basicis
@@ -171,9 +169,9 @@ class Basicis extends RequestHandler
     /**
      * Function __construct
      * Construct a instanceof Basicis\Basicis lovingly named $app
+     *
      * @param ServerRequestInterface $request
-     * @param array $options
-     * Acceptable options [mode=string, timezone=string, appDescription=string, appKey=string]
+     * @param array $options Acceptables options [mode=string, timezone=string, appDescription=string, appKey=string]
      */
     public function __construct(ServerRequestInterface $request, array $options = [])
     {
@@ -211,6 +209,7 @@ class Basicis extends RequestHandler
     /**
      * Function createApp Factory
      * Create a instanceof Basicis\Basicis and return it is
+     *
      * @param  ServerRequestInterface $request
      * @param  array $options
      * @return Basicis
@@ -239,8 +238,9 @@ class Basicis extends RequestHandler
      * - Using into outhers controllers or middlewares
      *
      * ```php
-     * $app->controller("example@functionName", $args = [object|array|null]);
+     * $app->controller("example@functionName", $args = [object, array or null]);
      * ````
+     *
      * @param array $controllers
      *
      * @return Basicis
@@ -278,7 +278,8 @@ class Basicis extends RequestHandler
     /**
      * Function getController
      * Get a controller by classname
-     * @param string $arg [keyname|class]
+     *
+     * @param string $arg [keyname or class]
      *
      * @return Controller|null
      */
@@ -305,6 +306,7 @@ class Basicis extends RequestHandler
     /**
      * Function getControllerKey
      * Get a controller key by classname
+     *
      * @param string $class
      *
      * @return Controller|null
@@ -324,8 +326,10 @@ class Basicis extends RequestHandler
 
     /**
      * Function filterMiddlewares
+     * Filter middlewares class on setting
+     *
      * @param array   $middlewares
-     * @param boolean $requireKey  = falseIf A middleware key must be defined
+     * @param boolean $requireKey false If A middleware key must be defined
      * @return array
      */
     private function filterMiddlewares(array $middlewares = [], $requireKey = false) : array
@@ -362,14 +366,14 @@ class Basicis extends RequestHandler
      * `@Route("/url", "method1", "middleware")` or
      * `@Route("/url, ...", "method1, ...", "middleware1, middleware2, ...")`
      *
-     * ```php
-     *    \/** @Route("/", "get", "example, guest") *\/
+     * ```
+     *    /** @Route("/", "get", "example, guest") *\/
      *    public function index($app, $args)
      *    {
      *        return $app->view("welcome");
      *    }
      *
-     *    \/** @Route("/dashboard", "get", "auth") *\/
+     *    /** @Route("/dashboard", "get", "auth") *\/
      *    public function painel($app, $args)
      *    {
      *        return $app->view("welcome");
@@ -394,8 +398,9 @@ class Basicis extends RequestHandler
 
     /**
      * Function setBeforeMiddlewares
-     * Setting before middlewares for app
-     * These are executed in the order they were defined, before the route middleware and main app handler
+     * Setting before middlewares for app These are executed in the order they were defined.
+     *
+     * These are executed before the route middleware and main app handler.
      *
      * - Setting into config/app-config.php file
      *
@@ -425,8 +430,9 @@ class Basicis extends RequestHandler
 
     /**
      * Function setAfterMiddlewares
-     * Setting after middlewares
-     * These are executed in the order they were defined, after the route middleware and main app handler,
+     * Setting after middlewares These are executed in the order they were defined.
+     *
+     * These are executed after the route middleware and main app handler,
      * if the ResponseInterface returned contains status codes greater than 200 or less than 206
      *
      * ```php
@@ -456,9 +462,11 @@ class Basicis extends RequestHandler
 
     /**
      * Function getMiddlewares
-     * Getting middlewares by type ['before'|'route'|'after'|null to all]
-     * @param string $type ['before'|'route'|'after'|null]
-     * Return an arra with especified middlewares type or all if no is especified the $type argument
+     * Getting middlewares by type ['before', 'route', 'after' or null to all].
+     *
+     * This return a array with especifieds middleware type or all if $type argument is equals null
+     *
+     * @param string $type ['before', 'route', 'after' or null]
      * @return array
      */
     public function getMiddlewares(string $type = null) : array
@@ -470,9 +478,10 @@ class Basicis extends RequestHandler
     }
 
 
-        /**
+    /**
      * Function handleBeforeMiddlewares
      * Handles middleware prior to the route and executes it, this return a Basicis
+     *
      * @return Basicis
      */
     private function handleBeforeMiddlewares() : Basicis
@@ -486,6 +495,7 @@ class Basicis extends RequestHandler
     /**
      * Function middlewaresHandle
      * Handles route middleware and executes it, this return a Basicis
+     *
      * @param  string|array $middlewares
      * @return Basicis
      */
@@ -506,6 +516,7 @@ class Basicis extends RequestHandler
     /**
      * Function handleAfterMiddlewares
      * Handles middleware after the route and executes it, this return a instance of Basicis
+     *
      * @return Basicis
      */
     private function handleAfterMiddlewares() : Basicis
@@ -519,6 +530,7 @@ class Basicis extends RequestHandler
     /**
      * Function path
      * Return app project root path
+     *
      * @return string
      */
     public static function path() : string
@@ -534,6 +546,7 @@ class Basicis extends RequestHandler
     /**
      * Function loadEnv
      * Load enviroment variables for use from app
+     *
      * @return boolean
      */
     public static function loadEnv() : bool
@@ -565,6 +578,7 @@ class Basicis extends RequestHandler
     /**
      * Function setAppDescription
      * Setting App description string
+     *
      * @param string $description
      * @return Basicis
      */
@@ -581,6 +595,8 @@ class Basicis extends RequestHandler
     /**
      * Function getResourceInput
      * Get app default resource input
+     *
+     * @return string
      */
     public function getResourceInput() : string
     {
@@ -591,6 +607,7 @@ class Basicis extends RequestHandler
     /**
      * Function setResourceInput
      * Set app default resource input
+     *
      * @param string $resourceInput
      * @return Basicis
      */
@@ -608,6 +625,8 @@ class Basicis extends RequestHandler
     /**
      * Function getResourceOutput
      * Get app default resource output
+     *
+     * @return string
      */
     public function getResourceOutput() : string
     {
@@ -617,6 +636,7 @@ class Basicis extends RequestHandler
     /**
      * Function setResourceOutput
      * Set app default resource output
+     *
      * @param string $resourceOutput
      *
      * @return Basicis
@@ -635,6 +655,7 @@ class Basicis extends RequestHandler
     /**
      * Function getAppDescription
      * Getting App description string
+     *
      * @return String
      */
     public function getAppDescription() : String
@@ -646,8 +667,9 @@ class Basicis extends RequestHandler
 
     /**
      * Function setMode
-     * Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"]
-     * @param string $mode = ["dev"|"production"|"prod"|null]
+     * Setting App operation Mode, development ["dev" or null] ou production ["production" or "prod"]
+     *
+     * @param string $mode ["dev", "production", "prod" or null]
      * Default value "dev" == Development Mode
      * @return Basicis
      */
@@ -675,6 +697,7 @@ class Basicis extends RequestHandler
     /**
      * Function getMode
      * Getting App operation Mode, development "dev" ou production "production"
+     *
      * @return String
      */
     public function getMode() : String
@@ -686,6 +709,7 @@ class Basicis extends RequestHandler
     /**
      * Function getAppKey
      * Getting hash appKey
+     *
      * @return String
      */
     public function getAppKey() : String
@@ -697,6 +721,7 @@ class Basicis extends RequestHandler
     /**
      * Function setAppKey
      * Setting hash appKey
+     *
      * @param string $appKey
      * @return Basicis
      */
@@ -717,7 +742,7 @@ class Basicis extends RequestHandler
 
     /**
      * Function enableCache
-     * Enable application cache $enable = true
+     * Enable application cache $enable true
      *
      * @param bool $enable
      * @param string $cacheFile
@@ -736,8 +761,9 @@ class Basicis extends RequestHandler
 
     /**
      * Function setTimezone
-     * Setting app timezone, default America/Recife
-     * @param string $timezone
+     * Setting app timezone
+     *
+     * @param string $timezone "America/Recife" if this is null
      * @return Basicis
      */
     public function setTimezone(string $timezone = null) : Basicis
@@ -750,6 +776,7 @@ class Basicis extends RequestHandler
     /**
      * Function getTimezone
      * Getting App Timezone, default "America/Recife"
+     *
      * @return String
      */
     public function getTimezone() : String
@@ -761,6 +788,7 @@ class Basicis extends RequestHandler
     /**
      * Function getRequest
      * Get current server request of app
+     *
      * @return ServerRequestInterface
      */
     public function getRequest() : ServerRequestInterface
@@ -772,6 +800,7 @@ class Basicis extends RequestHandler
     /**
      * Function setRequest
      * Set current server request of app
+     *
      * @param ServerRequestinterface $request
      * @return Basicis
      */
@@ -785,6 +814,7 @@ class Basicis extends RequestHandler
     /**
      * Function setRequestByArray
      * Set current server request of app by a array argument
+     *
      * @param array $request
      * @return Basicis
      */
@@ -832,6 +862,7 @@ class Basicis extends RequestHandler
     /**
      * Function request
      * Set and/or get current server request of app
+     *
      * @return ServerRequestInterface
      */
     public function request(ServerRequestinterface $request = null) : ServerRequestInterface
@@ -846,6 +877,7 @@ class Basicis extends RequestHandler
      /**
      * Function setResponse
      * Get current response of app
+     *
      * @param  int|null $code
      * @param  string $reasonPhrase
      * @return Basicis
@@ -866,6 +898,7 @@ class Basicis extends RequestHandler
     /**
      * Function getResponse
      * Get current response of app
+     *
      * @return ResponseInterface
      */
     public function getResponse() : ResponseInterface
@@ -880,6 +913,7 @@ class Basicis extends RequestHandler
     /**
      * Function response
      * Set and/or get current server response of app
+     *
      * @param  int    $code
      * @param  string $reasonPhrase
      * @return ResponseInterface
@@ -897,6 +931,7 @@ class Basicis extends RequestHandler
     /**
      * Function getRouter
      * Get the app Router engine instance
+     *
      * @return Router
      */
     public function getRouter() : Router
@@ -906,8 +941,10 @@ class Basicis extends RequestHandler
 
     /**
      * Function getRoute
-     * Get requested Route on router engine instance according to servervrequest,
+     * Get requested Route on router engine instance according to servervrequest.
+     *
      * A ResponseInterface object can be obtained by the getRequest function in the Router instance.
+     *
      * @return Route|null
      */
     public function getRoute() : ?Route
@@ -919,10 +956,11 @@ class Basicis extends RequestHandler
     /**
      * Function setRoute
      * Set a new route in the app router object
-     * @param string|array $url = "/"
-     * @param string|array $method = "GET"
-     * @param string|ControllerInterface|\Clousure $callback
-     * @param string|array $middlewares = null
+     *
+     * @param string|array $url "/"
+     * @param string|array $method "GET"
+     * @param string|ControllerInterface|\Clousure $callback null
+     * @param string|array $middlewares null
      * @return Basicis
      */
     public function setRoute($url = "/", $method = "GET", $callback = null, $middlewares = null) : Basicis
@@ -934,6 +972,7 @@ class Basicis extends RequestHandler
      /**
      * Function setRoutesByAnnotations
      * Receives a class as an argument, and works with the comment blocks as @Route
+     *
      * @param  string $class
      * @return Basicis
      */
@@ -955,6 +994,7 @@ class Basicis extends RequestHandler
     /**
      * Function setRoutesByControllers
      * Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'
+     *
      * @param  array|Controller[] $controllers
      * @return Basicis
      */
@@ -972,6 +1012,7 @@ class Basicis extends RequestHandler
     /**
      * Function handleRouterEngining
      * Handles routing engineering performs the specified callback for the route and returns a instance of Basicis
+     *
      * @return Basicis
      */
     private function handleRouterEngining() : Basicis
@@ -1005,8 +1046,9 @@ class Basicis extends RequestHandler
     /**
      * Function auth
      * Get the app Auth/User by authorization token, it is receive a class Basicis\Auth\AuthInterface
+     *
      * @param string $authClass
-     * @return \Basicis\Auth\Auth|null
+     * @return Auth|null
      */
     public function auth(string $authClass = "Basicis\Auth\Auth") : ?Auth
     {
@@ -1019,6 +1061,7 @@ class Basicis extends RequestHandler
 
     /**
      * Function cache
+     *
      * Get the app CacheItemPool engine instance
      * @return CacheItemPool
      */
@@ -1064,7 +1107,8 @@ class Basicis extends RequestHandler
      *   //or
      *   return $app->json(["test" => "Test with status code ok!", "success" => true], 200);
      * ````
-     * @param array $data = []
+     *
+     * @param array $data []
      * @param int   $statusCode
      * @return ResponseInterface
      */
@@ -1090,12 +1134,13 @@ class Basicis extends RequestHandler
 
      /**
       * Function view
-      * Set a template name, optional data and a optional path for write in the http response,
+      * Set a template name, optional data and a optional path for write in the http response.
+      *
       * If template especified no not found, a ResponseInterface with status code 404 is returned.
       *
       * - Using into controllers controllers or route callback
       *
-      * Starting from the idea that we have a template called `welcome.[html|php|twig]` inside `storage/templates/`
+      * Starting from the idea that we have a template called `welcome.[html, php or twig]` inside `storage/templates/`
       * or `my-custom/path/`, we have the following code to return this view:
       *
       *```php
@@ -1105,9 +1150,9 @@ class Basicis extends RequestHandler
       * ````
       *
       * - Using into Twig Template file
-      * ```twig
+      * ```
       *   <p>{{test2}}</p>
-      *   <p> Var is True: {{test}}</p>
+      *   <p>Var is True: {{test}}</p>
       * ```
       *
       * @param string $name
@@ -1147,6 +1192,7 @@ class Basicis extends RequestHandler
     /**
      * Function setViewFilters
      * Setting filters functions for use into template
+     *
      * - Setting into config/app-config.php file
      *
      * ```php
@@ -1160,13 +1206,13 @@ class Basicis extends RequestHandler
      *
      * - Using into Twig Template file
      *
-     * ```twig
+     * ```
      *   <p>Var is True: {{isTrue($var = true)}}<p>
      * ```
      *
      * or
      *
-     * ```twig
+     * ```
      *   {% if isTrue(var) %}
      *     <p>{{varTextHere}}</p>
      *   {% endif %}
@@ -1189,10 +1235,11 @@ class Basicis extends RequestHandler
     /**
      * Function clientFileDownload
      * Send a file in the body of the http response to the client
-     * @param string $filename
-     * @param bool $forced
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @param string $filename
+     * @param bool $forced false
+     *
+     * @return ResponseInterface
      */
     public function clientFileDownload(string $filename = null, bool $forced = false) : ResponseInterface
     {
@@ -1234,6 +1281,7 @@ class Basicis extends RequestHandler
     /**
      * Function clientFileUpload
      * Upload one or more files in the body of the http server request from the client
+     *
      * @param UploadedFileInterface $infile
      * @param string $outfile
      *
@@ -1269,19 +1317,20 @@ class Basicis extends RequestHandler
     /**
      * Function controller
      * Instantiate a Basicis\Controller\Controller object and execute the defined method or the standard index method.
+     *
      * The key for the controller or class name must be separated from the method name to be executed by `@` or `::`.
      *
      * - Using into outhers controllers or middlewares and defined for Basicis\Basicis::setControllers
      *
      * ```php
-     *   $app->controller("example@functionName", $args = [object|array|null]);
+     *   $app->controller("example@functionName", $args = [object, array or null]);
      *   //or
-     *   $app->controller("Namespace\Example::functionName", $args = [object|array|null]);
+     *   $app->controller("Namespace\Example::functionName", $args = [object, array or null]);
      * ````
      *
      * @param string $callback
      * @param string|int|array|object|null $args
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     public function controller(string $callback, $args) : ResponseInterface
     {
@@ -1346,9 +1395,10 @@ class Basicis extends RequestHandler
     /**
      * Function closure
      * Instantiate a Closure object and execute
+     *
      * @param \Closure $callback
      * @param string|int|array|object|null $args
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     public function closure(\Closure $callback, $args) : ResponseInterface
     {
@@ -1381,6 +1431,7 @@ class Basicis extends RequestHandler
     /**
      * Function input
      * Open a Stream Resource in Read mode and returns its content
+     *
      * @param  string $resourceFileName = "php://input"
      * @return void
      */
@@ -1399,6 +1450,7 @@ class Basicis extends RequestHandler
     /**
      * Function output
      * Open a Stream Resource in Recording mode and write a text in it, sending headers
+     *
      * @param  ServerRequestInterface $request
      * @param  ResponseInterface $response
      * @param  string $resourceFileName
@@ -1466,8 +1518,9 @@ class Basicis extends RequestHandler
     /**
      * Function extractData
      * Extract data on ServerRequest and/or Route url params
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Basicis\Router\Route $route
+     *
+     * @param ServerRequestInterface $request
+     * @param Route $route
      *
      * @return array
      */
@@ -1487,6 +1540,7 @@ class Basicis extends RequestHandler
     /**
      * handle function
      * Handles the callback function returned by routing engineering and executes it, this return a ResponseInterface
+     *
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
@@ -1521,11 +1575,12 @@ class Basicis extends RequestHandler
     /**
      * Function redirect
      * Redirect a Server Request with url, method and optional array of data
+     *
      * @param string $url
      * @param string $method
      * @param array $data
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     public function redirect(string $url = "/", $method = "GET", array $data = null) : ResponseInterface
     {
@@ -1542,7 +1597,8 @@ class Basicis extends RequestHandler
     /**
      * Function runAndResponse
      * Run app pipe line and return a instance of ResponseInterface
-     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @return ResponseInterface
      */
     public function runAndResponse() : ResponseInterface
     {
@@ -1564,8 +1620,10 @@ class Basicis extends RequestHandler
 
      /**
      * Function run
-     * Finally execute the app instance passed as parameters to standard input and output for php application,
-     * by definition the values ​​are respectively "php://input" for input and "php://output" for output.
+     * Finally execute the app instance passed as parameters to standard input and output for php application.
+     *
+     * By definition the values ​​are respectively "php://input" for input and "php://output" for output.
+     *
      * @param string $inputResource = "php://input"
      * @param string $outputResource = "php://output"
      * @return int

@@ -10,6 +10,7 @@ use Basicis\Http\Message\Stream;
 
 /**
  * Client class
+ *
  * @category Basicis/Http/Client
  * @package  Basicis/Http/Client
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -39,6 +40,7 @@ class Client implements ClientInterface
     /**
      * Funtion sendRequest
      * Sends a PSR-7 request and returns a PSR-7 response.
+     *
      * @param RequestInterface $request
      * @return ResponseInterface
      * @throws ClientException If an error happens while processing the request.
@@ -70,8 +72,8 @@ class Client implements ClientInterface
 
     /**
      * Function createContext
-     * Creates an http | https context with the stream_context_create() function
-     *  and returns the resource
+     * Creates an http or https context with the stream_context_create() function and returns the resource
+     *
      * @param RequestInterface $request
      * @param array $content
      * @return resource
@@ -100,8 +102,10 @@ class Client implements ClientInterface
 
     /**
      * Function send
-     * Instance a Request Interface object with the specified $ method,
-     * $uri, $data, and $options, and returns the created instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns the created instance.
+     *
      * @param string $method
      * @param string $uri
      * @param array $data [,$options = []]
@@ -114,8 +118,10 @@ class Client implements ClientInterface
 
     /**
      * Function get
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data
      * @param array $data [,$options = []]
@@ -128,8 +134,10 @@ class Client implements ClientInterface
 
     /**
      * Function post
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -141,8 +149,10 @@ class Client implements ClientInterface
 
     /**
      * Function path
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -155,8 +165,9 @@ class Client implements ClientInterface
     /**
      * Function put
      *
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
      *
      * @param string $uri
      * @param array $data [,$options = []]
@@ -169,8 +180,10 @@ class Client implements ClientInterface
 
     /**
      * Function delete
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -182,8 +195,10 @@ class Client implements ClientInterface
 
     /**
      * Function options
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -195,8 +210,10 @@ class Client implements ClientInterface
 
     /**
      * Function head
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -208,8 +225,10 @@ class Client implements ClientInterface
 
      /**
      * Function purge
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -221,8 +240,10 @@ class Client implements ClientInterface
 
      /**
      * Function trace
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface
@@ -234,8 +255,10 @@ class Client implements ClientInterface
 
     /**
      * Function connect
-     * Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-     * and returns a ResponseInterface instance.
+     * Instance a Request Interface object with the specified options.
+     *
+     * Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance.
+     *
      * @param string $uri
      * @param array $data [,$options = []]
      * @return ResponseInterface

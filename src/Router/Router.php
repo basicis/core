@@ -51,7 +51,7 @@ class Router
 
     /**
      * Function __constructs
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request
+     * @param ServerRequestInterface|null $request
      * @return void
      */
     public function __construct(ServerRequestInterface $request = null)
@@ -174,7 +174,7 @@ class Router
     /**
      * Function getResponse
      * Get a ResponseInterface Object or router run
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     public function getResponse() : ResponseInterface
     {
@@ -184,7 +184,7 @@ class Router
     /**
      * Function getResponse
      * Set a ServerRequestInterface Object for router run
-     * @return \Psr\Http\Message\ServerRequestInterface
+     * @return ServerRequestInterface
      */
     public function setRequest(ServerRequestInterface $request) : Router
     {
