@@ -12,35 +12,26 @@ Psr\Http\Client\ClientInterface
 | Name | Description |
 |------|-------------|
 |[connect](#clientconnect)|Function connect
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[delete](#clientdelete)|Function delete
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[get](#clientget)|Function get
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[head](#clienthead)|Function head
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[options](#clientoptions)|Function options
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[path](#clientpath)|Function path
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[post](#clientpost)|Function post
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[purge](#clientpurge)|Function purge
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 |[put](#clientput)|Function put|
 |[sendRequest](#clientsendrequest)|Funtion sendRequest
 Sends a PSR-7 request and returns a PSR-7 response.|
 |[trace](#clienttrace)|Function trace
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance.|
+Instance a Request Interface object with the specified options.|
 
 
 
@@ -54,10 +45,9 @@ public connect (string $uri, array $data)
 ```
 
 Function connect
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -84,10 +74,9 @@ public delete (string $uri, array $data)
 ```
 
 Function delete
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -114,10 +103,9 @@ public get (string $uri, array $data, array $data)
 ```
 
 Function get
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -145,10 +133,9 @@ public head (string $uri, array $data)
 ```
 
 Function head
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -175,10 +162,9 @@ public options (string $uri, array $data)
 ```
 
 Function options
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -205,10 +191,9 @@ public path (string $uri, array $data)
 ```
 
 Function path
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -235,10 +220,9 @@ public post (string $uri, array $data)
 ```
 
 Function post
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -265,10 +249,9 @@ public purge (string $uri, array $data)
 ```
 
 Function purge
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -296,8 +279,9 @@ public put (string $uri, array $data)
 
 Function put 
 
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,  
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options.  
+  
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 
@@ -357,10 +341,9 @@ public trace (string $uri, array $data)
 ```
 
 Function trace
-Instance a Request Interface object with the specified $method, $uri, $data, and $options,
-and returns a ResponseInterface instance. 
+Instance a Request Interface object with the specified options. 
 
- 
+Options: $method, $uri, $data, and $options, and returns a ResponseInterface instance. 
 
 **Parameters**
 

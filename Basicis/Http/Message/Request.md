@@ -34,9 +34,7 @@ Basicis\Http\Message\Message
 |[getMethod](#requestgetmethod)|Function getMethod
 Retrieves the HTTP method of the request.|
 |[getRequestTarget](#requestgetrequesttarget)|Function getRequestTarget
-Retrieves the message's request-target either as it will appear (for
-clients), as it appeared at request (for servers), or as it was
-specified for the instance (see withRequestTarget()).|
+Retrieves the message's request-target either as it will appear|
 |[getUri](#requestgeturi)|Function getUri
 Retrieves the URI instance.|
 |[withContentData](#requestwithcontentdata)|Function withContentData|
@@ -55,23 +53,19 @@ Returns an instance with the provided URI.|
 Gets the body of the message.|
 |getHeader|Function getHeader
 Retrieves a message header value by the given case-insensitive name.|
-|getHeaderLine|Function getHeaderLine
-Retrieves a comma-separated string of the values for a single header.|
+|getHeaderLine|Function getHeaderLine|
 |getHeaderLines|Function getHeaderLines|
 |getHeaders|Funtion getHeaders
-Retrieves all message header values
-The keys represent the header name as it will be sent over the wire, and
-each value is an array of strings associated with the header.|
+Retrieves all message header values|
 |getProtocolVersion|Function getProtocolVersion
 Retrieves the HTTP protocol version as a string.|
 |hasHeader|Function hasHeader
 Checks if a header exists by the given case-insensitive name.|
 |normalizeHeaderKey|Function normalizeHeaderKey|
 |parseHeader|Function parseHeader
-Pass an line to the current header, if the parameter $rewrite === false,
-the value of the line will be added to the header with the same key,
-otherwise the value of the current header will be replaced.|
-|parseHeaders|Function parseHeaders|
+Pass an line to the current header, if the parameter $rewrite === false|
+|parseHeaders|Function parseHeaders
+ Pass an array of lines to the current header, if the parameter $rewrite === false.|
 |withAddedHeader|FunctionwithAddedHeader
 Return an instance with the specified header appended with the given value.|
 |withBody|Function withBody
@@ -177,10 +171,11 @@ public getRequestTarget (void)
 ```
 
 Function getRequestTarget
-Retrieves the message's request-target either as it will appear (for
-clients), as it appeared at request (for servers), or as it was
-specified for the instance (see withRequestTarget()). 
+Retrieves the message's request-target either as it will appear 
 
+(forclients), as it appeared at request (for servers), or as it was  
+specified for the instance (see withRequestTarget()).  
+  
 In most cases, this will be the origin-form of the composed URI,  
 unless a value was provided to the concrete implementation (see  
 withRequestTarget() below).  

@@ -46,7 +46,7 @@ Receives a class as an argument, and works with the comment blocks as @Route|
 **Description**
 
 ```php
-public __construct (\Psr\Http\Message\ServerRequestInterface|null $request)
+public __construct (\ServerRequestInterface|null $request)
 ```
 
 Function __constructs 
@@ -55,7 +55,7 @@ Function __constructs
 
 **Parameters**
 
-* `(\Psr\Http\Message\ServerRequestInterface|null) $request`
+* `(\ServerRequestInterface|null) $request`
 
 **Return Values**
 
@@ -250,7 +250,7 @@ Get a ResponseInterface Object or router run
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 
@@ -361,7 +361,7 @@ Set a ServerRequestInterface Object for router run
 
 **Return Values**
 
-`\Psr\Http\Message\ServerRequestInterface`
+`\ServerRequestInterface`
 
 
 

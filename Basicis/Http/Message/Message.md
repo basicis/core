@@ -15,23 +15,19 @@ Psr\Http\Message\MessageInterface
 Gets the body of the message.|
 |[getHeader](#messagegetheader)|Function getHeader
 Retrieves a message header value by the given case-insensitive name.|
-|[getHeaderLine](#messagegetheaderline)|Function getHeaderLine
-Retrieves a comma-separated string of the values for a single header.|
+|[getHeaderLine](#messagegetheaderline)|Function getHeaderLine|
 |[getHeaderLines](#messagegetheaderlines)|Function getHeaderLines|
 |[getHeaders](#messagegetheaders)|Funtion getHeaders
-Retrieves all message header values
-The keys represent the header name as it will be sent over the wire, and
-each value is an array of strings associated with the header.|
+Retrieves all message header values|
 |[getProtocolVersion](#messagegetprotocolversion)|Function getProtocolVersion
 Retrieves the HTTP protocol version as a string.|
 |[hasHeader](#messagehasheader)|Function hasHeader
 Checks if a header exists by the given case-insensitive name.|
 |[normalizeHeaderKey](#messagenormalizeheaderkey)|Function normalizeHeaderKey|
 |[parseHeader](#messageparseheader)|Function parseHeader
-Pass an line to the current header, if the parameter $rewrite === false,
-the value of the line will be added to the header with the same key,
-otherwise the value of the current header will be replaced.|
-|[parseHeaders](#messageparseheaders)|Function parseHeaders|
+Pass an line to the current header, if the parameter $rewrite === false|
+|[parseHeaders](#messageparseheaders)|Function parseHeaders
+ Pass an array of lines to the current header, if the parameter $rewrite === false.|
 |[withAddedHeader](#messagewithaddedheader)|FunctionwithAddedHeader
 Return an instance with the specified header appended with the given value.|
 |[withBody](#messagewithbody)|Function withBody
@@ -115,9 +111,10 @@ return an empty array.
 public getHeaderLine (string $name)
 ```
 
-Function getHeaderLine
-Retrieves a comma-separated string of the values for a single header. 
+Function getHeaderLine 
 
+Retrieves a comma-separated string of the values for a single header.  
+  
 This method returns all of the header values of the given  
 case-insensitive header name as a string concatenated together using  
 a comma.  
@@ -179,11 +176,12 @@ public getHeaders (void)
 ```
 
 Funtion getHeaders
-Retrieves all message header values
-The keys represent the header name as it will be sent over the wire, and
-each value is an array of strings associated with the header. 
+Retrieves all message header values 
 
-// Represent the headers as a string  
+The keys represent the header name as it will be sent over the wire, and  
+each value is an array of strings associated with the header.  
+  
+    // Represent the headers as a string  
     foreach ($message->getHeaders() as $name => $values) {  
         echo $name . ": " . implode(", ", $values);  
     }  
@@ -306,10 +304,10 @@ public parseHeader (array $headers, bool $rewrite)
 ```
 
 Function parseHeader
-Pass an line to the current header, if the parameter $rewrite === false,
-the value of the line will be added to the header with the same key,
-otherwise the value of the current header will be replaced. 
+Pass an line to the current header, if the parameter $rewrite === false 
 
+The value of the line will be added to the header with the same key,  
+otherwise the value of the current header will be replaced.  
 $rewrite default:true 
 
 **Parameters**
@@ -336,10 +334,10 @@ $rewrite default:true
 public parseHeaders (array $headers, bool $rewrite)
 ```
 
-Function parseHeaders 
+Function parseHeaders
+ Pass an array of lines to the current header, if the parameter $rewrite === false. 
 
-Pass an array of lines to the current header, if the parameter $rewrite === false,  
-the value of the line will be added to the header with the same key,  
+The value of the line will be added to the header with the same key,  
 otherwise the value of the current header will be replaced.  
 $rewrite default:true 
 

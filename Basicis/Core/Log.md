@@ -4,6 +4,7 @@ Log Class
 Describes a logger instance.
 
 The message MUST be a string or object implementing __toString().
+
 The message MAY contain placeholders in the form: {foo} where foo
 will be replaced by the context data in key "foo".
 The context array can contain arbitrary data, the only assumption that
@@ -21,7 +22,7 @@ Psr\Log\LoggerInterface
 
 | Name | Description |
 |------|-------------|
-|[__construct](#log__construct)|__construct function|
+|[__construct](#log__construct)|Function __construct|
 |[alert](#logalert)|Function alert
 Action must be taken immediately.|
 |[critical](#logcritical)|Function critical
@@ -31,21 +32,11 @@ Detailed debug information|
 |[emergency](#logemergency)|Function emergency
 System is unusable.|
 |[error](#logerror)|Function error
-Runtime errors that do not require immediate action but should typically
-be logged and monitored.|
+Runtime errors that do not require immediate action but should typically be logged and monitored.|
 |[formatMessage](#logformatmessage)|Function formatMessage
 Format Message to file log line|
 |[formatMessageToArray](#logformatmessagetoarray)|Function formatMessageToArray
-Format Message line, and return this as array
-- Ex:
-```php
-[
-  "date" => Y/m/d H:i:s,
-  "level" => "Level",
-  "message" => "Text Message interpolated.",
-  "context" => array()
-];
-```|
+Format Message line, and return this as array|
 |[getByDate](#loggetbydate)|Function getByDate
 Get a log file by string date and return a array with contents|
 |[info](#loginfo)|Function info
@@ -70,16 +61,16 @@ Exceptional occurrences that are not errors.|
 public __construct (string $path, string $email)
 ```
 
-__construct function 
+Function __construct 
 
  
 
 **Parameters**
 
 * `(string) $path`
-: - Path to root log directory  
+: Path to root log directory  
 * `(string) $email`
-: - Email address for send log, default = null.  
+: Email address for send log, default = null.  
 
 **Return Values**
 
@@ -108,9 +99,9 @@ trigger the SMS alerts and wake you up.
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -138,9 +129,9 @@ Critical conditions.
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -198,9 +189,9 @@ System is unusable.
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -221,17 +212,16 @@ public error (string $message, array $context)
 ```
 
 Function error
-Runtime errors that do not require immediate action but should typically
-be logged and monitored. 
+Runtime errors that do not require immediate action but should typically be logged and monitored. 
 
  
 
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -259,13 +249,13 @@ Format Message to file log line
 **Parameters**
 
 * `(string) $level`
-: - Log level  
+: Log level  
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(string) $date_format`
-: - Default format "Y/m/d H:i:s"  
+: Default format "Y/m/d H:i:s"  
 * `(string) $format`
-: - Default line message format "{date} | {message}"  
+: Default line message format "{date} \| {message}"  
 
 **Return Values**
 
@@ -286,27 +276,27 @@ public formatMessageToArray (string $level, string $message, string $date_format
 ```
 
 Function formatMessageToArray
-Format Message line, and return this as array
-- Ex:
-```php
-[
-  "date" => Y/m/d H:i:s,
-  "level" => "Level",
-  "message" => "Text Message interpolated.",
-  "context" => array()
-];
-``` 
+Format Message line, and return this as array 
 
- 
+- Ex:  
+  
+```php  
+[  
+  "date" => Y/m/d H:i:s,  
+  "level" => "Level",  
+  "message" => "Text Message interpolated.",  
+  "context" => array()  
+];  
+``` 
 
 **Parameters**
 
 * `(string) $level`
-: - Log level  
+: Log level  
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(string) $date_format`
-: - Default format "Y/m/d H:i:s"  
+: Default format "Y/m/d H:i:s"  
 
 **Return Values**
 
@@ -361,9 +351,9 @@ Interesting events.
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -391,9 +381,9 @@ Interpolates context values into the message placeholders.
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -421,11 +411,11 @@ Logs with an arbitrary level.
 **Parameters**
 
 * `(mixed) $level`
-: - emergency|alert|critical|error|warning|notice|info|debug  
+: "emergency", "alert", "critical", "error", "warning", "notice", "info" or "debug"  
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -453,9 +443,9 @@ Normal but significant events
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 
@@ -478,15 +468,14 @@ public warning (string $message, array $context)
 Function warning
 Exceptional occurrences that are not errors. 
 
-- Ex: Use of deprecated APIs, poor use of an API, undesirable things  
-that are not necessarily wrong. 
+- Ex: Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong. 
 
 **Parameters**
 
 * `(string) $message`
-: - Text message  
+: Text message  
 * `(array) $context`
-: - Array with context values  
+: Array with context values  
 
 **Return Values**
 

@@ -1,8 +1,6 @@
 # Basicis\Basicis  
 
-Basicis - App
-
-Main class Basicis framework  
+Basicis\Basicis - Main class Basicis framework
 
 ## Implements:
 Psr\Http\Server\RequestHandlerInterface
@@ -17,8 +15,7 @@ Basicis\Http\Server\RequestHandler
 |------|-------------|
 |[auth](#basicisauth)|Function auth
 Get the app Auth/User by authorization token, it is receive a class Basicis\Auth\AuthInterface|
-|[cache](#basiciscache)|Function cache
-Get the app CacheItemPool engine instance|
+|[cache](#basiciscache)|Function cache|
 |[clientFileDownload](#basicisclientfiledownload)|Function clientFileDownload
 Send a file in the body of the http response to the client|
 |[clientFileUpload](#basicisclientfileupload)|Function clientFileUpload
@@ -30,7 +27,7 @@ Instantiate a Basicis\Controller\Controller object and execute the defined metho
 |[createApp](#basiciscreateapp)|Function createApp Factory
 Create a instanceof Basicis\Basicis and return it is|
 |[enableCache](#basicisenablecache)|Function enableCache
-Enable application cache $enable = true|
+Enable application cache $enable true|
 |[extractData](#basicisextractdata)|Function extractData
 Extract data on ServerRequest and/or Route url params|
 |[getAppDescription](#basicisgetappdescription)|Function getAppDescription
@@ -40,7 +37,7 @@ Getting hash appKey|
 |[getController](#basicisgetcontroller)|Function getController
 Get a controller by classname|
 |[getMiddlewares](#basicisgetmiddlewares)|Function getMiddlewares
-Getting middlewares by type ['before'|'route'|'after'|null to all]|
+Getting middlewares by type ['before', 'route', 'after' or null to all].|
 |[getMode](#basicisgetmode)|Function getMode
 Getting App operation Mode, development "dev" ou production "production"|
 |[getRequest](#basicisgetrequest)|Function getRequest
@@ -52,8 +49,7 @@ Get app default resource output|
 |[getResponse](#basicisgetresponse)|Function getResponse
 Get current response of app|
 |[getRoute](#basicisgetroute)|Function getRoute
-Get requested Route on router engine instance according to servervrequest,
-A ResponseInterface object can be obtained by the getRequest function in the Router instance.|
+Get requested Route on router engine instance according to servervrequest.|
 |[getRouter](#basicisgetrouter)|Function getRouter
 Get the app Router engine instance|
 |[getTimezone](#basicisgettimezone)|Function getTimezone
@@ -77,25 +73,21 @@ Set and/or get current server request of app|
 |[response](#basicisresponse)|Function response
 Set and/or get current server response of app|
 |[run](#basicisrun)|Function run
-Finally execute the app instance passed as parameters to standard input and output for php application,
-by definition the values ​​are respectively "php://input" for input and "php://output" for output.|
+Finally execute the app instance passed as parameters to standard input and output for php application.|
 |[runAndResponse](#basicisrunandresponse)|Function runAndResponse
 Run app pipe line and return a instance of ResponseInterface|
 |[setAfterMiddlewares](#basicissetaftermiddlewares)|Function setAfterMiddlewares
-Setting after middlewares
-These are executed in the order they were defined, after the route middleware and main app handler,
-if the ResponseInterface returned contains status codes greater than 200 or less than 206|
+Setting after middlewares These are executed in the order they were defined.|
 |[setAppDescription](#basicissetappdescription)|Function setAppDescription
 Setting App description string|
 |[setAppKey](#basicissetappkey)|Function setAppKey
 Setting hash appKey|
 |[setBeforeMiddlewares](#basicissetbeforemiddlewares)|Function setBeforeMiddlewares
-Setting before middlewares for app
-These are executed in the order they were defined, before the route middleware and main app handler|
+Setting before middlewares for app These are executed in the order they were defined.|
 |[setControllers](#basicissetcontrollers)|Function setControllers
 Setting all controller for app|
 |[setMode](#basicissetmode)|Function setMode
-Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"]|
+Setting App operation Mode, development ["dev" or null] ou production ["production" or "prod"]|
 |[setRequest](#basicissetrequest)|Function setRequest
 Set current server request of app|
 |[setRequestByArray](#basicissetrequestbyarray)|Function setRequestByArray
@@ -115,13 +107,11 @@ Receives a class as an argument, and works with the comment blocks as @Route|
 |[setRoutesByControllers](#basicissetroutesbycontrollers)|Function setRoutesByControllers
 Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'|
 |[setTimezone](#basicissettimezone)|Function setTimezone
-Setting app timezone, default America/Recife|
+Setting app timezone|
 |[setViewFilters](#basicissetviewfilters)|Function setViewFilters
-Setting filters functions for use into template
-- Setting into config/app-config.php file|
+Setting filters functions for use into template|
 |[view](#basicisview)|Function view
-Set a template name, optional data and a optional path for write in the http response,
-If template especified no not found, a ResponseInterface with status code 404 is returned.|
+Set a template name, optional data and a optional path for write in the http response.|
 |[write](#basiciswrite)|Function write
 Set a string and status code for write in the http response|
 
@@ -155,7 +145,7 @@ Get the app Auth/User by authorization token, it is receive a class Basicis\Auth
 
 **Return Values**
 
-`\Basicis\Auth\Auth|null`
+`\Auth|null`
 
 
 
@@ -171,10 +161,9 @@ Get the app Auth/User by authorization token, it is receive a class Basicis\Auth
 public cache (void)
 ```
 
-Function cache
-Get the app CacheItemPool engine instance 
+Function cache 
 
- 
+Get the app CacheItemPool engine instance 
 
 **Parameters**
 
@@ -207,10 +196,11 @@ Send a file in the body of the http response to the client
 
 * `(string) $filename`
 * `(bool) $forced`
+: false  
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 
@@ -266,7 +256,7 @@ Instantiate a Closure object and execute
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 
@@ -290,9 +280,9 @@ The key for the controller or class name must be separated from the method name 
 - Using into outhers controllers or middlewares and defined for Basicis\Basicis::setControllers  
   
 ```php  
-  $app->controller("example@functionName", $args = [object|array|null]);  
+  $app->controller("example@functionName", $args = [object, array or null]);  
   //or  
-  $app->controller("Namespace\Example::functionName", $args = [object|array|null]);  
+  $app->controller("Namespace\Example::functionName", $args = [object, array or null]);  
 ```` 
 
 **Parameters**
@@ -302,7 +292,7 @@ The key for the controller or class name must be separated from the method name 
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 
@@ -347,7 +337,7 @@ public enableCache (bool $enable, string $cacheFile)
 ```
 
 Function enableCache
-Enable application cache $enable = true 
+Enable application cache $enable true 
 
  
 
@@ -371,7 +361,7 @@ Enable application cache $enable = true
 **Description**
 
 ```php
-public static extractData (\Psr\Http\Message\ServerRequestInterface $request, \Basicis\Router\Route $route)
+public static extractData (\ServerRequestInterface $request, \Route $route)
 ```
 
 Function extractData
@@ -381,8 +371,8 @@ Extract data on ServerRequest and/or Route url params
 
 **Parameters**
 
-* `(\Psr\Http\Message\ServerRequestInterface) $request`
-* `(\Basicis\Router\Route) $route`
+* `(\ServerRequestInterface) $request`
+* `(\Route) $route`
 
 **Return Values**
 
@@ -464,7 +454,7 @@ Get a controller by classname
 **Parameters**
 
 * `(string) $arg`
-: [keyname|class]  
+: [keyname or class]  
 
 **Return Values**
 
@@ -485,15 +475,14 @@ public getMiddlewares (string $type)
 ```
 
 Function getMiddlewares
-Getting middlewares by type ['before'|'route'|'after'|null to all] 
+Getting middlewares by type ['before', 'route', 'after' or null to all]. 
 
- 
+This return a array with especifieds middleware type or all if $type argument is equals null 
 
 **Parameters**
 
 * `(string) $type`
-: ['before'|'route'|'after'|null]  
-Return an arra with especified middlewares type or all if no is especified the $type argument  
+: ['before', 'route', 'after' or null]  
 
 **Return Values**
 
@@ -578,7 +567,9 @@ Get app default resource input
 
 **Return Values**
 
-`void`
+`string`
+
+
 
 
 <hr />
@@ -603,7 +594,9 @@ Get app default resource output
 
 **Return Values**
 
-`void`
+`string`
+
+
 
 
 <hr />
@@ -645,10 +638,9 @@ public getRoute (void)
 ```
 
 Function getRoute
-Get requested Route on router engine instance according to servervrequest,
-A ResponseInterface object can be obtained by the getRequest function in the Router instance. 
+Get requested Route on router engine instance according to servervrequest. 
 
- 
+A ResponseInterface object can be obtained by the getRequest function in the Router instance. 
 
 **Parameters**
 
@@ -795,7 +787,7 @@ Set a array data and status code for write in the http response
 **Parameters**
 
 * `(array) $data`
-: = []  
+: []  
 * `(int) $statusCode`
 
 **Return Values**
@@ -912,7 +904,7 @@ Redirect a Server Request with url, method and optional array of data
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 
@@ -984,10 +976,9 @@ public run (string $inputResource, string $outputResource)
 ```
 
 Function run
-Finally execute the app instance passed as parameters to standard input and output for php application,
-by definition the values ​​are respectively "php://input" for input and "php://output" for output. 
+Finally execute the app instance passed as parameters to standard input and output for php application. 
 
- 
+By definition the values ​​are respectively "php://input" for input and "php://output" for output. 
 
 **Parameters**
 
@@ -1025,7 +1016,7 @@ Run app pipe line and return a instance of ResponseInterface
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 
@@ -1042,10 +1033,11 @@ public setAfterMiddlewares (array $middlewares)
 ```
 
 Function setAfterMiddlewares
-Setting after middlewares
-These are executed in the order they were defined, after the route middleware and main app handler,
-if the ResponseInterface returned contains status codes greater than 200 or less than 206 
+Setting after middlewares These are executed in the order they were defined. 
 
+These are executed after the route middleware and main app handler,  
+if the ResponseInterface returned contains status codes greater than 200 or less than 206  
+  
 ```php  
  $app->setAfterMiddlewares([  
     //key no is required  
@@ -1131,9 +1123,10 @@ public setBeforeMiddlewares (array $middlewares)
 ```
 
 Function setBeforeMiddlewares
-Setting before middlewares for app
-These are executed in the order they were defined, before the route middleware and main app handler 
+Setting before middlewares for app These are executed in the order they were defined. 
 
+These are executed before the route middleware and main app handler.  
+  
 - Setting into config/app-config.php file  
   
 ```php  
@@ -1181,7 +1174,7 @@ Setting all controller for app
 - Using into outhers controllers or middlewares  
   
 ```php  
-$app->controller("example@functionName", $args = [object|array|null]);  
+$app->controller("example@functionName", $args = [object, array or null]);  
 ```` 
 
 **Parameters**
@@ -1207,14 +1200,14 @@ public setMode (string $mode)
 ```
 
 Function setMode
-Setting App operation Mode, development ["dev"|null] ou production ["production"|"prod"] 
+Setting App operation Mode, development ["dev" or null] ou production ["production" or "prod"] 
 
  
 
 **Parameters**
 
 * `(string) $mode`
-: = ["dev"|"production"|"prod"|null]  
+: ["dev", "production", "prod" or null]  
 Default value "dev" == Development Mode  
 
 **Return Values**
@@ -1379,12 +1372,13 @@ Set a new route in the app router object
 **Parameters**
 
 * `(string|array) $url`
-: = "/"  
+: "/"  
 * `(string|array) $method`
-: = "GET"  
+: "GET"  
 * `(string|\ControllerInterface|\Clousure) $callback`
+: null  
 * `(string|array) $middlewares`
-: = null  
+: null  
 
 **Return Values**
 
@@ -1423,14 +1417,14 @@ Setting route middlewares for app
 `@Route("/url", "method1", "middleware")` or  
 `@Route("/url, ...", "method1, ...", "middleware1, middleware2, ...")`  
   
-```php  
-   \/** @Route("/", "get", "example, guest") *\/  
+```  
+   /** @Route("/", "get", "example, guest") *\/  
    public function index($app, $args)  
    {  
        return $app->view("welcome");  
    }  
   
-   \/** @Route("/dashboard", "get", "auth") *\/  
+   /** @Route("/dashboard", "get", "auth") *\/  
    public function painel($app, $args)  
    {  
        return $app->view("welcome");  
@@ -1514,13 +1508,14 @@ public setTimezone (string $timezone)
 ```
 
 Function setTimezone
-Setting app timezone, default America/Recife 
+Setting app timezone 
 
  
 
 **Parameters**
 
 * `(string) $timezone`
+: "America/Recife" if this is null  
 
 **Return Values**
 
@@ -1541,9 +1536,10 @@ public setViewFilters (array|\TwigFunction[] $filters)
 ```
 
 Function setViewFilters
-Setting filters functions for use into template
-- Setting into config/app-config.php file 
+Setting filters functions for use into template 
 
+- Setting into config/app-config.php file  
+  
 ```php  
  $app->setViewFilters([  
     //here, key is required  
@@ -1555,13 +1551,13 @@ Setting filters functions for use into template
   
 - Using into Twig Template file  
   
-```twig  
+```  
   <p>Var is True: {{isTrue($var = true)}}<p>  
 ```  
   
 or  
   
-```twig  
+```  
   {% if isTrue(var) %}  
     <p>{{varTextHere}}</p>  
   {% endif %}  
@@ -1590,12 +1586,13 @@ public view (string $name, array $data, string $customPath)
 ```
 
 Function view
-Set a template name, optional data and a optional path for write in the http response,
-If template especified no not found, a ResponseInterface with status code 404 is returned. 
+Set a template name, optional data and a optional path for write in the http response. 
 
+If template especified no not found, a ResponseInterface with status code 404 is returned.  
+  
 - Using into controllers controllers or route callback  
   
-Starting from the idea that we have a template called `welcome.[html|php|twig]` inside `storage/templates/`  
+Starting from the idea that we have a template called `welcome.[html, php or twig]` inside `storage/templates/`  
 or `my-custom/path/`, we have the following code to return this view:  
   
 ```php  
@@ -1605,9 +1602,9 @@ or `my-custom/path/`, we have the following code to return this view:
 ````  
   
 - Using into Twig Template file  
-```twig  
+```  
   <p>{{test2}}</p>  
-  <p> Var is True: {{test}}</p>  
+  <p>Var is True: {{test}}</p>  
 ``` 
 
 **Parameters**
