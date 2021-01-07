@@ -4,6 +4,7 @@ namespace Basicis\Http\Server;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Basicis\Basicis as App;
 
 /**
  * RequestHandler class
@@ -19,6 +20,18 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 abstract class RequestHandler implements RequestHandlerInterface
 {
+    /**
+     * $app variable
+     *
+     * @var App
+     */
+    private $app;
+
+    public function __construct(App &$app)
+    {
+        $this->app = $app;
+    }
+
    /**
     * Function handle
     * Handles a request and produces a response.

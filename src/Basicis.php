@@ -331,8 +331,10 @@ class Basicis extends RequestHandler
     private function filterMiddlewares(array $middlewares = [], $requireKey = false) : array
     {
         foreach ($middlewares as $key => $middleware) {
-            if (($requireKey && !is_string($key)) | !(new $middleware() instanceof Middleware)) {
-                throw new InvalidArgumentException("Unidentified key or Basicis\Http\Server\Middleware instance.");
+            if (($requireKey && !is_string($key)) && !(new $middleware() instanceof RequestHandlerInterface)) {
+                throw new InvalidArgumentException(
+                    "Unidentified key or Psr\Http\Server\RequestHandlerInterface instance."
+                );
                 unset($middlewares[$key]);
             }
         }
@@ -470,76 +472,46 @@ class Basicis extends RequestHandler
 
         /**
      * Function handleBeforeMiddlewares
-     * Handles middleware prior to the route and executes it, this return a ResponseInterface
+     * Handles middleware prior to the route and executes it, this return a Basicis
      * @return Basicis
      */
     private function handleBeforeMiddlewares() : Basicis
     {
         //Before middlewares here
-        $response = $this->getResponse();
-
-        foreach ($this->middlewares['before'] as $before) {
-            if (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206) {
-                $res = (new $before())->handle($this->getRequest());
-                $response->withStatus($res->getStatusCode(), $res->getReasonPhrase());
-            }
-        }
-
-        $this->response = $response;
+        $this->response = (new Middleware($this, "before"))->run();
         return $this;
     }
 
 
     /**
      * Function middlewaresHandle
-     * Handles route middleware and executes it, this return a ResponseInterface
+     * Handles route middleware and executes it, this return a Basicis
      * @param  string|array $middlewares
-     * @return ResponseInterface
+     * @return Basicis
      */
-    private function handleRouteMiddlewares($middlewares) : ResponseInterface
+    private function handleRouteMiddlewares($middlewares) : Basicis
     {
         //Run route middlewares
-        $response = $this->getResponse();
-
+        $middlewaresArray = [];
         foreach (is_string($middlewares) ? explode(",", $middlewares) : $middlewares as $middleware) {
-            if (key_exists($middleware, $this->middlewares["route"])
-                && (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206)
-            ) {
-                $res = (new $this->middlewares["route"][$middleware]($this))->handle($this->getRequest());
-                $response->withStatus($res->getStatusCode(), $res->getReasonPhrase())
-                        ->withBody($res->getBody());
-            }
-            if ($response->getStatusCode() > 206) {
-                break;
+            if (key_exists($middleware, $this->middlewares["route"])) {
+                $middlewaresArray[] =  $this->middlewares["route"][$middleware];
             }
         }
-        
-        return $response;
+        $this->response =  (new Middleware($this, $middlewaresArray))->run();
+        return $this;
     }
 
 
     /**
      * Function handleAfterMiddlewares
-     * Handles middleware after the route and executes it, this return a  instance of Basicis
+     * Handles middleware after the route and executes it, this return a instance of Basicis
      * @return Basicis
      */
     private function handleAfterMiddlewares() : Basicis
     {
         //After middlewares here
-        $response = $this->getResponse();
-
-        foreach ($this->middlewares['after'] as $after) {
-            if ($response->getStatusCode() <= 206) {
-                $res = (new $after())->handle($this->getRequest());
-                $response->withStatus($res->getStatusCode(), $res->getReasonPhrase());
-            }
-
-            if ($response->getStatusCode() > 206) {
-                break;
-            }
-        }
-        
-        $this->response = $response;
+        $this->response = (new Middleware($this, "after"))->run();
         return $this;
     }
 
@@ -1016,10 +988,10 @@ class Basicis extends RequestHandler
       
         if ($this->route instanceof Route) {
             //Route middlewares run
-            $res = $this->handleRouteMiddlewares($this->route->getMiddlewares());
+            $this->handleRouteMiddlewares($this->route->getMiddlewares());
                 
             //Routing and handle Request
-            if ($res->getStatusCode() >= 200 && $res->getStatusCode() <= 206) {
+            if ($this->response->getStatusCode() >= 200 && $this->response->getStatusCode() <= 206) {
                 //Handles Controller or Closure function
                 $res = $this->handle($this->request);
                 $this->response->withStatus($res->getStatusCode(), $res->getReasonPhrase())
@@ -1471,8 +1443,6 @@ class Basicis extends RequestHandler
     }
 
 
-
-
     /**
      * Function handleError
      * Returns a template view with errors occurred during the execution of the application according to http response
@@ -1483,18 +1453,36 @@ class Basicis extends RequestHandler
      */
     public function handleError(string $message = null) : Basicis
     {
-        if ($message === null) {
-            $message = sprintf(
-                "%s | %s",
+        $this->view("error", [
+            "message" => $message ?? sprintf(
+                "%s - %s",
                 $this->response->getStatusCode(),
                 $this->response->getReasonPhrase()
-            );
-        }
-
-        $this->view("error", ["message" => $message]);
+            )
+        ]);
         return $this;
     }
    
+    /**
+     * Function extractData
+     * Extract data on ServerRequest and/or Route url params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Basicis\Router\Route $route
+     *
+     * @return array
+     */
+    public static function extractData(ServerRequestInterface $request = null, Route $route = null) : array
+    {
+        $args = [];
+        if ($route !== null) {
+            $args = (array) $route->getArguments();
+        }
+
+        if ($request !== null && $request->getParsedBody() !== null) {
+            $args = array_merge((array) $request->getParsedBody(), (array) $args);
+        }
+        return $args;
+    }
 
     /**
      * handle function
@@ -1505,18 +1493,7 @@ class Basicis extends RequestHandler
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         //Mergin Route arguments and ServerRequest data, files, cookies...
-        $args = null;
-        if ($this->route !== null) {
-            $args = $this->route->getArguments();
-        }
-
-        if ($request->getParsedBody() !== null) {
-            $args = array_merge((array) $request->getParsedBody(), (array) $args);
-        }
-
-        if ($args === (object)[]) {
-            $args = null;
-        }
+        $args = (object) self::extractData($request, $this->route);
 
         //get callback Closure
         $callback = $this->route->getCallback();
@@ -1559,12 +1536,33 @@ class Basicis extends RequestHandler
         $this->setRequest(ServerRequestFactory::create($method, $url))
             ->getRequest()->withParsedBody($data ?? []);
 
-        return $this->handleRouterEngining()
-                ->getResponse()->withStatus(307);
+        return $this->handleRouterEngining()->getResponse()->withStatus(307);
     }
 
-
     /**
+     * Function runAndResponse
+     * Run app pipe line and return a instance of ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function runAndResponse() : ResponseInterface
+    {
+        //Get request body
+        $this->request->withParsedBody(self::input($this->getResourceInput()));
+        //Before middlewares and Router Engining
+        $this->handleBeforeMiddlewares();
+        //Router Engining
+        $this->handleRouterEngining();
+        //After middlewares
+        $this->handleAfterMiddlewares();
+        
+        //If errors occurred during the execution of the application according to http response
+        if ($this->response->getStatusCode() > 307) {
+            $this->handleError();
+        }
+        return $this->response;
+    }
+
+     /**
      * Function run
      * Finally execute the app instance passed as parameters to standard input and output for php application,
      * by definition the values ​​are respectively "php://input" for input and "php://output" for output.
@@ -1574,23 +1572,8 @@ class Basicis extends RequestHandler
      */
     public function run() : int
     {
-        //Get request body
-        $this->request->withParsedBody(self::input($this->getResourceInput()));
-
-        //Before middlewares and Router Engining
-        $this->handleBeforeMiddlewares()->handleRouterEngining();
-    
-        //After middlewares
-        if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
-            $this->handleAfterMiddlewares();
-        }
-
-        //If errors occurred during the execution of the application according to http response
-        if ($this->response->getStatusCode() > 307 && $this->response->getBody()->getSize() === null) {
-            $this->handleError();
-        }
-
-        //Set response body
-        return self::output($this->request, $this->response, $this->getResourceOutput());
+        //Run app pipe line and return a instance of ResponseInterface
+        $response = $this->runAndResponse();
+        return self::output($this->request, $response, $this->getResourceOutput());
     }
 }
