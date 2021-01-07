@@ -341,6 +341,10 @@ class Stream implements StreamInterface
             throw new RuntimeException('Unable to write to stream.');
             return 0;
         }
+        
+        if ($this->isSeekable()) {
+            $this->seek(0);
+        }
         return $this->size;
     }
 

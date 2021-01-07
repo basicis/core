@@ -14,11 +14,11 @@ use Basicis\Auth\Auth;
 use Basicis\Auth\Token;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class BasicisTest
  */
-
 class BasicisTest extends TestCase
 {
     /**
@@ -118,7 +118,6 @@ class BasicisTest extends TestCase
         );
 
         $middlewares = $this->app->getMiddlewares();
-        
         $this->assertEquals(["Basicis\Http\Server\ExampleMiddleware"], $middlewares["before"]);
         $this->assertEquals(["Basicis\Http\Server\ExampleMiddleware"], $middlewares["after"]);
         $this->assertEquals(["example" => "Basicis\Http\Server\ExampleMiddleware"], $middlewares["route"]);
@@ -267,5 +266,16 @@ class BasicisTest extends TestCase
         $this->assertInstanceOf(Auth::class, $this->app->auth());
         $this->assertEquals(true, $user->delete()); //delete test user
         $this->assertEquals(null, Auth::all()); //check if all is removed
+    }
+
+
+    /**
+     * Function testRunAndResponse
+     *
+     * @return void
+     */
+    public function testRunAndResponse()
+    {
+        $this->assertInstanceOf(ResponseInterface::class, $this->app->runAndResponse());
     }
 }

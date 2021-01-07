@@ -26,11 +26,11 @@ class Middleware extends RequestHandler implements MiddlewareInterface
 {
     
     /**
-     * $middlewares
+     * $handlers
      *
      * @var array|RequestHandler[]
      */
-    private $middlewares;
+    private $handlers;
 
     /**
      * $app variable
@@ -42,21 +42,21 @@ class Middleware extends RequestHandler implements MiddlewareInterface
     /**
      * Function __construct
      */
-    public function __construct(App &$app, $middlewares = "before")
+    public function __construct(App &$app, $handlers = null)
     {
         $this->app = $app;
-        if (is_string($middlewares)) {
-            $this->middlewares = $app->getMiddlewares($middlewares);
+        if (is_string($handlers)) {
+            $this->handlers = $app->getMiddlewares($handlers);
         }
 
-        if (is_array($middlewares)) {
-            $this->middlewares = $middlewares;
+        if (is_array($handlers)) {
+            $this->handlers = $handlers;
         }
     }
 
     /**
      * Function run
-     * Run process middlewares pool
+     * Run process han$handlers pool
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function run() : ResponseInterface
@@ -88,9 +88,9 @@ class Middleware extends RequestHandler implements MiddlewareInterface
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         $response = $this->app->getResponse();
-        foreach ($this->middlewares as $middleware) {
+        foreach ($this->handlers as $next) {
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() <= 206) {
-                $response = $this->process($request, new $middleware($this->app));
+                $response = $this->process($request, new $next($this->app));
             }
         }
         return $this->app->getResponse()

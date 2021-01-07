@@ -18,7 +18,7 @@ use Basicis\Basicis as App;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Http/Server/Middleware.php
  */
-abstract class RequestHandler implements RequestHandlerInterface
+class RequestHandler implements RequestHandlerInterface
 {
     /**
      * $app variable
@@ -27,6 +27,11 @@ abstract class RequestHandler implements RequestHandlerInterface
      */
     private $app;
 
+    /**
+     * Function __construct
+     * Receives a instance of Basicis\Basicis $app as argument
+     * @param \Basicis\Basicis $app
+     */
     public function __construct(App &$app)
     {
         $this->app = $app;
@@ -40,5 +45,8 @@ abstract class RequestHandler implements RequestHandlerInterface
     * @param \Psr\Http\Message\ServerRequestInterface $request
     * @return \Psr\Http\Message\ResponseInterface
     */
-    abstract public function handle(ServerRequestInterface $request): ResponseInterface;
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->app->getResponse();
+    }
 }
