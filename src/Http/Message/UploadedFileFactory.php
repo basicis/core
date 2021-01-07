@@ -92,9 +92,9 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
      *
      * @return UploadedFileInterface
      */
-    public function createUploadedFileFromFilename(string $filename) : UploadedFileInterface
+    public function createUploadedFileFromFilename(string $filename, string $mode = "r+") : UploadedFileInterface
     {
-        $stream = (new StreamFactory)->createStreamFromFile($filename);
+        $stream = (new StreamFactory)->createStreamFromFile($filename, $mode);
         return $this->createUploadedFile(
             $stream,
             $stream->getSize(),

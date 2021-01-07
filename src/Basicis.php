@@ -178,7 +178,7 @@ class Basicis extends RequestHandler
     public function __construct(ServerRequestInterface $request, array $options = [])
     {
         $this->enableCache($options["enableCache"] ?? false, self::path()."cache/app");
-
+        
         if ($this->enableCache && $this->cache->hasItem("router")) {
             $this->router = $this->cache->getItem("router")->get();
         }
@@ -1146,20 +1146,31 @@ class Basicis extends RequestHandler
       */
     public function view(string $name, array $data = [], $customPath = "") : ResponseInterface
     {
-        $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
-        $view->setFilters($this->viewFilters);
-        $content = $view->getView($name, $data);
+        $content = null;
+        if ($this->enableCache && $this->cache->hasItem("template@".$name)) {
+            $content = $this->cache->getItem("template@".$name)->get();
+        }
+
+        if ($content === null) {
+            $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
+            $view->setFilters($this->viewFilters);
+            $content = $view->getView($name, $data);
+
+            if ($this->enableCache) {
+                $this->cache->addItem("template@".$name, $content, "10 seconds")->commit();
+            }
+        }
         $statusCode = 200;
 
         if ($content === null) {
             $content = "Template file '$name' not found!";
             $statusCode = 404;
         }
-
         return $this->write($content)
                 ->withStatus($statusCode)
                 ->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
     }
+
 
     /**
      * Function setViewFilters
@@ -1215,23 +1226,35 @@ class Basicis extends RequestHandler
     {
         //If file exists, this no is null
         if ($filename !== null && file_exists($filename)) {
-            $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
-            if ($file->isReadable()) {
-                $headers = [
-                    "Content-Type" => \MimeType\MimeType::getType($filename),
-                    "Content-disposition" => ["filename=".basename($filename)]
-                ];
+            $file = null;
+            $headers = [
+                "Content-Type" => \MimeType\MimeType::getType($filename),
+                "Content-disposition" => ["filename=".basename($filename)]
+            ];
 
-                if ($forced) {
-                    $headers["Content-disposition"] = array_unshift($headers["Content-disposition"], "attachment");
+            if ($forced) {
+                $headers["Content-disposition"] = array_unshift($headers["Content-disposition"], "attachment");
+            }
+
+            if ($this->enableCache && $this->cache->hasItem("file@".$filename)) {
+                $file = $this->cache->getItem("file@".$filename)->get();
+            }
+
+            if ($file === null) {
+                $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
+                if ($this->enableCache) {
+                    $this->cache->addItem("file@".$filename, $file, "2 minutes")->commit();
                 }
+            }
+
+            if ($file->isReadable()) {
                 return $this->response->withHeaders($headers)->withStatus(200)->withBody($file);
             }
 
             $file->close();
             return $this->response->withStatus(404, "File not found!");
         }
-        return $this->response->withStatus(500, "Invalid filename or file no exists!");
+        return $this->response->withStatus(404, "Invalid filename or file no exists!");
     }
 
 
@@ -1453,10 +1476,6 @@ class Basicis extends RequestHandler
     /**
      * Function handleError
      * Returns a template view with errors occurred during the execution of the application according to http response
-     * @return Basicis
-     */
-    /**
-     * Undocumented function
      *
      * @param string $message
      *
@@ -1522,7 +1541,15 @@ class Basicis extends RequestHandler
         return $this->response(500);
     }
 
-
+    /**
+     * Function redirect
+     * Redirect a Server Request with url, method and optional array of data
+     * @param string $url
+     * @param string $method
+     * @param array $data
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function redirect(string $url = "/", $method = "GET", array $data = null) : ResponseInterface
     {
         if (isset($data) && $this->getRequest()->getParsedBody() !== null) {

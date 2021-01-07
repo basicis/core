@@ -21,7 +21,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Http/Server/Middleware.php
  */
-abstract class Middleware extends RequestHandler implements MiddlewareInterface
+abstract class Middleware implements MiddlewareInterface
 {
     /**
      * $app variable
@@ -57,14 +57,4 @@ abstract class Middleware extends RequestHandler implements MiddlewareInterface
     {
         return $handler->handle($request);
     }
-
-    /**
-    * Function handle
-    * Handles a request and produces a response.
-    * May call other collaborating code to generate the response.
-    *
-    * @param \Psr\Http\Message\ServerRequestInterface $request
-    * @return \Psr\Http\Message\ResponseInterface
-    */
-    abstract public function handle(ServerRequestInterface $request): ResponseInterface;
 }

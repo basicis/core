@@ -4,7 +4,7 @@ namespace {{namespace}};
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Basicis\Http\Message\ResponseFactory;
-use Basicis\Http\Server\Middleware;
+use Basicis\Http\Server\RequestHandler;
 
 /**
  * {{class}} Class
@@ -16,7 +16,7 @@ use Basicis\Http\Server\Middleware;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/{{author.username}}/<repository>/blob/<default-branch>/{{path}}{{class}}.php
  */
-class {{class}} extends Middleware
+class {{class}} extends RequestHandler 
 {
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
