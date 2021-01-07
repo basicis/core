@@ -201,6 +201,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function withQueryParams
      * Return an instance with the specified query string arguments.
+     *
      * These values SHOULD remain immutable over the course of the incoming
      * request. They MAY be injected during instantiation, such as from PHP's
      * $_GET superglobal, or MAY be derived from some other value such as the
@@ -229,6 +230,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function getUploadedFiles
      * Retrieve normalized file upload data.
+     *
      * This method returns upload metadata in a normalized tree, with each leaf
      * an instance of Psr\Http\Message\UploadedFileInterface.
      * These values MAY be prepared from $_FILES or the message body during
@@ -245,6 +247,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function withUploadedFiles
      * Create a new instance with the specified uploaded files.
+     *
      * This method MUST be implemented in such a way as to retain the
      * immutability of the message, and MUST return an instance that has the
      * updated body parameters.
@@ -271,6 +274,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function getParsedBody
      * Retrieve any parameters provided in the request body.
+     *
      * If the request Content-Type is either application/x-www-form-urlencoded
      * or multipart/form-data, and the request method is POST, this method MUST
      * return the contents of $_POST.
@@ -298,6 +302,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function withParsedBody
      * Return an instance with the specified body parameters.
+     *
      * These MAY be injected during instantiation.
      * If the request Content-Type is either application/x-www-form-urlencoded
      * or multipart/form-data, and the request method is POST, use this method
@@ -344,6 +349,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function getAttributes
      * Retrieve attributes derived from the request.
+     *
      * The request "attributes" may be used to allow injection of any
      * parameters derived from the request: e.g., the results of path
      * match operations; the results of decrypting cookies; the results of
@@ -360,6 +366,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function getAttribute
      * Retrieve a single derived request attribute.
+     *
      * Retrieves a single derived request attribute as described in
      * getAttributes(). If the attribute has not been previously set, returns
      * the default value as provided.
@@ -379,6 +386,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     /**
      * Function withAttribute
      * Return an instance with the specified derived request attribute.
+     *
      * This method allows setting a single derived request attribute as
      * described in getAttributes().
      * This method MUST be implemented in such a way as to retain the

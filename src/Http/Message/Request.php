@@ -84,26 +84,21 @@ class Request extends Message implements RequestInterface
         $this->withUri(new Uri($target));
 
         foreach ($options as $key => $value) {
-            if ((($key === 0) && is_array($value)) && (count($options) === 1)) {
-                $this->withContentData($value);
-            } elseif (strtolower($key) === 'data' | strtolower($key) === 'body' | strtolower($key) === 'content') {
-                $this->withContentData($value);
-            } else {
-                if (strtolower($key) === 'version') {
-                    $this->withProtocolVersion($value);
-                }
+            if (strtolower($key) === 'version') {
+                $this->withProtocolVersion($value);
+            }
 
-                if (srtolower($key) === 'headers') {
-                    $this->withHeaders($value);
-                }
+            if (srtolower($key) === 'headers') {
+                $this->withHeaders($value);
             }
         }
     }
 
     /**
      * Function getRequestTarget
-     * Retrieves the message's request-target either as it will appear (for
-     * clients), as it appeared at request (for servers), or as it was
+     * Retrieves the message's request-target either as it will appear
+     *
+     * (forclients), as it appeared at request (for servers), or as it was
      * specified for the instance (see withRequestTarget()).
      *
      * In most cases, this will be the origin-form of the composed URI,
@@ -124,6 +119,7 @@ class Request extends Message implements RequestInterface
     /**
      * Function withRequestTarget
      * Return an instance with the specific request-target.
+     *
      * If the request needs a non-origin-form request-target — e.g., for
      * specifying an absolute-form, authority-form, or asterisk-form —
      * this method may be used to create an instance with the specified
@@ -158,6 +154,7 @@ class Request extends Message implements RequestInterface
     /**
      * Function withMethod
      * Return an instance with the provided HTTP method.
+     *
      * While HTTP method names are typically all uppercase characters, HTTP
      * method names are case-sensitive and thus implementations SHOULD NOT
      * modify the given string.
@@ -183,6 +180,7 @@ class Request extends Message implements RequestInterface
     /**
      * Function getUri
      * Retrieves the URI instance.
+     *
      * This method MUST return a UriInterface instance.
      *
      * @link   http://tools.ietf.org/html/rfc3986#section-4.3
@@ -197,6 +195,7 @@ class Request extends Message implements RequestInterface
     /**
      * Function withUri
      * Returns an instance with the provided URI.
+     *
      * This method MUST update the Host header of the returned request by
      * default if the URI contains a host component. If the URI does not
      * contain a host component, any pre-existing Host header MUST be carried

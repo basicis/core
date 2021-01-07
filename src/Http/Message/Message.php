@@ -60,6 +60,7 @@ class Message implements MessageInterface
     /**
      * Function getProtocolVersion
      * Retrieves the HTTP protocol version as a string.
+     *
      * The string MUST contain only the HTTP version number (e.g., "1.0", "1.1").
      *
      * @return string HTTP protocol version.
@@ -73,6 +74,7 @@ class Message implements MessageInterface
     /**
      * Function withProtocolVersion
      * Return an instance with the specified HTTP protocol version.
+     *
      * The version string MUST contain only the HTTP version number (e.g.,
      * "1.1", "1.0").
      * This method MUST be implemented in such a way as to retain the
@@ -97,6 +99,7 @@ class Message implements MessageInterface
     /**
      * Funtion getHeaders
      * Retrieves all message header values
+     *
      * The keys represent the header name as it will be sent over the wire, and
      * each value is an array of strings associated with the header.
      *
@@ -126,7 +129,7 @@ class Message implements MessageInterface
 
 
     /**
-     * Function hasHeader
+    * Function hasHeader
     * Checks if a header exists by the given case-insensitive name.
     *
     * @param string $name Case-insensitive header field name.
@@ -141,8 +144,9 @@ class Message implements MessageInterface
 
 
     /**
-     * Function getHeader
+    * Function getHeader
     * Retrieves a message header value by the given case-insensitive name.
+    *
     * This method returns an array of all the header values of the given
     * case-insensitive header name.
     * If the header does not appear in the message, this method MUST return an
@@ -160,8 +164,10 @@ class Message implements MessageInterface
 
 
     /**
-     * Function getHeaderLine
+    * Function getHeaderLine
+    *
     * Retrieves a comma-separated string of the values for a single header.
+    *
     * This method returns all of the header values of the given
     * case-insensitive header name as a string concatenated together using
     * a comma.
@@ -266,6 +272,7 @@ class Message implements MessageInterface
     /**
      * FunctionwithAddedHeader
      * Return an instance with the specified header appended with the given value.
+     *
      * Existing values for the specified header will be maintained. The new
      * value(s) will be appended to the existing list. If the header did not
      * exist previously, it will be added.
@@ -341,6 +348,7 @@ class Message implements MessageInterface
     /**
      * Function withBody
      * Return an instance with the specified message body.
+     *
      * The body MUST be a StreamInterface object.
      * This method MUST be implemented in such a way as to retain the
      * immutability of the message, and MUST return a new instance that has the
@@ -362,9 +370,9 @@ class Message implements MessageInterface
 
     /**
      * Function parseHeaders
+     *  Pass an array of lines to the current header, if the parameter $rewrite === false.
      *
-     *  Pass an array of lines to the current header, if the parameter $rewrite === false,
-     *  the value of the line will be added to the header with the same key,
+     *  The value of the line will be added to the header with the same key,
      *  otherwise the value of the current header will be replaced.
      *  $rewrite default:true
      *
@@ -383,8 +391,9 @@ class Message implements MessageInterface
 
      /**
      * Function parseHeader
-     * Pass an line to the current header, if the parameter $rewrite === false,
-     * the value of the line will be added to the header with the same key,
+     * Pass an line to the current header, if the parameter $rewrite === false
+     *
+     * The value of the line will be added to the header with the same key,
      * otherwise the value of the current header will be replaced.
      * $rewrite default:true
      *

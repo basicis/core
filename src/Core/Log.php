@@ -10,6 +10,7 @@ use Basicis\Http\Message\StreamFactory;
  * Log Class
  * Describes a logger instance.
  * The message MUST be a string or object implementing __toString().
+ *
  * The message MAY contain placeholders in the form: {foo} where foo
  * will be replaced by the context data in key "foo".
  * The context array can contain arbitrary data, the only assumption that
@@ -17,6 +18,7 @@ use Basicis\Http\Message\StreamFactory;
  * to produce a stack trace, it MUST be in a key named "exception".
  * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
  * for the full interface specification.
+ *
  * @category Core
  * @package  Basicis/Core
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
@@ -45,9 +47,10 @@ class Log implements LoggerInterface
     private $context;
 
     /**
-     * __construct function
-     * @param  string $path  - Path to root log directory
-     * @param  string $email - Email address for send log, default = null.
+     * Function __construct
+     *
+     * @param  string $path Path to root log directory
+     * @param  string $email Email address for send log, default = null.
      * @return void
      */
     public function __construct(string $path = null, string $email = null)
@@ -66,8 +69,9 @@ class Log implements LoggerInterface
     /**
      * Function interpolate
      * Interpolates context values into the message placeholders.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return string
      */
     public function interpolate(string $message, array $context = array()) : string
@@ -92,9 +96,10 @@ class Log implements LoggerInterface
     /**
      * Function log
      * Logs with an arbitrary level.
-     * @param  mixed  $level   - emergency|alert|critical|error|warning|notice|info|debug
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * @param  mixed  $level  "emergency", "alert", "critical", "error", "warning", "notice", "info" or "debug"
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function log($level, $message, array $context = array())
@@ -108,8 +113,9 @@ class Log implements LoggerInterface
     /**
      * Function emergency
      * System is unusable.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function emergency($message, array $context = array())
@@ -123,8 +129,8 @@ class Log implements LoggerInterface
      * Action must be taken immediately.
      * - Ex: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function alert($message, array $context = array())
@@ -136,9 +142,11 @@ class Log implements LoggerInterface
     /**
      * Function critical
      * Critical conditions.
+     *
      * - Ex: Application component unavailable, unexpected exception.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function critical($message, array $context = array())
@@ -148,10 +156,10 @@ class Log implements LoggerInterface
 
     /**
      * Function error
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     * Runtime errors that do not require immediate action but should typically be logged and monitored.
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function error($message, array $context = array())
@@ -162,10 +170,11 @@ class Log implements LoggerInterface
     /**
      * Function warning
      * Exceptional occurrences that are not errors.
-     * - Ex: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * - Ex: Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong.
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function warning($message, array $context = array())
@@ -176,8 +185,9 @@ class Log implements LoggerInterface
     /**
      * Function notice
      * Normal but significant events
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function notice($message, array $context = array())
@@ -188,9 +198,11 @@ class Log implements LoggerInterface
     /**
      * Function info
      * Interesting events.
+     *
      * - Ex: User logs in, SQL logs.
-     * @param  string $message - Text message
-     * @param  array  $context - Array with context values
+     *
+     * @param  string $message Text message
+     * @param  array  $context Array with context values
      * @return void
      */
     public function info($message, array $context = array())
@@ -201,6 +213,7 @@ class Log implements LoggerInterface
     /**
      * Funtion debug
      * Detailed debug information
+     *
      * @param  string $message - Text message
      * @param  array  $context - Array with context values
      * @return void
@@ -214,8 +227,9 @@ class Log implements LoggerInterface
     /**
      * Function toFile
      * Write message in the log file as json
-     * @param  string $level   - Log level
-     * @param  string $message - Text message
+     *
+     * @param  string $level   Log level
+     * @param  string $message Text message
      * @return boolean
      */
     private function toFile(string $level, string $message) : bool
@@ -248,10 +262,10 @@ class Log implements LoggerInterface
 
     /**
      * Function toFileJson
-     * Send a log message for especified mail address or
-     * write message in the log file.
-     * @param  string $level   - Log level
-     * @param  string $message - Text message
+     * Send a log message for especified mail address or write message in the log file.
+     *
+     * @param  string $level   Log level
+     * @param  string $message Text message
      * @return boolean
      */
     private function toEmail(string $level, string $message) : bool
@@ -274,10 +288,11 @@ class Log implements LoggerInterface
     /**
      * Function formatMessage
      * Format Message to file log line
-     * @param  string $level       - Log level
-     * @param  string $message     - Text message
-     * @param  string $date_format - Default format "Y/m/d H:i:s"
-     * @param  string $format      - Default line message format "{date} | {message}"
+     *
+     * @param  string $level       Log level
+     * @param  string $message     Text message
+     * @param  string $date_format Default format "Y/m/d H:i:s"
+     * @param  string $format      Default line message format "{date} \| {message}"
      * @return string
      */
     public function formatMessage(
@@ -295,7 +310,9 @@ class Log implements LoggerInterface
     /**
      * Function formatMessageToArray
      * Format Message line, and return this as array
+     *
      * - Ex:
+     *
      * ```php
      * [
      *   "date" => Y/m/d H:i:s,
@@ -304,9 +321,10 @@ class Log implements LoggerInterface
      *   "context" => array()
      * ];
      * ```
-     * @param  string $level       - Log level
-     * @param  string $message     - Text message
-     * @param  string $date_format - Default format "Y/m/d H:i:s"
+     *
+     * @param  string $level       Log level
+     * @param  string $message     Text message
+     * @param  string $date_format Default format "Y/m/d H:i:s"
      * @return string
      */
     public function formatMessageToArray(string $level, string $message, string $date_format = 'Y/m/d H:i:s') : array
@@ -323,6 +341,7 @@ class Log implements LoggerInterface
     /**
      * Function getByDate
      * Get a log file by string date and return a array with contents
+     *
      * @param string $date
      *
      * @return Array|null

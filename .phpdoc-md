@@ -13,34 +13,32 @@ return (object) [
         '\Basicis\Auth\AuthInterface',
         '\Basicis\Auth\Token',
 
+         /* Basicis\Cache\ */
+        '\Basicis\Cache\CacheException',
+        '\Basicis\Cache\CacheItem',
+        '\Basicis\Cache\CacheItemPool',
+        '\Basicis\Cache\InvalidArgumentException',
+
+        /* Basicis\Controller\ */
+        '\Basicis\Controller\Controller',
+        '\Basicis\Controller\ControllerInterface',
+        '\Basicis\Controller\ExampleController',
+
         /* Basicis\Core\ */
+        '\Basicis\Core\Annotations',
         '\Basicis\Core\Log',
         '\Basicis\Core\Validator',
-        '\Basicis\Core\Annotations',
 
-        /* Basicis\View\ */
-        '\Basicis\View\View',
-
-        /* Basicis\Router\ */
-        '\Basicis\Router\Router',
-        '\Basicis\Router\Route',
-        '\Basicis\Router\RouterFactory',
-
-        /* Basicis\Model\ */
-        '\Basicis\Model\DataBase',
-        '\Basicis\Model\Model',
-        '\Basicis\Model\ExampleModel',
-        '\Basicis\Model\ModelInterface',
+        /* Basicis\Exceptions\ */
+        '\Basicis\Exceptions\BasicisException',
+        '\Basicis\Exceptions\InvalidArgumentException',
+        '\Basicis\Exceptions\RuntimeException',
 
         /* Basicis\Http\Client */
         '\Basicis\Http\Client\Client',
         '\Basicis\Http\Client\ClientException',
         '\Basicis\Http\Client\NetworkException',
         '\Basicis\Http\Client\RequestException',
-
-        /* Basicis\Http\Server */
-        '\Basicis\Http\Server\Middleware',
-        '\Basicis\Http\Server\RequestHandler',
 
         /* Basicis\Http\Message */
         '\Basicis\Http\Message\Message',
@@ -55,5 +53,23 @@ return (object) [
         '\Basicis\Http\Message\UploadedFile',
         '\Basicis\Http\Message\UploadedFileFactory',
         '\Basicis\Http\Message\Uri',
+
+         /* Basicis\Http\Server */
+        '\Basicis\Http\Server\Middleware',
+        '\Basicis\Http\Server\RequestHandler',
+
+        /* Basicis\Model\ */
+        '\Basicis\Model\DataBase',
+        '\Basicis\Model\Model',
+        '\Basicis\Model\ExampleModel',
+        '\Basicis\Model\ModelInterface',
+
+        /* Basicis\Router\ */
+        '\Basicis\Router\Router',
+        '\Basicis\Router\Route',
+        '\Basicis\Router\RouterFactory',
+
+        /* Basicis\View\ */
+        '\Basicis\View\View',
     ],
 ];
