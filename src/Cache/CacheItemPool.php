@@ -5,6 +5,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Basicis\Cache\InvalidArgumentException;
+use Basicis\Exceptions\RuntimeException;
 use Basicis\Cache\CacheItem;
 use Basicis\Http\Message\StreamFactory;
 use Basicis\Basicis as App;
@@ -31,35 +32,44 @@ class CacheItemPool implements CacheItemPoolInterface
     private $items = [];
 
     /**
-     * $cacheFilePath variable
+     * $cacheFile variable
      * @var string
      */
-    private $cacheFilePath;
+    private $cacheFile;
 
+    /**
+     * $stream variable
+     * @var StreamInterface
+     */
     private $stream;
 
     /**
      * Function __construct
-     * Receives a cacheFilePath path as param or null
-     * @param string|null $cacheFilePath
-     * If cacheFilePath is null, default path is defined the app path
+     * Receives a cacheFile path as param or null
+     * @param string|null $cacheFile
+     * If cacheFile is null, default path is defined the app path
      */
-    public function __construct(string $cacheFilePath = null)
+    public function __construct(string $cacheFile = null)
     {
-        $this->cacheFilePath = $cacheFilePath;
-        if ($cacheFilePath === null) {
-            $this->cacheFilePath = App::path();
+        $this->cacheFile = $cacheFile;
+        if ($cacheFile === null) {
+            $this->cacheFile = App::path()."cache/app";
         }
 
-        if (!preg_match("/\/$/", $this->cacheFilePath)) {
-                $this->cacheFilePath .= "/";
+        $path = pathinfo($this->cacheFile, PATHINFO_DIRNAME);
+        if (!is_dir($path)) {
+            mkdir($path, 0775, true);
         }
 
-        $this->cacheFilePath .= "cache";
-        $this->stream = (new StreamFactory)->createStreamFromFile($this->cacheFilePath, "w+");
-        
-        $this->load();
-        $this->checkExpiredItems();
+        if (!file_exists($this->cacheFile)) {
+            touch($this->cacheFile);
+        }
+
+        if (file_exists($this->cacheFile)) {
+            $this->stream = (new StreamFactory)->createStreamFromFile($this->cacheFile, "w+");
+            $this->load();
+            $this->checkExpiredItems();
+        }
     }
 
 
@@ -197,8 +207,8 @@ class CacheItemPool implements CacheItemPoolInterface
         $this->deleteItems();
         $this->commit();
 
-        if (file_exists($this->cacheFilePath)) {
-            return unlink($this->cacheFilePath);
+        if (file_exists($this->cacheFile)) {
+            return unlink($this->cacheFile);
         }
         return false;
     }
@@ -267,7 +277,7 @@ class CacheItemPool implements CacheItemPoolInterface
     public function load() : ?CacheItemPool
     {
         if ($this->stream instanceof StreamInterface && $this->stream->isReadable()) {
-            if ($this->cacheFilePath === $this->stream->getMetadata("uri")) {
+            if ($this->cacheFile === $this->stream->getMetadata("uri")) {
                 $this->unserialize($this->stream->getContents());
             }
         }
@@ -321,10 +331,10 @@ class CacheItemPool implements CacheItemPoolInterface
         $this->checkExpiredItems();
 
         if ($this->stream instanceof StreamInterface && $this->stream->isWritable()) {
-            if ($this->cacheFilePath === $this->stream->getMetadata("uri")) {
+            if ($this->cacheFile === $this->stream->getMetadata("uri")) {
                 $poolSerialized = $this->serialize();
                 $isWrite = $this->stream->write($poolSerialized) === strlen($poolSerialized);
-                $isSave = $isWrite && file_exists($this->cacheFilePath);
+                $isSave = $isWrite && file_exists($this->cacheFile);
             }
         }
         return $isSave;
@@ -346,13 +356,13 @@ class CacheItemPool implements CacheItemPoolInterface
     }
 
     /**
-     * Function getFilePath
+     * Function getFile
      * Get this pool file path
      * @return string
      */
-    public function getFilePath() : string
+    public function getFile() : string
     {
-        return $this->cacheFilePath;
+        return $this->cacheFile;
     }
 
     /**

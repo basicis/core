@@ -180,7 +180,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     /**
      * Function getQueryParamsByUri
-     *
+     * Get all query params passed by uri
      * @return array
      */
     public function getQueryParamsByUri() : array
@@ -257,9 +257,8 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         $this->uploadedFiles = [];
         $files = (new UploadedFileFactory())->createUploadedFilesFromArray($uploadedFiles);
-
         foreach ($files as $key => $file) {
-            if ($file instanceof UploadedFileInterface) {
+            if ($file instanceof UploadedFile) {
                 $this->uploadedFiles[$key] = $file;
                 continue;
             }

@@ -97,8 +97,12 @@ class Stream implements StreamInterface
      */
     public function __construct($resource, array $options = [])
     {
+        $this->metadata = $options['metadata'] ?? [];
+        $this->seekable = $this->readable = $this->writable = false;
+
         if (is_resource($resource)) {
-            $this->resource =  $resource;
+            $this->resource = $resource;
+            $meta = stream_get_meta_data($this->resource);
 
             if (!isset($options['mode'])) {
                 $options['mode'] = 'r';
@@ -107,16 +111,20 @@ class Stream implements StreamInterface
             if (isset($options['size'])) {
                 $this->size = $options['size'];
             }
-            
-            $this->metadata = $options['metadata'] ?? [];
-            $meta = stream_get_meta_data($resource);
+        
+            if (!preg_match(self::READABLE_MODES, $meta['mode']) &&
+                !preg_match(self::WRITABLE_MODES, $meta['mode'])) {
+                throw new InvalidArgumentException("Not is a valid mode.");
+                return;
+            }
+
+            $this->readable = (bool) preg_match(self::READABLE_MODES, $meta['mode']);
+            $this->writable = (bool) preg_match(self::WRITABLE_MODES, $meta['mode']);
             $this->seekable = $meta['seekable'];
-            $this->readable = (bool)preg_match(self::READABLE_MODES, $meta['mode']);
-            $this->writable = (bool)preg_match(self::WRITABLE_MODES, $meta['mode']);
-            $this->uri = $this->getMetadata('uri');
+            $this->uri = $meta['uri'];
             return;
         }
-        throw new InvalidArgumentException('Stream must be a resource');
+        throw new RuntimeException('Stream must be a resource');
     }
 
     /**
@@ -142,7 +150,7 @@ class Stream implements StreamInterface
                 $this->seek(0);
             }
             return $this->getContents();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if (\PHP_VERSION_ID >= 70400) {
                 throw $e;
             }
@@ -333,6 +341,10 @@ class Stream implements StreamInterface
             throw new RuntimeException('Unable to write to stream.');
             return 0;
         }
+        
+        if ($this->isSeekable()) {
+            $this->seek(0);
+        }
         return $this->size;
     }
 
@@ -399,11 +411,10 @@ class Stream implements StreamInterface
             throw new RuntimeException('Stream is detached');
         }
 
-        $contents = null;
+        $contents = "";
         try {
             $contents = @stream_get_contents($this->resource);
         } catch (Exception $e) {
-            //throw $e;
             if ($contents === false) {
                 throw new RuntimeException('Unable to read stream contents', 0, $e);
             }

@@ -232,6 +232,10 @@ class Log implements LoggerInterface
             $jsonObj = $this->getByDate(Date('Y/m/d'));
         }
 
+        if (!file_exists($filename) && touch($filename)) {
+            $jsonObj = [];
+        }
+
         $jsonObj[] = $this->formatMessageToArray($level, $message);
         $stream = (new StreamFactory)->createStreamFromFile($filename);
         if ($stream->isWritable()) {

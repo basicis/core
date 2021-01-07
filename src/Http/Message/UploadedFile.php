@@ -104,6 +104,10 @@ class UploadedFile implements UploadedFileInterface
         if (!is_null($clientMediaType)) {
             $this->clientMediaType = $clientMediaType;
         }
+
+        if ($this->stream instanceof StreamInterface && $this->getClientFilename() === null) {
+            $this->clientFilename = $this->stream->getMetadata("uri");
+        }
     }
 
     /**

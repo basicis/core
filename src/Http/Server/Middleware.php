@@ -1,11 +1,12 @@
 <?php
 namespace Basicis\Http\Server;
 
-use Basicis\Basicis;
+use Basicis\Basicis as App;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Basicis\Http\Message\ResponseFactory;
 
 /**
  * Middleware class
@@ -21,28 +22,46 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Http/Server/Middleware.php
  */
-abstract class Middleware extends RequestHandler implements MiddlewareInterface
+class Middleware extends RequestHandler implements MiddlewareInterface
 {
+    
+    /**
+     * $handlers
+     *
+     * @var array|RequestHandler[]
+     */
+    private $handlers;
+
     /**
      * $app variable
      *
-     * @var Basicis
+     * @var App
      */
-    protected $app;
+    private $app;
 
     /**
      * Function __construct
-     * Receives an instance of Basicis \ Basicis or null as param
-     * @param \Basicis\Basicis $app
      */
-    public function __construct(Basicis $app = null)
+    public function __construct(App &$app, $handlers = null)
     {
-        if ($app instanceof Basicis) {
-            $this->app = $app;
-            return;
+        $this->app = $app;
+        if (is_string($handlers)) {
+            $this->handlers = $app->getMiddlewares($handlers);
         }
-        Basicis::loadEnv();
-        $this->app = Basicis::createApp();
+
+        if (is_array($handlers)) {
+            $this->handlers = $handlers;
+        }
+    }
+
+    /**
+     * Function run
+     * Run process han$handlers pool
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function run() : ResponseInterface
+    {
+        return $this->handle($this->app->getRequest());
     }
 
     /**
@@ -66,5 +85,15 @@ abstract class Middleware extends RequestHandler implements MiddlewareInterface
     * @param \Psr\Http\Message\ServerRequestInterface $request
     * @return \Psr\Http\Message\ResponseInterface
     */
-    abstract public function handle(ServerRequestInterface $request): ResponseInterface;
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        $response = $this->app->getResponse();
+        foreach ($this->handlers as $next) {
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() <= 206) {
+                $response = $this->process($request, new $next($this->app));
+            }
+        }
+        return $this->app->getResponse()
+        ->withStatus($response->getStatusCode(), $response->getReasonPhrase());
+    }
 }

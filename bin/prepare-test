@@ -4,7 +4,8 @@ $files = [
     "storage/test.db",
     "bin/test.db",
     ".env.test",
-    "cache"
+    "cache/app",
+    "php://temp/cache"
 ];
 
 foreach ($files as $file) {

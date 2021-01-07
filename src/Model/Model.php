@@ -374,6 +374,7 @@ abstract class Model implements ModelInterface
         return $data;
     }
 
+
     /**
      * Function __toString
      * Get Entity Data as Json, without the propreties defined in the array property $protecteds

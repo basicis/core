@@ -25,6 +25,7 @@ use Basicis\Controller\Controller;
 use Basicis\Controller\ControllerInterface;
 use Basicis\Http\Server\Middleware;
 use Basicis\Exceptions\InvalidArgumentException;
+use Basicis\Exceptions\BasicisException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -176,8 +177,8 @@ class Basicis extends RequestHandler
      */
     public function __construct(ServerRequestInterface $request, array $options = [])
     {
-        $this->enableCache($options["enableCache"] ?? false);
-
+        $this->enableCache($options["enableCache"] ?? false, self::path()."cache/app");
+        
         if ($this->enableCache && $this->cache->hasItem("router")) {
             $this->router = $this->cache->getItem("router")->get();
         }
@@ -330,8 +331,10 @@ class Basicis extends RequestHandler
     private function filterMiddlewares(array $middlewares = [], $requireKey = false) : array
     {
         foreach ($middlewares as $key => $middleware) {
-            if (($requireKey && !is_string($key)) | !(new $middleware() instanceof Middleware)) {
-                throw new InvalidArgumentException("Unidentified key or Basicis\Http\Server\Middleware instance.");
+            if (($requireKey && !is_string($key)) && !(new $middleware() instanceof RequestHandlerInterface)) {
+                throw new InvalidArgumentException(
+                    "Unidentified key or Psr\Http\Server\RequestHandlerInterface instance."
+                );
                 unset($middlewares[$key]);
             }
         }
@@ -383,6 +386,7 @@ class Basicis extends RequestHandler
             $this->middlewares['route'] = $this->filterMiddlewares($middlewares, true);
         } catch (InvalidArgumentException $e) {
             $this->middlewares['route'] = [];
+            (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
         }
         return $this;
     }
@@ -413,6 +417,7 @@ class Basicis extends RequestHandler
             $this->middlewares['before'] = $this->filterMiddlewares($middlewares);
         } catch (InvalidArgumentException $e) {
             $this->middlewares['before'] = [];
+            (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
         }
         return $this;
     }
@@ -442,6 +447,7 @@ class Basicis extends RequestHandler
             $this->middlewares['after'] = $this->filterMiddlewares($middlewares);
         } catch (InvalidArgumentException $e) {
             $this->middlewares['after'] = [];
+            (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
         }
         return $this;
     }
@@ -466,76 +472,46 @@ class Basicis extends RequestHandler
 
         /**
      * Function handleBeforeMiddlewares
-     * Handles middleware prior to the route and executes it, this return a ResponseInterface
+     * Handles middleware prior to the route and executes it, this return a Basicis
      * @return Basicis
      */
     private function handleBeforeMiddlewares() : Basicis
     {
         //Before middlewares here
-        $response = $this->getResponse();
-
-        foreach ($this->middlewares['before'] as $before) {
-            if (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206) {
-                $res = (new $before())->handle($this->getRequest());
-                $response->withStatus($res->getStatusCode(), $res->getReasonPhrase());
-            }
-        }
-
-        $this->response = $response;
+        $this->response = (new Middleware($this, "before"))->run();
         return $this;
     }
 
 
     /**
      * Function middlewaresHandle
-     * Handles route middleware and executes it, this return a ResponseInterface
+     * Handles route middleware and executes it, this return a Basicis
      * @param  string|array $middlewares
-     * @return ResponseInterface
+     * @return Basicis
      */
-    private function handleRouteMiddlewares($middlewares) : ResponseInterface
+    private function handleRouteMiddlewares($middlewares) : Basicis
     {
         //Run route middlewares
-        $response = $this->getResponse();
-
+        $middlewaresArray = [];
         foreach (is_string($middlewares) ? explode(",", $middlewares) : $middlewares as $middleware) {
-            if (key_exists($middleware, $this->middlewares["route"])
-                && (($response->getStatusCode() >= 200) && $response->getStatusCode() <= 206)
-            ) {
-                $res = (new $this->middlewares["route"][$middleware]($this))->handle($this->getRequest());
-                $response->withStatus($res->getStatusCode(), $res->getReasonPhrase())
-                        ->withBody($res->getBody());
-            }
-            if ($response->getStatusCode() > 206) {
-                break;
+            if (key_exists($middleware, $this->middlewares["route"])) {
+                $middlewaresArray[] =  $this->middlewares["route"][$middleware];
             }
         }
-        
-        return $response;
+        $this->response =  (new Middleware($this, $middlewaresArray))->run();
+        return $this;
     }
 
 
     /**
      * Function handleAfterMiddlewares
-     * Handles middleware after the route and executes it, this return a  instance of Basicis
+     * Handles middleware after the route and executes it, this return a instance of Basicis
      * @return Basicis
      */
     private function handleAfterMiddlewares() : Basicis
     {
         //After middlewares here
-        $response = $this->getResponse();
-
-        foreach ($this->middlewares['after'] as $after) {
-            if ($response->getStatusCode() <= 206) {
-                $res = (new $after())->handle($this->getRequest());
-                $response->withStatus($res->getStatusCode(), $res->getReasonPhrase());
-            }
-
-            if ($response->getStatusCode() > 206) {
-                break;
-            }
-        }
-        
-        $this->response = $response;
+        $this->response = (new Middleware($this, "after"))->run();
         return $this;
     }
 
@@ -547,29 +523,11 @@ class Basicis extends RequestHandler
      */
     public static function path() : string
     {
-        $cache = new CacheItemPool("php://temp/cache");
-        if ($cache->hasItem("app-root-path")) {
-            return $cache->getItem("app-root-path")->get();
+        $path = getcwd();
+        if (str_ends_with($path, "public")) {
+            $path .= "/..";
         }
-
-        $path = sprintf("%s/", getcwd());
-        $i = 0;
-
-        while ($i < 3) {
-            $command = exec('ls '.$path);
-            if ((strpos($command, 'vendor')  >= 0) && (strpos($command, 'vendor') !== false)) {
-                break;
-            }
-            $path .= '../';
-            $i++;
-        }
-
-        if (!preg_match("/\/$/", $path)) {
-            $path .= "/";
-        }
-
-        $cache->addItem("app-root-path", $path, "20 minutes")->commit();
-        return $path;
+        return $path .= "/";
     }
 
 
@@ -757,16 +715,20 @@ class Basicis extends RequestHandler
     }
 
 
-     /**
+    /**
      * Function enableCache
      * Enable application cache $enable = true
+     *
+     * @param bool $enable
+     * @param string $cacheFile
+     *
      * @return Basicis
      */
-    public function enableCache(bool $enable = true)  : Basicis
+    public function enableCache(bool $enable = true, string $cacheFile = null)  : Basicis
     {
         $this->enableCache = $enable;
         if ($enable) {
-            $this->cache = new CacheItemPool(self::path()."cache/"); //self::path()
+            $this->cache = new CacheItemPool($cacheFile);
         }
         return $this;
     }
@@ -851,7 +813,7 @@ class Basicis extends RequestHandler
                     $request["host"] ?? "localhost",
                     $port,
                     $request["path"] ?? "/",
-                    $query,
+                    $query
                 )
             );
         }
@@ -1026,10 +988,10 @@ class Basicis extends RequestHandler
       
         if ($this->route instanceof Route) {
             //Route middlewares run
-            $res = $this->handleRouteMiddlewares($this->route->getMiddlewares());
+            $this->handleRouteMiddlewares($this->route->getMiddlewares());
                 
             //Routing and handle Request
-            if ($res->getStatusCode() >= 200 && $res->getStatusCode() <= 206) {
+            if ($this->response->getStatusCode() >= 200 && $this->response->getStatusCode() <= 206) {
                 //Handles Controller or Closure function
                 $res = $this->handle($this->request);
                 $this->response->withStatus($res->getStatusCode(), $res->getReasonPhrase())
@@ -1085,8 +1047,8 @@ class Basicis extends RequestHandler
     public function write(string $text = "", int $statusCode = null) : ResponseInterface
     {
         return $this->getResponse()
-            ->withStatus($statusCode ?? 200)
-            ->withBody((new StreamFactory)->createStream($text));
+                ->withStatus($statusCode ?? 200)
+                ->withBody((new StreamFactory)->createStream($text));
     }
 
 
@@ -1164,19 +1126,23 @@ class Basicis extends RequestHandler
         if ($content === null) {
             $view = new View([self::path() . "storage/templates/", self::path() . $customPath]);
             $view->setFilters($this->viewFilters);
-            $this->getResponse()->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
             $content = $view->getView($name, $data);
 
-            if ($content === null) {
-                $this->write("Template file '$name' not found!", 404);
-            }
-
             if ($this->enableCache) {
-                $this->cache->addItem("template@".$name, $content, "2 minutes")->commit();
+                $this->cache->addItem("template@".$name, $content, "10 seconds")->commit();
             }
         }
-        return $this->write($content);
+        $statusCode = 200;
+
+        if ($content === null) {
+            $content = "Template file '$name' not found!";
+            $statusCode = 404;
+        }
+        return $this->write($content)
+                ->withStatus($statusCode)
+                ->withHeader("Content-Type", ["text/html", "charset=UTF-8"]);
     }
+
 
     /**
      * Function setViewFilters
@@ -1231,22 +1197,36 @@ class Basicis extends RequestHandler
     public function clientFileDownload(string $filename = null, bool $forced = false) : ResponseInterface
     {
         //If file exists, this no is null
-        if ($filename !== null) {
-            $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
-            if ($file->isReadable()) {
-                $headers = [
-                    "Content-Type" => \MimeType\MimeType::getType($filename),
-                    "Content-disposition" => ["filename=".basename($filename)]
-                ];
+        if ($filename !== null && file_exists($filename)) {
+            $file = null;
+            $headers = [
+                "Content-Type" => \MimeType\MimeType::getType($filename),
+                "Content-disposition" => ["filename=".basename($filename)]
+            ];
 
-                if ($forced) {
-                    $headers["Content-disposition"] = array_unshift($headers["Content-disposition"], "attachment");
+            if ($forced) {
+                $headers["Content-disposition"] = array_unshift($headers["Content-disposition"], "attachment");
+            }
+
+            if ($this->enableCache && $this->cache->hasItem("file@".$filename)) {
+                $file = $this->cache->getItem("file@".$filename)->get();
+            }
+
+            if ($file === null) {
+                $file = (new StreamFactory())->createStreamFromFile($filename, "r+");
+                if ($this->enableCache) {
+                    $this->cache->addItem("file@".$filename, $file, "2 minutes")->commit();
                 }
+            }
+
+            if ($file->isReadable()) {
                 return $this->response->withHeaders($headers)->withStatus(200)->withBody($file);
             }
+
+            $file->close();
             return $this->response->withStatus(404, "File not found!");
         }
-        return $this->response->withStatus(500, "Development error, Filename must not be null.");
+        return $this->response->withStatus(404, "Invalid filename or file no exists!");
     }
 
 
@@ -1262,22 +1242,23 @@ class Basicis extends RequestHandler
     public function clientFileUpload(UploadedFileInterface $infile, string $outfile = null) : ?array
     {
         if ($infile instanceof UploadedFileInterface) {
-            //move file to path
-            $infile->moveTo($outfile);
+            if (!file_exists($outfile) && touch($outfile)) {
+                //move file to path
+                $infile->moveTo($outfile);
+                //reading file in storage
+                $outfile = (new StreamFactory())->createStreamFromFile($outfile, "r");
 
-            //reading file in storage
-            $outfile = (new StreamFactory())->createStreamFromFile($outfile, "r+");
-
-            //Verify if is uploaded
-            if ($infile->getSize() === $outfile->getSize()) {
-                $data =  [
-                    "name" => str_replace(" ", "", $infile->getClientFilename()),
-                    "size" => $infile->getSize(),
-                    "type" => $infile->getClientMediaType(),
-                ];
-                $infile->getStream()->close();
-                $outfile->close();
-                return $data;
+                //Verify if is uploaded
+                if ($infile->getSize() === $outfile->getSize()) {
+                    $data =  [
+                        "name" => str_replace(" ", "", $infile->getClientFilename()),
+                        "size" => $infile->getSize(),
+                        "type" => $infile->getClientMediaType(),
+                    ];
+                    $infile->getStream()->close();
+                    $outfile->close();
+                    return $data;
+                }
             }
         }
         return null;
@@ -1352,6 +1333,7 @@ class Basicis extends RequestHandler
                 }
                 return $this->response()->withStatus(200);
             } catch (InvalidArgumentException $e) {
+                (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
                 return $this->getResponse()->withStatus(500, $e->getMessage());
             }
         }
@@ -1385,14 +1367,14 @@ class Basicis extends RequestHandler
                 return $this->response = $result;
             }
 
-            return $this->response();
+            return $this->getResponse();
         }
 
         throw new InvalidArgumentException(
             'Expected an instance of \Closure or a with this example:'
-            .' function(App $app, $args){}. Optionals params.'
+            .' function (App $app, $args){}. Optionals params.'
         );
-        return $this->response()->withStatus(500);
+        return $this->getResponse()->withStatus(500);
     }
 
     
@@ -1404,10 +1386,12 @@ class Basicis extends RequestHandler
      */
     public static function input(string $resourceFileName = "php://input"): string
     {
-        //Opening input stream
-        $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'r');
-        $content = $stream->getContents();
-        $stream->close();
+        $content = null;
+        if (file_exists($resourceFileName) | $resourceFileName === "php://input") {
+            $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'r');
+            $content = $stream->getContents();
+            $stream->close();
+        }
         return $content ?? '';
     }
 
@@ -1425,44 +1409,43 @@ class Basicis extends RequestHandler
         ResponseInterface $response,
         string $resourceFileName = "php://output"
     ) : int {
-        //Opening output stream
-        $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
-        $size = 0;
-
-        if ($stream->isWritable()) {
-            header(
-                sprintf(
-                    '%s/%s %s %s',
-                    strtoupper($request->getUri()->getScheme()),
-                    $response->getProtocolVersion(),
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase()
-                ),
-                true
-            );
- 
-            foreach ($response->getHeaders() as $name => $value) {
-                header($response->getHeaderLine($name), true);
-            }
-
-            $size = $stream->write($response->getBody());
-            $response->getBody()->close();
+        if (!file_exists($resourceFileName) && $resourceFileName !== "php://output") {
+            touch($resourceFileName);
         }
 
-        $stream->close();
-        return $size;
+        if (file_exists($resourceFileName) | $resourceFileName === "php://output") {
+            $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
+            $size = 0;
+
+            if ($stream->isWritable()) {
+                header(
+                    sprintf(
+                        '%s/%s %s %s',
+                        strtoupper($request->getUri()->getScheme()),
+                        $response->getProtocolVersion(),
+                        $response->getStatusCode(),
+                        $response->getReasonPhrase()
+                    ),
+                    true
+                );
+    
+                foreach ($response->getHeaders() as $name => $value) {
+                    header($response->getHeaderLine($name), true);
+                }
+                $size = $stream->write($response->getBody());
+                $response->getBody()->close();
+            }
+
+            $stream->close();
+            return $size;
+        }
+        return 0;
     }
-
-
 
 
     /**
      * Function handleError
      * Returns a template view with errors occurred during the execution of the application according to http response
-     * @return Basicis
-     */
-    /**
-     * Undocumented function
      *
      * @param string $message
      *
@@ -1470,18 +1453,36 @@ class Basicis extends RequestHandler
      */
     public function handleError(string $message = null) : Basicis
     {
-        if ($message === null) {
-            $message = sprintf(
-                "%s | %s",
+        $this->view("error", [
+            "message" => $message ?? sprintf(
+                "%s - %s",
                 $this->response->getStatusCode(),
                 $this->response->getReasonPhrase()
-            );
-        }
-
-        $this->view("error", ["message" => $message]);
+            )
+        ]);
         return $this;
     }
    
+    /**
+     * Function extractData
+     * Extract data on ServerRequest and/or Route url params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Basicis\Router\Route $route
+     *
+     * @return array
+     */
+    public static function extractData(ServerRequestInterface $request = null, Route $route = null) : array
+    {
+        $args = [];
+        if ($route !== null) {
+            $args = (array) $route->getArguments();
+        }
+
+        if ($request !== null && $request->getParsedBody() !== null) {
+            $args = array_merge((array) $request->getParsedBody(), (array) $args);
+        }
+        return $args;
+    }
 
     /**
      * handle function
@@ -1492,18 +1493,7 @@ class Basicis extends RequestHandler
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         //Mergin Route arguments and ServerRequest data, files, cookies...
-        $args = null;
-        if ($this->route !== null) {
-            $args = $this->route->getArguments();
-        }
-
-        if ($request->getParsedBody() !== null) {
-            $args = array_merge((array) $request->getParsedBody(), (array) $args);
-        }
-
-        if ($args === (object)[]) {
-            $args = null;
-        }
+        $args = (object) self::extractData($request, $this->route);
 
         //get callback Closure
         $callback = $this->route->getCallback();
@@ -1511,7 +1501,7 @@ class Basicis extends RequestHandler
             try {
                 return $this->closure($callback, $args);
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), 0, $e);
+                (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
             }
         }
 
@@ -1521,14 +1511,22 @@ class Basicis extends RequestHandler
             try {
                 return $this->controller($callback, $args);
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), 0, $e);
+                (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
             }
         }
 
         return $this->response(500);
     }
 
-
+    /**
+     * Function redirect
+     * Redirect a Server Request with url, method and optional array of data
+     * @param string $url
+     * @param string $method
+     * @param array $data
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function redirect(string $url = "/", $method = "GET", array $data = null) : ResponseInterface
     {
         if (isset($data) && $this->getRequest()->getParsedBody() !== null) {
@@ -1536,12 +1534,35 @@ class Basicis extends RequestHandler
         }
         
         $this->setRequest(ServerRequestFactory::create($method, $url))
-            ->getRequest()->withParsedBody(isset($data) ? $data : []);
-        return $this->handleRouterEngining()->response()->withStatus(307);
+            ->getRequest()->withParsedBody($data ?? []);
+
+        return $this->handleRouterEngining()->getResponse()->withStatus(307);
     }
 
-
     /**
+     * Function runAndResponse
+     * Run app pipe line and return a instance of ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function runAndResponse() : ResponseInterface
+    {
+        //Get request body
+        $this->request->withParsedBody(self::input($this->getResourceInput()));
+        //Before middlewares and Router Engining
+        $this->handleBeforeMiddlewares();
+        //Router Engining
+        $this->handleRouterEngining();
+        //After middlewares
+        $this->handleAfterMiddlewares();
+        
+        //If errors occurred during the execution of the application according to http response
+        if ($this->response->getStatusCode() > 307) {
+            $this->handleError();
+        }
+        return $this->response;
+    }
+
+     /**
      * Function run
      * Finally execute the app instance passed as parameters to standard input and output for php application,
      * by definition the values ​​are respectively "php://input" for input and "php://output" for output.
@@ -1551,23 +1572,8 @@ class Basicis extends RequestHandler
      */
     public function run() : int
     {
-        //Get request body
-        $this->request->withParsedBody(self::input($this->getResourceInput()));
-
-        //Before middlewares and Router Engining
-        $this->handleBeforeMiddlewares()->handleRouterEngining();
-    
-        //After middlewares
-        if (($this->response->getStatusCode() >= 200) && $this->response->getStatusCode() <= 206) {
-            $this->handleAfterMiddlewares();
-        }
-
-        //If errors occurred during the execution of the application according to http response
-        if ($this->response->getStatusCode() > 307 && $this->response->getBody()->getSize() === null) {
-            $this->handleError();
-        }
-
-        //Set response body
-        return self::output($this->request, $this->response, $this->getResourceOutput());
+        //Run app pipe line and return a instance of ResponseInterface
+        $response = $this->runAndResponse();
+        return self::output($this->request, $response, $this->getResourceOutput());
     }
 }

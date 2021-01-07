@@ -16,8 +16,7 @@ class UploadedFileTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-        $streamFactory = new StreamFactory();
-        $this->uploadedFile = new UploadedFile($streamFactory->createStream());
+        $this->uploadedFile = new UploadedFile((new StreamFactory)->createStream());
     }
 
     /**
@@ -69,7 +68,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetClientFilename()
     {
-        $this->assertEquals(null, $this->uploadedFile->getClientFilename());
+        $this->assertNotEmpty($this->uploadedFile->getClientFilename());
     }
     
     /**

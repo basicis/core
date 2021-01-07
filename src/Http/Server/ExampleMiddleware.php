@@ -16,6 +16,6 @@ class ExampleMiddleware extends Middleware
          * All persoal middleware code implementation
          *
          */
-        return ResponseFactory::create(200);
+        return ResponseFactory::create(202);
     }
 }

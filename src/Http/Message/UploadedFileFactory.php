@@ -51,7 +51,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
             throw new InvalidArgumentException('The file resource is not readable.');
             return new UploadedFile();
         }
-        
+
         return new UploadedFile($stream, $size, $error, $clientFilename, $tmpName, $clientMediaType);
     }
 
@@ -65,18 +65,43 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
     public function createUploadedFilesFromArray(array $files) : array
     {
         $uploadedFiles = [];
-
         foreach ($files as $key => $file) {
-            $uploadedFiles[$key] = $this->createUploadedFile(
-                (new StreamFactory())->createStreamFromFile($file["tmp_name"], "rw"),
-                $file["size"],
-                $file["error"],
-                $file["name"],
-                $file["tmp_name"],
-                $file["type"]
-            );
+            if (is_array($file) && file_exists($file["tmp_name"])) {
+                $uploadedFiles[$key] = $this->createUploadedFile(
+                    (new StreamFactory())->createStreamFromFile($file["tmp_name"], "rw"),
+                    $file["size"] ?? null,
+                    $file["error"] ?? \UPLOAD_ERR_OK,
+                    $file["name"] ?? null,
+                    $file["tmp_name"] ?? null,
+                    $file["type"] ?? null
+                );
+            }
+
+            if ($file instanceof UploadedFile) {
+                $uploadedFiles[$key] = $file;
+            }
         }
 
         return $uploadedFiles;
+    }
+
+    /**
+     * Function createUploadedFileFromFilename
+     * Create a new uploaded file from filename
+     * @param string $filename
+     *
+     * @return UploadedFileInterface
+     */
+    public function createUploadedFileFromFilename(string $filename, string $mode = "r+") : UploadedFileInterface
+    {
+        $stream = (new StreamFactory)->createStreamFromFile($filename, $mode);
+        return $this->createUploadedFile(
+            $stream,
+            $stream->getSize(),
+            \UPLOAD_ERR_OK,
+            basename($filename),
+            $stream->getMetadata("uri"),
+            \MimeType\MimeType::getType($filename)
+        );
     }
 }

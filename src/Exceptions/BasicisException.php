@@ -68,17 +68,13 @@ class BasicisException extends \Exception
      * - info
      * - debug
      *
-     * @param  string|int $level
+     * @param  int $level
      * @param  string $message=null
      * @param  array  $context
      * @return BasicisException
      */
-    public function log($level = null, $message = null, array $context = []) : BasicisException
+    public function log(int $level = null, $message = null, array $context = []) : BasicisException
     {
-        if (!in_array($level, $this->levels)) {
-            $level = "error";
-        }
-
         if (is_int($level)) {
             $level = $this->levels[$level];
         }

@@ -334,7 +334,7 @@ class Message implements MessageInterface
      */
     public function getBody() : Stream
     {
-        return $this->body ?? $this->body = (new StreamFactory())->createStreamFromFile('php://input', 'r');
+        return $this->body ?? $this->body = (new StreamFactory())->createStream();
     }
 
 
@@ -353,7 +353,7 @@ class Message implements MessageInterface
     public function withBody(StreamInterface $body) : Message
     {
         if (is_null($body) && !($body instanceof StreamInterface)) {
-            $this->body = (new StreamFactory())->createStreamFromFile('php://output', 'rw');
+            $this->body = (new StreamFactory())->createStream();
             throw new InvalidArgumentException("When the body is not valid.");
         }
         $this->body = $body;

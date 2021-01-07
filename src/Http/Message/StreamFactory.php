@@ -6,6 +6,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Basicis\Exceptions\BasicisException;
 use Basicis\Exceptions\InvalidArgumentException;
 use Basicis\Exceptions\RuntimeException;
+use Basicis\Basicis as App;
 
 /**
  * StreamFactory class
@@ -30,7 +31,8 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStream(string $content = ''): StreamInterface
     {
-        $stream = new Stream(fopen(tempnam("/tmp", "tmpf"), 'w+', false), ['mode' => 'w+']);
+        $file = @tempnam("/tmp", "tmpf");
+        $stream = new Stream(@fopen($file, 'w+', false));
         $stream->write($content);
         return $stream;
     }
@@ -55,11 +57,15 @@ class StreamFactory implements StreamFactoryInterface
     {
         try {
             $resource = @fopen($filename, $mode, false);
-            if (is_resource($resource)) {
-                return new Stream($resource, ['mode' => $mode]);
-            }
-        } catch (Exception $e) {
-            throw new RuntimeException("The file $filename cannot be opened.", 0, $e);
+            return new Stream($resource, ['mode' => $mode]);
+        } catch (RuntimeException $noOpen) {
+            throw new RuntimeException($noOpen->getMessage(), $noOpen->getCode(), $noOpen);
+        } catch (InvalidArgumentException $invaliArgument) {
+            throw new InvalidArgumentException(
+                $invaliArgument->getMessage(),
+                $invaliArgument->getCode(),
+                $invaliArgument
+            );
         }
         return $this->createStream("");
     }
@@ -75,6 +81,9 @@ class StreamFactory implements StreamFactoryInterface
      */
     public function createStreamFromResource($resource): StreamInterface
     {
-        return new Stream($resource);
+        if (is_resource($resource)) {
+            return new Stream($resource, ['mode' => "w+"]);
+        }
+        return $this->createStream("");
     }
 }

@@ -1,11 +1,13 @@
 vendor/
-cache
-.env*
-!.env.example
+log/
+docs/
+tmp/
 src/controllers/
 src/middlewares/
 src/routes/
-docs/
+cache/
+.env*
+!.env.example
 .vscode/
 bin/basicis.db
 test.db
