@@ -15,10 +15,37 @@ Psr\Http\Server\RequestHandlerInterface
 
 | Name | Description |
 |------|-------------|
+|[__construct](#requesthandler__construct)|Function __construct
+Receives a instance of Basicis\Basicis $app as argument|
 |[handle](#requesthandlerhandle)|Function handle
 Handles a request and produces a response.|
 
 
+
+
+### RequestHandler::__construct  
+
+**Description**
+
+```php
+public __construct (\Basicis\Basicis $app)
+```
+
+Function __construct
+Receives a instance of Basicis\Basicis $app as argument 
+
+ 
+
+**Parameters**
+
+* `(\Basicis\Basicis) $app`
+
+**Return Values**
+
+`void`
+
+
+<hr />
 
 
 ### RequestHandler::handle  

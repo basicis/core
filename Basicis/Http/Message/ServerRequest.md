@@ -58,7 +58,8 @@ Retrieves cookies sent by the client to the server.|
 Retrieve any parameters provided in the request body.|
 |[getQueryParams](#serverrequestgetqueryparams)|Function getQueryParams
 Retrieve query string arguments.|
-|[getQueryParamsByUri](#serverrequestgetqueryparamsbyuri)|Function getQueryParamsByUri|
+|[getQueryParamsByUri](#serverrequestgetqueryparamsbyuri)|Function getQueryParamsByUri
+Get all query params passed by uri|
 |[getServerParams](#serverrequestgetserverparams)|Function getServerParams
 Retrieve server parameters.|
 |[getUploadedFiles](#serverrequestgetuploadedfiles)|Function getUploadedFiles
@@ -298,7 +299,8 @@ or from the `QUERY_STRING` server param.
 public getQueryParamsByUri (void)
 ```
 
-Function getQueryParamsByUri 
+Function getQueryParamsByUri
+Get all query params passed by uri 
 
  
 

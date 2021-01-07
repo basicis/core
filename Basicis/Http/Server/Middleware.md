@@ -18,43 +18,20 @@ Basicis\Http\Server\RequestHandler
 
 | Name | Description |
 |------|-------------|
-|[__construct](#middleware__construct)|Function __construct
-Receives an instance of Basicis \ Basicis or null as param|
 |[process](#middlewareprocess)|Function process
 Process an incoming server request.|
+|[run](#middlewarerun)|Function run
+Run process han$handlers pool|
 
 ## Inherited methods
 
 | Name | Description |
 |------|-------------|
+|__construct|Function __construct
+Receives a instance of Basicis\Basicis $app as argument|
 |handle|Function handle
 Handles a request and produces a response.|
 
-
-
-### Middleware::__construct  
-
-**Description**
-
-```php
-public __construct (\Basicis\Basicis $app)
-```
-
-Function __construct
-Receives an instance of Basicis \ Basicis or null as param 
-
- 
-
-**Parameters**
-
-* `(\Basicis\Basicis) $app`
-
-**Return Values**
-
-`void`
-
-
-<hr />
 
 
 ### Middleware::process  
@@ -79,6 +56,33 @@ request handler to do so.
 **Return Values**
 
 `void`
+
+
+<hr />
+
+
+### Middleware::run  
+
+**Description**
+
+```php
+public run (void)
+```
+
+Function run
+Run process han$handlers pool 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`\Psr\Http\Message\ResponseInterface`
+
+
 
 
 <hr />

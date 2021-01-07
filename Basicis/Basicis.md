@@ -15,8 +15,6 @@ Basicis\Http\Server\RequestHandler
 
 | Name | Description |
 |------|-------------|
-|[__construct](#basicis__construct)|Function __construct
-Construct a instanceof Basicis\Basicis lovingly named $app|
 |[auth](#basicisauth)|Function auth
 Get the app Auth/User by authorization token, it is receive a class Basicis\Auth\AuthInterface|
 |[cache](#basiciscache)|Function cache
@@ -33,6 +31,8 @@ Instantiate a Basicis\Controller\Controller object and execute the defined metho
 Create a instanceof Basicis\Basicis and return it is|
 |[enableCache](#basicisenablecache)|Function enableCache
 Enable application cache $enable = true|
+|[extractData](#basicisextractdata)|Function extractData
+Extract data on ServerRequest and/or Route url params|
 |[getAppDescription](#basicisgetappdescription)|Function getAppDescription
 Getting App description string|
 |[getAppKey](#basicisgetappkey)|Function getAppKey
@@ -58,7 +58,8 @@ A ResponseInterface object can be obtained by the getRequest function in the Rou
 Get the app Router engine instance|
 |[getTimezone](#basicisgettimezone)|Function getTimezone
 Getting App Timezone, default "America/Recife"|
-|[handleError](#basicishandleerror)|Undocumented function|
+|[handleError](#basicishandleerror)|Function handleError
+Returns a template view with errors occurred during the execution of the application according to http response|
 |[input](#basicisinput)|Function input
 Open a Stream Resource in Read mode and returns its content|
 |[json](#basicisjson)|Function json
@@ -69,7 +70,8 @@ Load enviroment variables for use from app|
 Open a Stream Resource in Recording mode and write a text in it, sending headers|
 |[path](#basicispath)|Function path
 Return app project root path|
-|[redirect](#basicisredirect)||
+|[redirect](#basicisredirect)|Function redirect
+Redirect a Server Request with url, method and optional array of data|
 |[request](#basicisrequest)|Function request
 Set and/or get current server request of app|
 |[response](#basicisresponse)|Function response
@@ -77,6 +79,8 @@ Set and/or get current server response of app|
 |[run](#basicisrun)|Function run
 Finally execute the app instance passed as parameters to standard input and output for php application,
 by definition the values ​​are respectively "php://input" for input and "php://output" for output.|
+|[runAndResponse](#basicisrunandresponse)|Function runAndResponse
+Run app pipe line and return a instance of ResponseInterface|
 |[setAfterMiddlewares](#basicissetaftermiddlewares)|Function setAfterMiddlewares
 Setting after middlewares
 These are executed in the order they were defined, after the route middleware and main app handler,
@@ -125,36 +129,11 @@ Set a string and status code for write in the http response|
 
 | Name | Description |
 |------|-------------|
+|__construct|Function __construct
+Receives a instance of Basicis\Basicis $app as argument|
 |handle|Function handle
 Handles a request and produces a response.|
 
-
-
-### Basicis::__construct  
-
-**Description**
-
-```php
-public __construct (\ServerRequestInterface $request, array $options)
-```
-
-Function __construct
-Construct a instanceof Basicis\Basicis lovingly named $app 
-
- 
-
-**Parameters**
-
-* `(\ServerRequestInterface) $request`
-* `(array) $options`
-: Acceptable options [mode=string, timezone=string, appDescription=string, appKey=string]  
-
-**Return Values**
-
-`void`
-
-
-<hr />
 
 
 ### Basicis::auth  
@@ -364,7 +343,7 @@ Create a instanceof Basicis\Basicis and return it is
 **Description**
 
 ```php
-public enableCache (void)
+public enableCache (bool $enable, string $cacheFile)
 ```
 
 Function enableCache
@@ -374,11 +353,40 @@ Enable application cache $enable = true
 
 **Parameters**
 
-`This function has no parameters.`
+* `(bool) $enable`
+* `(string) $cacheFile`
 
 **Return Values**
 
 `\Basicis`
+
+
+
+
+<hr />
+
+
+### Basicis::extractData  
+
+**Description**
+
+```php
+public static extractData (\Psr\Http\Message\ServerRequestInterface $request, \Basicis\Router\Route $route)
+```
+
+Function extractData
+Extract data on ServerRequest and/or Route url params 
+
+ 
+
+**Parameters**
+
+* `(\Psr\Http\Message\ServerRequestInterface) $request`
+* `(\Basicis\Router\Route) $route`
+
+**Return Values**
+
+`array`
 
 
 
@@ -718,7 +726,8 @@ Getting App Timezone, default "America/Recife"
 public handleError (string $message)
 ```
 
-Undocumented function 
+Function handleError
+Returns a template view with errors occurred during the execution of the application according to http response 
 
  
 
@@ -887,20 +896,25 @@ Return app project root path
 **Description**
 
 ```php
- redirect (void)
+public redirect (string $url, string $method, array $data)
 ```
 
- 
+Function redirect
+Redirect a Server Request with url, method and optional array of data 
 
  
 
 **Parameters**
 
-`This function has no parameters.`
+* `(string) $url`
+* `(string) $method`
+* `(array) $data`
 
 **Return Values**
 
-`void`
+`\Psr\Http\Message\ResponseInterface`
+
+
 
 
 <hr />
@@ -985,6 +999,33 @@ by definition the values ​​are respectively "php://input" for input and "php
 **Return Values**
 
 `int`
+
+
+
+
+<hr />
+
+
+### Basicis::runAndResponse  
+
+**Description**
+
+```php
+public runAndResponse (void)
+```
+
+Function runAndResponse
+Run app pipe line and return a instance of ResponseInterface 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`\Psr\Http\Message\ResponseInterface`
 
 
 

@@ -13,6 +13,8 @@ Psr\Http\Message\UploadedFileFactoryInterface
 |------|-------------|
 |[createUploadedFile](#uploadedfilefactorycreateuploadedfile)|Function createUploadedFile
 Create a new uploaded file.|
+|[createUploadedFileFromFilename](#uploadedfilefactorycreateuploadedfilefromfilename)|Function createUploadedFileFromFilename
+Create a new uploaded file from filename|
 |[createUploadedFilesFromArray](#uploadedfilefactorycreateuploadedfilesfromarray)|Function createUploadedFilesFromArray|
 
 
@@ -58,6 +60,33 @@ uploaded file content.
 
 `\InvalidArgumentException`
 > If the file resource is not readable.
+
+<hr />
+
+
+### UploadedFileFactory::createUploadedFileFromFilename  
+
+**Description**
+
+```php
+public createUploadedFileFromFilename (string $filename)
+```
+
+Function createUploadedFileFromFilename
+Create a new uploaded file from filename 
+
+ 
+
+**Parameters**
+
+* `(string) $filename`
+
+**Return Values**
+
+`\UploadedFileInterface`
+
+
+
 
 <hr />
 
