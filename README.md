@@ -1,6 +1,7 @@
 # Basicis | Core
 
 * [Basicis\Basicis](Basicis/Basicis.md) 
+* [Basicis\Console](Basicis/Console.md) 
 * [Basicis\Auth\Auth](Basicis/Auth/Auth.md) 
 * [Basicis\Auth\AuthInterface](Basicis/Auth/AuthInterface.md) 
 * [Basicis\Auth\Token](Basicis/Auth/Token.md) 
