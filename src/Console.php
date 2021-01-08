@@ -1,12 +1,72 @@
 <?php
 namespace Basicis;
 
+use Basicis\Exceptions\RuntimeException;
 use Basicis\Http\Message\StreamFactory;
 use Basicis\View\View;
 use Basicis\Basicis as App;
 
 /**
- * Basicis Console class
+ * Basicis\Console class affectionately called Maker
+ *
+ * ## Get Started:
+ * ```
+ *  maker <command> [<option> <option-value> ... ]
+ * ```
+ *
+ * - Obs: The characters "-" (dash) or "_" (underline) indicate that the following
+ * letter must be capitalized when creating class.
+ *
+ * List all controllers files
+ * ```
+ *  maker controller -l
+ * ```
+ *
+ * Create a new controller file named `test`
+ * ```
+ *  maker controller -c test
+ * ```
+ *
+ * Create a new controller alias with command alias `-C`, namespace and model params `model-test`
+ * ```
+ *  maker -C -c test -m model-test -n "App\Controllers"
+ * ```
+ *
+ * Create a new model file
+ * ```
+ *  maker model -c ModelTest
+ * ```
+ *
+ * Create a new model alias with command alias `-M`, namespace and model params
+ * ```
+ *  maker -M -c model-test --namesapace "App\Models"
+ * ```
+ *
+ * ### Commands:
+ * | Name | Alias | Description |
+ * |------|-------|-------------|
+ * | help | * | This Help page |
+ * | controller | -C | Remove or List Controllers |
+ * | model | -M | Create, Remove or List Models |
+ * | middleware | -D | Create, Remove or List Middleware |
+ *
+ *
+ * ### Options:
+ * | Name | Alias | Description | Value required |
+ * |------|-------|-------------|----------------|
+ * | -l | | List all classes Controllers, Models or Middlewares | none |
+ * | -c | | Create | classname : string |
+ * | -r | | Remove | classname : string |
+ * | -n | --namesapace | Namespace | namespace : string |
+ * | --class | --name | Class Name | class : string |
+ * | -t | --table | Table name for model command | table : string |
+ * | -m | --model | Model name for controller command | model : string |
+ * | -p | --path | Namespace path | path : string |
+ * | --author.name |  | Author Name | name : string |
+ * | --author.email |  | Author Email | email : string |
+ * | --author.username |  | Author Username | username : string |
+ * | --link |  | File vendor Link | link : string |
+ *
  *
  * @category Basicis
  * @package  Basicis
@@ -30,6 +90,7 @@ class Console
     private $options = [
         "-c"  => "create",
         "-r"  => "remove",
+        "-l" => "list",
         "-n"  => "namespace",
         "--namespace"  => "namespace",
         "--name"  => "class",
@@ -43,6 +104,7 @@ class Console
         "--author.username"  => "author.username",
         "-p" => "namespace.path",
         "--path" => "namespace.path",
+        "--link" => "link",
     ];
 
     /**
@@ -71,7 +133,8 @@ class Console
                 "author.email",
                 "author.username",
                 "link",
-                "model"
+                "model",
+                "list"
             ],
             "namespace" => "App\Controllers",
             "path" => "src/controllers/"
@@ -90,7 +153,8 @@ class Console
                 "author.email",
                 "author.username",
                 "table",
-                "link"
+                "link",
+                "list"
             ],
             "namespace" => "App\Models",
             "path" => "src/models/"
@@ -108,7 +172,8 @@ class Console
                 "author.name",
                 "author.email",
                 "author.username",
-                "link"
+                "link",
+                "list"
             ],
             "namespace" => "App\Middlewares",
             "path" => "src/middlewares/"
@@ -137,6 +202,31 @@ class Console
         "bold_cyan" => "1;36",
         "white" => "1;37",
         "bold_gray" => "0;37",
+    ];
+
+    /**
+     * $bgColors variable
+     *
+     * @var array
+     */
+    private $bgColors = [
+        "black" => "0;40",
+        "dark_gray" => "1;40",
+        "red" => "0;41",
+        "bold_red" => "1;41",
+        "green" => "0;42",
+        "bold_green" => "1;42",
+        "brown" => "0;44",
+        "yellow" => "1;43",
+        "blue" => "0;44",
+        "bold_blue" => "1;44",
+        "purple" => "0;35",
+        "bold_purple" => "1;45",
+        "cyan" => "0;46",
+        "bold_cyan" => "1;46",
+        "white" => "1;47",
+        "bold_gray" => "0;47",
+        "none" => ""
     ];
 
     /**
@@ -308,7 +398,14 @@ class Console
     {
         $writed = 0;
         if (!file_exists($filename)) {
-            $stream = (new StreamFactory)->createStreamFromFile($filename);
+            $stream = null;
+            try {
+                $stream = (new StreamFactory)->createStreamFromFile($filename);
+            } catch (RuntimeException $e) {
+                mkdir(pathinfo($filename, PATHINFO_DIRNAME), 0775, true);
+                $stream = (new StreamFactory)->createStreamFromFile($filename);
+            }
+
             if ($stream->isWritable()) {
                 $writed = $stream->write($content);
             }
@@ -328,7 +425,13 @@ class Console
     private function removeFile(string $filename) : bool
     {
         if (file_exists($filename)) {
-            return unlink($filename);
+            $removed = unlink($filename);
+            $path = pathinfo($filename, PATHINFO_DIRNAME);
+            
+            if ($removed && count(glob($path."/*")) === 0) {
+                return $removed && rmdir($path);
+            }
+            return $removed;
         }
         return false;
     }
@@ -355,10 +458,28 @@ class Console
      *
      * @return string
      */
-    public function color(string $name, string $text) : string
+    private function color(string $name, string $text) : string
     {
         if (array_key_exists($name, $this->colors)) {
             return "\033[".$this->colors[$name]."m".$text."\033[0m";
+        }
+        return $text;
+    }
+
+    /**
+     * Function colors
+     * Colors the past text according to the specific colors in the first argument
+     *
+     * @param string $text
+     * @param string $color
+     * @param string $bgColor
+     *
+     * @return string
+     */
+    private function colors(string $text, string $color = "white", string $bgColor = "none") : string
+    {
+        if (array_key_exists($color, $this->colors) && array_key_exists($bgColor, $this->bgColors)) {
+            return "\033[".$this->colors[$color].";".$this->bgColors[$bgColor]."m".$text."\033[0m";
         }
         return $text;
     }
@@ -371,22 +492,43 @@ class Console
      */
     public function help()
     {
-        echo $this->color("purple", "\nBasicis - Maker\n\n");
-        echo $this->color("white", "Use Mode: \n");
-        echo $this->color("grey", "\n $ maker ".
-        $this->color("cyan", "<command>").
-        " [<classname> ".$this->color("bold_blue", "<option>")." <option-value> ... ]\n");
-        
-        echo $this->color("white", "\nCommands:\n");
+        echo "\n"
+        .$this->colors(
+            "Basicis - Maker",
+            "white",
+            "blue"
+        )
+        ."\n\n"
+        .$this->color("white", "Use Mode: ")
+        ."\n\n"
+        .$this->color("grey", " maker "
+        .$this->color("cyan", "<command>")
+        ."[".$this->color("bold_blue", "<option>")
+        ." <value>")." ...]"
+        ."\n\n"
+        .$this->color("white", "\nCommands:")."\n";
+
         foreach ($this->commands as $command) {
             echo " ".   $this->color("cyan", $command['name']). " : "
-            .$this->color("grey", ($command['description'] ?? ucfirst($command['name'])))."\n";
+            .$this->color("grey", ($command['description'] ?? ucfirst($command['name'])))
+            ."\n";
         }
 
-        echo $this->color("bold_blue", "\nOptions: \n");
+        echo "\n"
+        .$this->color("bold_blue", "Options: ")
+        ."\n";
+
         foreach ($this->options as $opKey => $option) {
             $option = ucwords(str_replace(".", " ", $option), " ");
-            echo " ". $this->color("bold_blue", $opKey). "  <value> : ". $this->color("grey", $option)."\n";
+            $line = " "
+            .$this->color("bold_blue", $opKey);
+
+            if ($opKey !== "-l") {
+                $line .= "  <value>";
+            }
+            $line .= " : ".$this->color("grey", $option)."\n";
+
+            echo $line;
         }
         echo "\n";
         return;
@@ -394,78 +536,27 @@ class Console
 
 
     /**
-     * Function controller
-     * List, create and remove controllers
+     * Function $data["fileType"]
+     * Exec List, create and remove by $data["fileType"]
+     *
      * @param string $action
      * @param array $data
      *
      * @return void
      */
-    public function controller(string $action = null, array $data = [])
+    public function exec(string $action = null, array $data = [])
     {
         switch ($action) {
             case 'create':
-                $this->create("Controller", $data);
+                $this->create($data);
                 break;
 
             case 'remove':
-                $this->remove("Controller", $data);
+                $this->remove($data);
                 break;
             
             default:
-                $this->list("Controllers", $data["path"]);
-                break;
-        }
-    }
-
-
-    /**
-     * Function model
-     * List, create and remove models
-     * @param string $action
-     * @param array $data
-     *
-     * @return void
-     */
-    public function model(string $action = null, array $data = [])
-    {
-        switch ($action) {
-            case 'create':
-                $this->create("Model", $data);
-                break;
-
-            case 'remove':
-                $this->remove("Model", $data);
-                break;
-            
-            default:
-                $this->list("Models", $data["path"]);
-                break;
-        }
-    }
-
-
-    /**
-     * Function middleware
-     * List, create and remove middlewares
-     * @param string $action
-     * @param array $data
-     *
-     * @return void
-     */
-    public function middleware(string $action = null, array $data = [])
-    {
-        switch ($action) {
-            case 'create':
-                $this->create("Middleware", $data);
-                break;
-
-            case 'remove':
-                $this->remove("Middleware", $data);
-                break;
-            
-            default:
-                $this->list("Middlewares", $data["path"]);
+                $this->list($data["fileType"] ?? "", $data["path"]);
                 break;
         }
     }
@@ -481,30 +572,45 @@ class Console
      */
     public function list(string $fileType, string $path)
     {
-        echo $this->color("purple", "\nBasicis - $fileType \n\n");
+        echo "\n"
+        .$this->colors(
+            "Basicis - Maker | List all $fileType",
+            "white",
+            "blue"
+        )
+        ."\n\n";
+        
         $files = glob($path);
         if (count($files) > 0) {
             foreach (glob($path."*.php") as $file) {
-                echo $this->color("green", " ✔ ".str_replace(".php", "", basename($file))."\n");
+                echo $this->color("green", " ✔ ".str_replace(".php", "", basename($file)))
+                ."\n";
             }
             echo "\n";
             return;
         }
-        echo $this->color("red", " ⊘ $fileType Not found! \n\n");
+        echo $this->color("red", " ⊘ $fileType Not found!")."\n\n";
     }
 
 
     /**
      * Function create
      * Create files of a specified type
-     * @param string $fileType
+     *
      * @param array $data
      *
      * @return bool
      */
-    private function create(string $fileType, array $data = []) : bool
+    private function create(array $data = []) : bool
     {
-        echo $this->color("purple", "\nBasicis - Create $fileType \n\n");
+        echo "\n"
+        .$this->colors(
+            "Basicis - Maker | Create ".$data["fileType"],
+            "white",
+            "blue"
+        )
+        ."\n\n";
+
         $filename = sprintf(
             "%s%s.%s",
             $data["path"],
@@ -513,17 +619,35 @@ class Console
         );
         
         $content = $this->getTemplate(
-            strtolower($fileType),
+            strtolower($data["fileType"]),
             $data
         );
 
-        if ($this->createFile($filename, $content)) {
-            echo $this->color("green", " ✔ Created $fileType "
+        if (file_exists($filename)) {
+            echo $this->colors(
+                " ✔ File "
+                .str_replace(".php", "", basename($filename))." already exists!",
+                "white",
+                "red"
+            )
+            ."\n";
+            return false;
+        }
+
+        if ($this->createFile($filename, $content ?? "")) {
+            echo $this->color("green", " ✔ Created ".$data["fileType"]." "
             .str_replace(".php", "", basename($filename)))
             ." --> ".$filename."\n";
             return true;
         }
-        echo $this->color("red", " ⊘ Error on create $fileType ".str_replace(".php", "", basename($filename))." \n");
+
+        echo $this->color(
+            "red",
+            " ⊘ Error on create "
+            .$data["fileType"]." "
+            .str_replace(".php", "", basename($filename))
+            ." \n"
+        );
         return false;
     }
 
@@ -531,25 +655,89 @@ class Console
     /**
      * Function remove
      * Create files of a specified type
-     * @param string $fileType
+     *
      * @param array $data
      *
      * @return bool
      */
-    private function remove(string $fileType, array $data = []) : bool
+    private function remove(array $data = []) : bool
     {
-        echo $this->color("purple", "\nBasicis - Remove $fileType \n\n");
+        echo "\n"
+        .$this->colors(
+            "Basicis - Maker | Create ".$data["fileType"],
+            "white",
+            "blue"
+        )
+        ."\n\n";
+
         $filename = sprintf(
             "%s%s.%s",
             $data["path"],
             $data["class"],
             "php"
         );
-        if ($this->removeFile($filename)) {
-            echo $this->color("green", " ✔ Removed $fileType ".str_replace(".php", "", basename($filename))." \n");
-            return true;
+
+        if (!file_exists($filename)) {
+            echo $this->colors(
+                " ⊘ Error, file "
+                .str_replace(".php", "", basename($filename))." no exists!",
+                "white",
+                "red"
+            )
+            ."\n";
+            return false;
         }
-        echo $this->color("red", " ⊘ Error on Removing $fileType ".str_replace(".php", "", basename($filename))." \n");
+
+        $line = readline(
+            "Do you really want to remove the ".$data["fileType"]." "
+            .str_replace(".php", "", $this->color("blue", basename($filename)))."? ["
+            .$this->color("green", "yes")." or "
+            .$this->color("red", "no")."]: "
+        );
+
+        if (strtolower($line) === "yes" | str_starts_with(strtolower($line), "y")) {
+            if ($this->removeFile($filename)) {
+                echo $this->color(
+                    "green",
+                    " ✔ Removed file "
+                    .$data["fileType"]." "
+                    .str_replace(".php", "", basename($filename))
+                    ." \n"
+                );
+                return true;
+            }
+
+            echo $this->color(
+                "red",
+                " ⊘ Error on Removing "
+                .$data["fileType"]." "
+                .str_replace(".php", "", basename($filename))
+                ." \n"
+            );
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Function hasCommand
+     * Check if a command exists
+     *
+     * If except $name is equals "help", for this return only false
+     * @param string $name
+     *
+     * @return bool
+     */
+    private function hasCommand(string $name) : bool
+    {
+        foreach ($this->commands as $key => $command) {
+            $exists = ((isset($command["name"]) && ($command["name"] === $name)) |
+                        (isset($command["alias"]) && ($command["alias"] === $name)));
+            if ($exists && $name !== "help") {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -565,12 +753,12 @@ class Console
     public function run(array $argv = null)
     {
         $parse = $this->parse($argv ?? $this->args);
-        $method = $parse->method;
 
-        if (method_exists($this, $parse->method) && $parse->method !== "help") {
-            $method = $parse->method;
-            return $this->$method($parse->action, $parse->data);
+        if ($this->hasCommand($parse->method)) {
+            $parse->data["fileType"] = ucfirst($parse->method);
+            return $this->exec($parse->action, $parse->data);
         }
-        $this->help();
+
+        return $this->help();
     }
 }
