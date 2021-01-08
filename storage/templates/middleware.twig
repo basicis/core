@@ -26,6 +26,6 @@ class {{class}} extends RequestHandler
          * All persoal middleware code implementation
          *
          */
-        return ResponseFactory::create(200);
+        return $this->app->getResponse();
     }
 }
