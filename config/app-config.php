@@ -83,6 +83,7 @@ $app->setBeforeMiddlewares([
 // Route middlweares
 $app->setRouteMiddlewares([
   //only here, key is required
+  "development" => "App\\Middlewares\\Development",
   "guest" => "App\\Middlewares\\Guest",
   "auth" => "App\\Middlewares\\Auth",
   "example" => "App\\Middlewares\\Example",
