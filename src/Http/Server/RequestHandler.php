@@ -25,7 +25,7 @@ class RequestHandler implements RequestHandlerInterface
      *
      * @var App
      */
-    private $app;
+    protected $app;
 
     /**
      * Function __construct

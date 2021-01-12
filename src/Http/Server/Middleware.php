@@ -37,7 +37,7 @@ class Middleware extends RequestHandler implements MiddlewareInterface
      *
      * @var App
      */
-    private $app;
+    protected $app;
 
     /**
      * Function __construct
