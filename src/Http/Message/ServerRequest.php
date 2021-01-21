@@ -94,7 +94,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param string $method
      * @param array  $serverParams
      */
-    public function __construct($uri = "/", string $method = 'GET', array $serverParams = [])
+    public function __construct($uri = "/", string $method = 'GET')
     {
         parent::__construct($uri, $method);
     }
@@ -383,6 +383,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
 
+
     /**
      * Function withAttribute
      * Return an instance with the specified derived request attribute.
@@ -401,6 +402,28 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function withAttribute($name, $value) : ServerRequest
     {
         $this->attributes[$name] = $value;
+        return $this;
+    }
+
+    /**
+     * Function withAttributes
+     * Return an instance with the specified derived request attribute.
+     *
+     * This method allows setting a single derived request attribute as
+     * described in getAttributes().
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated attribute.
+     *
+     * @see    getAttributes()
+     * @param  array $attributes  The attribute name.
+     * @return static
+     */
+    public function withAttributes(array $attributes) : ServerRequest
+    {
+        foreach ($attributes as $name => $value) {
+            $this->withAttribute($name, $value);
+        }
         return $this;
     }
 

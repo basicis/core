@@ -263,7 +263,8 @@ class BasicisTest extends TestCase
         $this->app->setRequest($this->app->request()->withHeader("authorization", "Bearer ".$tokenString));
         
         //Exec tests assertions
-        $this->assertInstanceOf(Auth::class, $this->app->auth());
+        $this->assertEquals(null, $this->app->auth());
+        $this->assertInstanceOf(Auth::class, $this->app->auth("Basicis\Auth\Auth"));
         $this->assertEquals(true, $user->delete()); //delete test user
         $this->assertEquals(null, Auth::all()); //check if all is removed
     }

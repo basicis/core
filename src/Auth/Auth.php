@@ -34,8 +34,15 @@ class Auth extends Model implements AuthInterface
     ];
 
     /**
+     * $protecteds variable
+     * Protecteds propreties
+     * @var array
+     */
+    protected $protecteds = ["pass"];
+
+    /**
      * $username variable
-     * @ORM\Column(name="username", length=300, unique=true)
+     * @ORM\Column(name="username", length=300, unique=true, nullable=true)
      * @var string
      */
     protected $username;
@@ -61,14 +68,6 @@ class Auth extends Model implements AuthInterface
      * @var int
      */
     protected $role;
-
-
-    /**
-     * $protecteds variable
-     *
-     * @var array
-     */
-    protected $protecteds = ["pass"];
 
 
     /**
@@ -105,6 +104,23 @@ class Auth extends Model implements AuthInterface
     }
 
 
+    /**
+     * Function setEmail
+     * Set Auth email
+     * @param string $email
+     * @return Auth
+     */
+    public function setEmail(string $email) : Auth
+    {
+        if (Validator::validate($email, "email")) {
+            $this->email = $email;
+
+            if ($this->getUsername() === null) {
+                $this->setUsername($email);
+            }
+        }
+        return $this;
+    }
 
     /**
      * Function getEmail
@@ -116,23 +132,6 @@ class Auth extends Model implements AuthInterface
         return $this->email;
     }
 
-
-    /**
-     * Function setEmail
-     * Set Auth email
-     * @param string $email
-     * @return Auth
-     */
-    public function setEmail(string $email) : Auth
-    {
-        if (Validator::validate($email, "email")) {
-            $this->email = $email;
-            if ($this->getUsername() === null) {
-                $this->setUsername($email);
-            }
-        }
-        return $this;
-    }
 
 
     /**

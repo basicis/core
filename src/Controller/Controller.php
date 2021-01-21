@@ -44,26 +44,22 @@ abstract class Controller implements ControllerInterface
     public function create(App $app, object $args = null) : ResponseInterface
     {
         $class = $this->getModelByAnnotation();
-        if ($class !== null && get_parent_class($class) === "Basicis\Model\Model") {
+        if ($class !== null) {
             $uniqueColumns = self::extractUniqueColumns($class, (array) $args);
-            if ($class::exists($uniqueColumns)) {
+            if (count($uniqueColumns) >= 1 && $class::exists($uniqueColumns)) {
                 return $app->json(null, 406);
             }
 
-            $classObj = new  $class((array) $args);
-            if ($classObj instanceof $class) {
-                try {
-                    $classObj->save();
-                    if ($class::exists($uniqueColumns)) {
-                        return $app->json($classObj->__toArray(), 201);
-                    }
-                } catch (\Exception $e) {
-                    return $app->json(null, 500);
+            $model = new $class((array) $args);
+            if ($model instanceof $class) {
+                $model->save();
+                if ($class::exists(["id" => $model->getId()])) {
+                    return $app->json($model->__toArray(), 201);
                 }
             }
             return $app->json(null, 400);
         }
-        return $app->json(null, 500);
+        return $app->json("Annotation @Model <class> no is defined.", 500);
     }
 
 
@@ -76,24 +72,32 @@ abstract class Controller implements ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function update(App $app, Model $model = null, object $args = null) : ResponseInterface
+    public function update(App $app, object $args = null) : ResponseInterface
     {
-        try {
-            if ($model instanceof Model) {
-                $class = get_class($model);
-                foreach ((array) $args as $name => $value) {
-                    $method = "set".ucfirst($name);
-                    if (method_exists($model, $method)) {
-                        $model->$method($value);
-                    }
+        $class = $this->getModelByAnnotation();
+        if ($class !== null && isset($args->id)) {
+            try {
+                if (!$class::exists(["id" => $args->id])) {
+                    return $app->json(null, 404);
                 }
-                $model->save();
-                return $app->json($model->__toArray(), 202);
+
+                $model = $class::findOneBy(["id" => $args->id]);
+                if ($model instanceof $class) {
+                    foreach ((array) $args as $name => $value) {
+                        $method = "set".ucfirst($name);
+                        if (method_exists($model, $method)) {
+                            $model->$method($value);
+                        }
+                    }
+                    $model->save();
+                    return $app->json($model->__toArray(), 202);
+                }
+                return $app->json(null, 400);
+            } catch (\Exception $e) {
+                return $app->json(null, 500);
             }
-            return $app->json(null, 404);
-        } catch (\Exception $e) {
-            return $app->json(null, 406);
         }
+        return $app->json("Annotation @Model or argument 'id' no is defined.", 500);
     }
 
 
@@ -106,17 +110,28 @@ abstract class Controller implements ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function delete(App $app, Model $model = null, object $args = null) : ResponseInterface
+    public function delete(App $app, object $args = null) : ResponseInterface
     {
-        $statusCode = 404;
-        if ($model !== null && $model instanceof Model) {
-            try {
-                $statusCode = $model->delete() ? 200 : 400;
-            } catch (\Exception $e) {
-                $statusCode = 500;
+        $class = $this->getModelByAnnotation();
+        if ($class !== null && isset($args->id)) {
+            $uniqueColumns = self::extractUniqueColumns($class, (array) $args);
+            if (!$class::exists($uniqueColumns)) {
+                return $app->json(null, 404);
             }
+
+            $model = $class::findOneBy($uniqueColumns);
+            $statusCode = 400;
+
+            if ($model !== null && $model instanceof Model) {
+                try {
+                    $statusCode = $model->delete() ? 200 : 400;
+                } catch (\Exception $e) {
+                    $statusCode = 500;
+                }
+            }
+            return $app->json(null, $statusCode);
         }
-        return $app->json(null, $statusCode);
+        return $app->json("Annotation @Model or argument 'id' no is defined.", 500);
     }
 
 
@@ -129,10 +144,15 @@ abstract class Controller implements ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function find(App $app, Model $model = null, object $args = null) : ResponseInterface
+    public function find(App $app, object $args = null) : ResponseInterface
     {
-        if ($model instanceof Model) {
-            return $app->json($model->__toArray(), 200);
+        $class = $this->getModelByAnnotation();
+        $model = null;
+        if ($class !== null && class_exists($class)) {
+            $model = $class::findOneBy((array) $args);
+            if ($model instanceof $class) {
+                return $app->json($model->__toArray(), 200);
+            }
         }
         return $app->json()->withStatus(404);
     }
@@ -146,10 +166,15 @@ abstract class Controller implements ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function all(App $app, Models $models = null) : ResponseInterface
+    public function all(App $app, object $args = null) : ResponseInterface
     {
-        if ($models !== null) {
-            return $app->json($models->getArray(), 200);
+        $class = $this->getModelByAnnotation();
+        $models = null;
+        if ($class !== null && class_exists($class)) {
+            $models = new Models($class);
+            if ($models !== null && $models->getArray() !== null) {
+                return $app->json($models->getArray(), 200);
+            }
         }
         return $app->getResponse()->withStatus(404);
     }
@@ -186,8 +211,10 @@ abstract class Controller implements ControllerInterface
         $argsForFind = [];
         $props = (new Annotations($class))->getClass()->getProperties();
         foreach ($props as $key => $pro) {
-            $propAnn = $class::getPropertyAnnotation($pro->getName(), "Column");
-            if ($propAnn !== null && array_key_exists("unique", $propAnn) && $propAnn["unique"] === "true") {
+            $annotationProp = $class::getPropertyAnnotation($pro->getName(), "Column");
+            if ($annotationProp !== null &&
+                array_key_exists("unique", $annotationProp) &&
+                $annotationProp["unique"] === "true") {
                 if (isset($args[$pro->getName()])) {
                     $argsForFind[$pro->getName()] = $args[$pro->getName()];
                 }

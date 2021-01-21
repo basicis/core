@@ -45,7 +45,7 @@ interface ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function update(App $app, Model $model = null, object $args = null) : ResponseInterface;
+    public function update(App $app, object $args = null) : ResponseInterface;
 
     /**
      * Function delete
@@ -56,7 +56,7 @@ interface ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function delete(App $app, Model $model = null, object $args = null) : ResponseInterface;
+    public function delete(App $app, object $args = null) : ResponseInterface;
 
     /**
      * Function find
@@ -67,7 +67,7 @@ interface ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function find(App $app, Model $model = null, object $args = null) : ResponseInterface;
+    public function find(App $app, object $args = null) : ResponseInterface;
 
     /**
      * Function all
@@ -77,5 +77,5 @@ interface ControllerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function all(App $app, Models $models = null) : ResponseInterface;
+    public function all(App $app, object $args = null) : ResponseInterface;
 }

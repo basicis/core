@@ -191,13 +191,8 @@ class Basicis extends RequestHandler
         if ($this->enableCache && $this->cache->hasItem("controllers")) {
             $this->setControllers($this->cache->getItem("controllers")->get());
         }
-        
-        $this->setMode($options['mode'] ?? "dev");
-        $this->setTimezone($options['timezone'] ?? null);
-        $this->setAppKey($options['appKey'] ?? null);
-        $this->setAppDescription($options['appDescription'] ?? null);
 
-        $this->setRequest($request);
+        $this->setRequest($request->withAttributes($options));
         $this->response = (ResponseFactory::create())->withHeader(
             "X-Powered-By",
             $options['appDescription'] ?? $this->getAppDescription()
@@ -656,11 +651,16 @@ class Basicis extends RequestHandler
      * Function getAppDescription
      * Getting App description string
      *
+     * @param string $descriptionDefault
+     *
      * @return String
      */
-    public function getAppDescription() : String
+    public function getAppDescription(string $descriptionDefault = null) : String
     {
-        return $this->appDescription;
+        return $this->getRequest()->getAttribute(
+            "appDescription",
+            $descriptionDefault ?? "A Application Basicis Framework!"
+        );
     }
 
 
@@ -675,20 +675,15 @@ class Basicis extends RequestHandler
      */
     public function setMode(string $mode = "dev") : Basicis
     {
-        $displayErrors = 1;
-        $appEnv = "APP_ENV=dev";
-        $errorReporting = E_ALL;
-
         if (in_array($mode, ["production", "prod"])) {
-            $appEnv = "APP_ENV=production";
-            $displayErrors = 0;
             $mode = "production";
+        } else {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            $mode = "dev";
         }
 
-        error_reporting($errorReporting);
-        ini_set('display_errors', $displayErrors);
-        putenv($appEnv);
-        $this->mode = in_array($mode, ["production", "prod"]) ?  "production" : "dev";
+        $this->request()->withAttribute("mode", $mode);
         return $this;
     }
 
@@ -702,7 +697,7 @@ class Basicis extends RequestHandler
      */
     public function getMode() : String
     {
-        return $this->mode;
+        return $this->getRequest()->getAttribute("mode", "dev");
     }
 
 
@@ -714,7 +709,7 @@ class Basicis extends RequestHandler
      */
     public function getAppKey() : String
     {
-        return $this->appKey;
+        return $this->getRequest()->getAttribute("appKey", "default-appkey");
     }
 
 
@@ -728,14 +723,12 @@ class Basicis extends RequestHandler
     public function setAppKey(string $appKey = null) : Basicis
     {
         if ($appKey === null) {
-            $hash = "";
             if (file_exists(self::path()."composer.lock")) {
                 $hash = ((array) json_decode(self::input(self::path()."composer.lock")))["content-hash"];
-                $this->appKey = "default-appkey". $hash;
+                $appKey =  $this->getRequest()->getAttribute("appKey") . $hash;
             }
-            return $this;
         }
-        $this->appKey = $appKey;
+        $this->getRequest()->withAttribute("appKey", $appKey);
         return $this;
     }
 
@@ -751,10 +744,10 @@ class Basicis extends RequestHandler
      */
     public function enableCache(bool $enable = true, string $cacheFile = null)  : Basicis
     {
-        $this->enableCache = $enable;
         if ($enable) {
             $this->cache = new CacheItemPool($cacheFile);
         }
+        $this->getRequest()->withAttribute("enableCache", $this->enableCache = $enable);
         return $this;
     }
 
@@ -770,6 +763,7 @@ class Basicis extends RequestHandler
     {
         $this->timezone = isset($timezone) ? $timezone : date_default_timezone_get();
         date_default_timezone_set($this->timezone);
+        $this->getRequest()->withAttribute("timezone", $timezone);
         return $this;
     }
 
@@ -779,9 +773,9 @@ class Basicis extends RequestHandler
      *
      * @return String
      */
-    public function getTimezone() : String
+    public function getTimezone(string $default = null) : String
     {
-        return $this->timezone;
+        return  $this->getRequest()->getAttribute("timezone", $default ?? "America/Recife");
     }
 
 
@@ -789,11 +783,11 @@ class Basicis extends RequestHandler
      * Function getRequest
      * Get current server request of app
      *
-     * @return ServerRequestInterface
+     * @return ServerRequestInterface|null
      */
-    public function getRequest() : ServerRequestInterface
+    public function getRequest() : ?ServerRequestInterface
     {
-        return $this->request;
+        return $this->request ?? ServerRequestFactory::create("GET", "/");
     }
 
     
@@ -923,7 +917,6 @@ class Basicis extends RequestHandler
         if ($code !== null) {
             return $this->setResponse($code, $reasonPhrase)->getResponse();
         }
-
         return $this->getResponse();
     }
 
@@ -1030,7 +1023,7 @@ class Basicis extends RequestHandler
         if ($this->route instanceof Route) {
             //Route middlewares run
             $this->handleRouteMiddlewares($this->route->getMiddlewares());
-                
+
             //Routing and handle Request
             if ($this->response->getStatusCode() >= 200 && $this->response->getStatusCode() <= 206) {
                 //Handles Controller or Closure function
@@ -1050,10 +1043,23 @@ class Basicis extends RequestHandler
      * @param string $authClass
      * @return Auth|null
      */
-    public function auth(string $authClass = "Basicis\Auth\Auth") : ?Auth
+    public function auth(string $authClass = null) : ?Auth
     {
-        if (count($this->request()->getHeader('authorization')) >= 1 && new $authClass instanceof AuthInterface) {
-            return $authClass::getUser($this->request()->getHeader('authorization')[0], $this->getAppKey());
+        if ($authClass === null) {
+            $authClass = "";
+        }
+
+        if (class_exists($authClass)) {
+            $intefaces = class_implements($authClass);
+
+            if (count($this->request()->getHeader('authorization')) >= 1 &&
+                in_array("Basicis\Auth\AuthInterface", $intefaces) &&
+                in_array("Basicis\Model\ModelInterface", $intefaces)) {
+                return $authClass::getUser(
+                    $this->request()->getHeader('authorization')[0],
+                    $this->getAppKey()
+                );
+            }
         }
         return null;
     }
@@ -1339,7 +1345,7 @@ class Basicis extends RequestHandler
             $controller = explode("@", $callback)[0];
             $method = explode("@", $callback)[1] ?? 'index';
             $args = (object) $args;
-
+    
             try {
                 $controllerObj = $this->getController($controller);
                 $result = null;
@@ -1362,13 +1368,21 @@ class Basicis extends RequestHandler
                             $arguments[$key] = $this;
                         }
 
-                        if ((class_exists($class) && get_parent_class($class) === "Basicis\Model\Model") && $key >= 1) {
-                            if (isset($args->id) && $type === "Basicis\Model\Model") {
-                                $arguments[$key] = $class::findOneBy(["id" => $args->id]);
-                            }
+                        try {
+                            if (Models::isModel($class) && $key >= 1) {
+                                if (isset($args->id) && $type === "Basicis\Model\Model") {
+                                    $arguments[$key] = $class::findOneBy(["id" => $args->id]);
+                                }
 
-                            if ($type === "Basicis\Model\Models") {
-                                $arguments[$key] = new Models($class, (array) $args);
+                                if ($type === "Basicis\Model\Models") {
+                                    $arguments[$key] = new Models($class, (array) $args);
+                                }
+                            }
+                        } catch (InvalidArgumentException $e) {
+                            if ($key >= 1 &&
+                                $type === "Basicis\Model\Model" |
+                                $type === "Basicis\Model\Models") {
+                                $arguments[$key] = null;
                             }
                         }
                     }
@@ -1591,7 +1605,7 @@ class Basicis extends RequestHandler
         $this->setRequest(ServerRequestFactory::create($method, $url))
             ->getRequest()->withParsedBody($data ?? []);
 
-        return $this->handleRouterEngining()->getResponse()->withStatus(307);
+        return $this->runAndResponse()->withStatus(307);
     }
 
     /**
@@ -1631,7 +1645,6 @@ class Basicis extends RequestHandler
     public function run() : int
     {
         //Run app pipe line and return a instance of ResponseInterface
-        $response = $this->runAndResponse();
-        return self::output($this->request, $response, $this->getResourceOutput());
+        return self::output($this->request, $this->runAndResponse(), $this->getResourceOutput());
     }
 }
