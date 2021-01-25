@@ -56,4 +56,49 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
     {
         return (new ServerRequestFactory())->createServerRequest($method, $uri, $serverParams);
     }
+
+
+    public function createFromGlobals(array $globals = [], array $serverParams = []) : ServerRequestInterface
+    {
+        $options = [
+            "server" => [
+                "REQUEST_METHOD" => "GET",
+                "SERVER_PROTOCOL" => "http",
+                "HTTP_HOST" => "0.0.0.0",
+                "REQUEST_URI" => "/",
+                "SERVER_PORT" => null
+            ],
+            "files" => [],
+            "cookie" => [],
+            "env" => []
+        ];
+
+        foreach ($globals as $global => $value) {
+            if (key_exists($global, $options)) {
+                $options[$global] = array_merge($options[$global], $value);
+            }
+        }
+        
+        //Creating ServerRequest and Uri into this
+        return self::create(
+            $options["server"]["REQUEST_METHOD"],
+            (new Uri())
+            ->withScheme(explode("/", $options["server"]["SERVER_PROTOCOL"])[0] ?? "http")
+            ->withHost($options["server"]["HTTP_HOST"] ?? "localhost")
+            ->withPort($options["server"]["SERVER_PORT"] ?? null)
+            ->withPath($options["server"]["REQUEST_URI"]),
+            $serverParams
+        )
+        ->withHeaders(getallheaders())
+        ->withUploadedFiles($options["files"])
+        ->withCookieParams($_COOKIE);
+    }
+
+
+    public function filterSeverParams(array $serverParams = []) : array
+    {
+        foreach ($serverParams as $key => $param) {
+            var_dump($param, $key);
+        }
+    }
 }

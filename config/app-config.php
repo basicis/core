@@ -44,11 +44,18 @@ $app = App::createApp(
     ->withCookieParams($_COOKIE),
     //Setting app optionals flags
     [
-      "appDescription" => $_ENV['APP_DESCRIPTION'],
+      "description" => $_ENV['APP_DESCRIPTION'],
       "mode" => $_ENV['APP_ENV'],
       "timezone" => $_ENV["APP_TIMEZONE"],
-      "appKey" => $_ENV['APP_KEY'],
-      "enableCache" => true, //defalut false
+      "key" => $_ENV['APP_KEY'],
+      "cache" => true, //defalut false
+      /*
+      "token" => [
+        "iss" => "",
+        "expiration" => "+30 minutes",
+        "nobefore" => "now",
+      ]
+      */
     ]
 );
 

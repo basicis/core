@@ -172,7 +172,6 @@ class Request extends Message implements RequestInterface
         if (!in_array(strtoupper($method), self::VALID_METHODS)) {
             throw new InvalidArgumentException("Invalid or unsupported Method.");
         }
-        
         $this->method = strtoupper($method);
         return $this;
     }

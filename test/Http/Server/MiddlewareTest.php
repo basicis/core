@@ -5,8 +5,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Basicis\Http\Server\Middleware;
 use Basicis\Http\Server\ExampleMiddleware;
-use Basicis\Http\Server\RequestHandler;
-use Basicis\Basicis as App;
+use Basicis\Http\Message\ServerRequestFactory;
+use Basicis\Http\Message\ResponseFactory;
 
 /**
  * ClassTest\Http\Server\MiddlewareTest
@@ -15,16 +15,9 @@ use Basicis\Basicis as App;
 class MiddlewareTest extends TestCase
 {
     /**
-     * $app variable
-     *
-     * @var App
-     */
-    private $app;
-
-    /**
      * $middleware variable
      *
-     * @var Middleware
+     * @var ExampleMiddleware
      */
     private $middleware;
 
@@ -34,8 +27,7 @@ class MiddlewareTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-        $this->app = App::createApp();
-        $this->middleware = new Middleware($this->app, ["Basicis\Http\Server\ExampleMiddleware"]);
+        $this->middleware = new ExampleMiddleware();
     }
 
     /**
@@ -48,15 +40,6 @@ class MiddlewareTest extends TestCase
         $this->assertInstanceOf(Middleware::class, $this->middleware);
     }
 
-    /**
-     * Function testHandler
-     *
-     * @return void
-     */
-    public function testHandler()
-    {
-        $this->assertInstanceOf(ResponseInterface::class, $this->middleware->handle($this->app->getRequest()));
-    }
 
     /**
      * Function testProcess
@@ -65,19 +48,13 @@ class MiddlewareTest extends TestCase
      */
     public function testProcess()
     {
+        //Basicis\Http\Server\ExampleMiddleware
         $this->assertInstanceOf(
             ResponseInterface::class,
-            $this->middleware->process($this->app->getRequest(), new RequestHandler($this->app))
+            $this->middleware->process(
+                ServerRequestFactory::create("get", "/"),
+                ResponseFactory::create()
+            )
         );
-    }
-
-    /**
-     * Function testRun
-     *
-     * @return void
-     */
-    public function testRun()
-    {
-        $this->assertInstanceOf(ResponseInterface::class, $this->middleware->run());
     }
 }

@@ -1,8 +1,9 @@
 <?php
 namespace Basicis\Controller;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Basicis\Controller\ControllerInterface;
+use Basicis\Http\Server\RequestHandler;
 use Basicis\Model\Model;
 use Basicis\Model\Models;
 use Basicis\Core\Annotations;
@@ -17,8 +18,46 @@ use Basicis\Basicis as App;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Controller/Controller.php
  */
-abstract class Controller implements ControllerInterface
+abstract class Controller extends RequestHandler implements ControllerInterface
 {
+    /**
+     * Function __invoke
+     * Default method
+     *
+     * @param ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param callable $next
+     * @param object|array|null $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ) : ResponseInterface {
+        return $this->handle($request, $response, $next, $args);
+    }
+
+    /**
+     * Function handle
+     * Default method
+     *
+     * @param ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param callable $next
+     * @param object|array|null $args
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function handle(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ) : ResponseInterface {
+        //
+    }
+
     /**
      * Function index
      * Default method

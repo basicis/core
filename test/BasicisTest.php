@@ -118,9 +118,9 @@ class BasicisTest extends TestCase
         );
 
         $middlewares = $this->app->getMiddlewares();
-        $this->assertEquals(["Basicis\Http\Server\ExampleMiddleware"], $middlewares["before"]);
-        $this->assertEquals(["Basicis\Http\Server\ExampleMiddleware"], $middlewares["after"]);
-        $this->assertEquals(["example" => "Basicis\Http\Server\ExampleMiddleware"], $middlewares["route"]);
+        $this->assertEquals([new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["before"]);
+        $this->assertEquals([new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["after"]);
+        $this->assertEquals([new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["route"]);
     }
 
     /**
@@ -179,7 +179,6 @@ class BasicisTest extends TestCase
             "port" => "8080",
             "path" => "/my-path2",
             "headers" => ["test" => "Ok!"]
-            
         ]);
         $this->assertEquals(
             "http://localhost:8080/my-path2",
@@ -246,10 +245,10 @@ class BasicisTest extends TestCase
     public function testAuth()
     {
         //Setup Test, setting appKey
-        $this->app->setAppKey("test-app-key-here");
+        $this->app->setKey("test-app-key-here");
 
         //Creating a instanceof Token and a instanceof Auth (user)
-        $tokenObj = new Token($this->app->getAppKey(), "Test Iss", "+10 minutes", "now");
+        $tokenObj = new Token($this->app->getKey(), "Test Iss", "+10 minutes", "now");
         $user = new Auth();
 
         //Setting Auth (user) params
@@ -277,6 +276,9 @@ class BasicisTest extends TestCase
      */
     public function testRunAndResponse()
     {
-        $this->assertInstanceOf(ResponseInterface::class, $this->app->runAndResponse());
+        $this->assertInstanceOf(ResponseInterface::class, $this->app->__invoke(
+            $this->app->getRequest(),
+            $this->app->getResponse()
+        ));
     }
 }

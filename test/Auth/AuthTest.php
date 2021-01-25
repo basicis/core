@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Basicis\Basicis as App;
 use Basicis\Auth\Token;
 use Basicis\Auth\Auth;
+use Basicis\Http\Message\ServerRequestFactory;
 
 /**
  * Class AuthTest
@@ -134,7 +135,11 @@ class AuthTest extends TestCase
                     ->setPass("okboss0987")
                     ->save();
         $token = (new Token($this->appKey, "Basics Core | Test"))->create($this->auth);
-        $user = Auth::getUser($token, $this->appKey);
+        $request = ServerRequestFactory::create("get", "/");
+        $request->withHeader("authorization", "Bearer ". $token)
+                ->withAttribute("appKey", $this->appKey);
+
+        $user = Auth::getUser($request);
         $this->assertEquals("antony_boss@test.com", $user->getEmail());
         $user->delete();
         $this->assertEquals(null, Auth::all());

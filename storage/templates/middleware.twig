@@ -1,10 +1,11 @@
 <?php
 namespace {{namespace}};
 
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Basicis\Http\Message\ResponseFactory;
-use Basicis\Http\Server\RequestHandler;
+use Basicis\Http\Server\Middleware;
 
 /**
  * {{class}} Class
@@ -16,16 +17,48 @@ use Basicis\Http\Server\RequestHandler;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/{{author.username}}/<repository>/blob/<default-branch>/{{path}}{{class}}.php
  */
-class {{class}} extends RequestHandler 
-{
-    public function handle(ServerRequestInterface $request): ResponseInterface
+class {{class}} extends Middleware 
+{   
+    /**
+     * Function process
+     * Process an incoming server request.
+     *
+     * Processes an incoming server request in order to produce a response.
+     * If unable to produce the response itself, it may delegate to the provided
+     * request $next handler to do so.
+     *
+     * ```php
+     *  //Perform here all persoal code implementation and return $next
+     *  retrun $next($request);
+     * ```
+     *
+     * ```php
+     *    //Or receive um ResponseInterface from $next and procces you ResponseInterface
+     *    $response = $next($request);
+     *    ...
+     *    retrun $response;
+     * ```
+     *
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $next
+     *
+     * @return ResponseInterface
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         /**
          *
-         * Proccess here
-         * All persoal middleware code implementation
+         * Process here all persoal middleware code implementation and return $next
+         * ...
+         * retrun $next($request);
          *
+         * Or receive um ResponseInterface from $next and procces you ResponseInterface
+         *
+         * $response = $next($request);
+         * ...
+         * retrun $response;
          */
-        return $this->app->getResponse();
+
+        retrun $next($request);
     }
 }

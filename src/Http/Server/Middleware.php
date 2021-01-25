@@ -1,11 +1,8 @@
 <?php
 namespace Basicis\Http\Server;
 
-use Basicis\Basicis as App;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Basicis\Http\Message\ResponseFactory;
 
 /**
@@ -22,46 +19,30 @@ use Basicis\Http\Message\ResponseFactory;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Http/Server/Middleware.php
  */
-class Middleware extends RequestHandler implements MiddlewareInterface
+abstract class Middleware implements MiddlewareInterface
 {
-    
     /**
-     * $handlers
+     * Function process
+     * Process an incoming server request a alias to process method
      *
-     * @var array|RequestHandler[]
-     */
-    private $handlers;
-
-    /**
-     * $app variable
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param MiddlewareInterface|null $next
      *
-     * @var App
+     * @return ResponseInterface
      */
-    protected $app;
-
-    /**
-     * Function __construct
-     */
-    public function __construct(App &$app, $handlers = null)
-    {
-        $this->app = $app;
-        if (is_string($handlers)) {
-            $this->handlers = $app->getMiddlewares($handlers);
-        }
-
-        if (is_array($handlers)) {
-            $this->handlers = $handlers;
-        }
-    }
-
-    /**
-     * Function run
-     * Run process han$handlers pool
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function run() : ResponseInterface
-    {
-        return $this->handle($this->app->getRequest());
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface {
+        return $this->process(
+            $request,
+            $response,
+            $next ?? function ($req, $res) {
+                return $res;
+            }
+        );
     }
 
     /**
@@ -70,30 +51,50 @@ class Middleware extends RequestHandler implements MiddlewareInterface
      *
      * Processes an incoming server request in order to produce a response.
      * If unable to produce the response itself, it may delegate to the provided
-     * request handler to do so.
+     * request $next handler to do so.
+     *
+     * ```php
+     *  //Perform here all persoal code implementation and return $next
+     *  retrun $next($request);
+     * ```
+     *
+     * ```php
+     *    //Or receive um ResponseInterface from $next and procces you ResponseInterface
+     *    $response = $next($request);
+     *    ...
+     *    retrun $response;
+     * ```
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable|null $next
+     *
+     * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
-        return $handler->handle($request);
-    }
+    abstract public function process(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface;
 
     /**
-    * Function handle
-    * Handles a request and produces a response.
-    * May call other collaborating code to generate the response.
-    *
-    * @param \Psr\Http\Message\ServerRequestInterface $request
-    * @return \Psr\Http\Message\ResponseInterface
-    */
-    public function handle(ServerRequestInterface $request) : ResponseInterface
+     * Funtion setPipeLine
+     * Handle all middlewares
+     *
+     * @param array $middlewares
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $next
+     *
+     * @return PipeLine
+     */
+    public static function pipeLine(array $middlewares) : PipeLine
     {
-        $response = $this->app->getResponse();
-        foreach ($this->handlers as $next) {
-            if ($response->getStatusCode() >= 200 && $response->getStatusCode() <= 206) {
-                $response = $this->process($request, new $next($this->app));
-            }
+        //Handle all middlewares
+        $pipeLine = new PipeLine();
+        foreach ($middlewares as $middleware) {
+            $pipeLine->add($middleware);
         }
-        return $this->app->getResponse()
-        ->withStatus($response->getStatusCode(), $response->getReasonPhrase());
+        return $pipeLine;
     }
 }

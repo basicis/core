@@ -1,6 +1,7 @@
 <?php
 namespace Basicis\Auth;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Basicis\Model\Model;
 use Basicis\Core\Validator;
@@ -236,19 +237,22 @@ class Auth extends Model implements AuthInterface
 
     /**
      * Function getUser
-     * Get a Auth User by token and appKey
-     * @param string $token
+     * Get a Auth User by ServerRequestInterface
+     * @param ServerRequestInterface $request
      * @return Auth|null
      */
-    public static function getUser(string $token, string $appKey) : ?Auth
+    public static function getUser(ServerRequestInterface $request) : ?Auth
     {
-        $tokenObj = new Token($appKey);
-        if ($tokenObj->check($token)) {
-            $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
-            if ($user === null) {
-                $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+        if (isset($request->getHeader('authorization')[0])) {
+            $token = $request->getHeader('authorization')[0];
+            $tokenObj = new Token($request->getAttribute("appKey"));
+            if ($tokenObj->check($token)) {
+                $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
+                if ($user === null) {
+                    $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+                }
+                return $user;
             }
-            return $user;
         }
         return null;
     }

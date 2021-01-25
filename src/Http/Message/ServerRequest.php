@@ -4,6 +4,8 @@ namespace Basicis\Http\Message;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Basicis\Exceptions\InvalidArgumentException;
+use Basicis\Router\Route;
+use Basicis\Router\Router;
 
 /**
  * Representation of an incoming, server-side HTTP request.
@@ -94,7 +96,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @param string $method
      * @param array  $serverParams
      */
-    public function __construct($uri = "/", string $method = 'GET')
+    public function __construct($uri = "/", string $method = 'GET', array $serverParams = [])
     {
         parent::__construct($uri, $method);
     }
@@ -112,6 +114,7 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function getServerParams() : array
     {
         return  [
+            "uri" => $this->getUri(),
             "host" => $this->getUri()->getHost(),
             "port" => $this->getUri()->getPort(),
             "method" => $this->getMethod(),
@@ -119,6 +122,7 @@ class ServerRequest extends Request implements ServerRequestInterface
             "path" => $this->getUri()->getPath(),
             "query" => $this->getQueryParamsByUri(),
             "files" => $this->getUploadedFiles(),
+            "body" => $this->getParsedBody()
         ];
     }
 
@@ -437,7 +441,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that removes
      * the attribute.
      *
-     * @see    getAttributes()
+     * @see    getAttributes()`
      * @param  string $name The attribute name.
      * @return static
      */

@@ -3,7 +3,6 @@ namespace Basicis\Http\Server;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Basicis\Basicis as App;
 
 /**
@@ -18,35 +17,45 @@ use Basicis\Basicis as App;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Http/Server/Middleware.php
  */
-class RequestHandler implements RequestHandlerInterface
+abstract class RequestHandler implements RequestHandlerInterface
 {
-    /**
-     * $app variable
-     *
-     * @var App
-     */
-    protected $app;
-
-    /**
-     * Function __construct
-     * Receives a instance of Basicis\Basicis $app as argument
-     * @param \Basicis\Basicis $app
-     */
-    public function __construct(App &$app)
-    {
-        $this->app = $app;
-    }
-
-   /**
+     /**
     * Function handle
     * Handles a request and produces a response.
     * May call other collaborating code to generate the response.
     *
-    * @param \Psr\Http\Message\ServerRequestInterface $request
-    * @return \Psr\Http\Message\ResponseInterface
+    * @param ServerRequestInterface $request
+    * @param ResponseInterface $response
+    * @param callable $next null
+    * @return ResponseInterface
     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        return $this->app->getResponse();
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface {
+        return $this->handle(
+            $request,
+            $response,
+            $next ?? function ($req, $res) {
+                return $res;
+            }
+        );
     }
+
+    /**
+    * Function handle
+    * Handles a request and produces a response.
+    * May call other collaborating code to generate the response.
+    *
+    * @param ServerRequestInterface $request
+    * @param ResponseInterface $response
+    * @param callable $next null
+    * @return ResponseInterface
+    */
+    abstract public function handle(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ) : ResponseInterface;
 }
