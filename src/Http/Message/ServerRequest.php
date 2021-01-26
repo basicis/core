@@ -55,6 +55,13 @@ class ServerRequest extends Request implements ServerRequestInterface
 {
 
     /**
+     * $serverParams variable
+     *
+     * @var array
+     */
+    private $serverParams = [];
+
+    /**
      * $cookies variable
      *
      * @var array
@@ -67,6 +74,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @var array
      */
     private $queryParams = [];
+    
 
     /**
      * $uploadedFiles variable
@@ -99,6 +107,29 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function __construct($uri = "/", string $method = 'GET', array $serverParams = [])
     {
         parent::__construct($uri, $method);
+        $this->serverParams = $serverParams;
+
+        if (isset($serverParams["protocol"])) {
+            $protocol = explode("/", $serverParams["protocol"]);
+            $this->getUri()->withScheme($protocol[0] ?? "http");
+            $this->withProtocolVersion($protocol[1] ?? "1.2");
+        }
+
+        if (isset($serverParams["cookie"])) {
+            $this->withCookieParams($serverParams["cookie"] ?? []);
+        }
+
+        if (isset($serverParams["headers"])) {
+            $this->withHeaders($serverParams["headers"]);
+        }
+
+        if (isset($serverParams["files"])) {
+            $this->withUploadedFiles($serverParams["files"]);
+        }
+
+        if (isset($serverParams["cache"])) {
+            $this->withAttribute("appCache", $serverParams["cache"]);
+        }
     }
 
     /**
@@ -113,17 +144,20 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getServerParams() : array
     {
-        return  [
-            "uri" => $this->getUri(),
-            "host" => $this->getUri()->getHost(),
-            "port" => $this->getUri()->getPort(),
-            "method" => $this->getMethod(),
-            "scheme" =>  $this->getUri()->getScheme(),
-            "path" => $this->getUri()->getPath(),
-            "query" => $this->getQueryParamsByUri(),
-            "files" => $this->getUploadedFiles(),
-            "body" => $this->getParsedBody()
-        ];
+        return  array_merge(
+            $this->serverParams,
+            [
+                "uri" => $this->getUri(),
+                "host" => $this->getUri()->getHost(),
+                "port" => $this->getUri()->getPort(),
+                "method" => $this->getMethod(),
+                "scheme" =>  $this->getUri()->getScheme(),
+                "path" => $this->getUri()->getPath(),
+                "query" => $this->getQueryParamsByUri(),
+                "files" => $this->getUploadedFiles(),
+                "body" => $this->getParsedBody()
+            ]
+        );
     }
 
     /**

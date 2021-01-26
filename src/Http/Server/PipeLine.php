@@ -29,24 +29,6 @@ class PipeLine extends RequestHandler
     protected $pipeLine = [];
 
     /**
-    * Function __invoke
-    * Handles a request and produces a response.
-    * May call other collaborating code to generate the response.
-    *
-    * @param ServerRequestInterface $request
-    * @param ResponseInterface $response
-    * @param callable $next null
-    * @return ResponseInterface
-    */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
-    ) : ResponseInterface {
-        return $this->handle($request, $response, $next);
-    }
-
-    /**
     * Function handle
     * Handles a request and produces a response.
     * May call other collaborating code to generate the response.

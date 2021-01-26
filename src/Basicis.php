@@ -147,7 +147,6 @@ class Basicis implements RequestHandlerInterface
      */
     public function __construct(ServerRequestInterface $request, array $options = [])
     {
-        //$this->pipeLine = new PipeLine();
         $this->router = new Router();
         $this->setRequest($request)->setOptions($options);
     }
@@ -156,22 +155,22 @@ class Basicis implements RequestHandlerInterface
      * Function createApp Factory
      * Create a instanceof Basicis\Basicis and return it is
      *
-     * @param  ServerRequestInterface $request
+     * @param  ServerRequestInterface|array $request
      * @param  array $options
      * @return Basicis
      */
     public static function createApp($request = null, array $options = []) : Basicis
     {
-        self::loadEnv();
+        $serverRequest = ServerRequestFactory::create('GET', '/');
+
+        if ($request instanceof ServerRequestInterface) {
+            $serverRequest = $request;
+        }
+    
         if (is_array($request)) {
-            $request = ServerRequestFactory::createFromGlobals($request);
+            $serverRequest = ServerRequestFactory::createFromArray(array_merge($request, $options));
         }
-
-        if ($request === null) {
-            $request = ServerRequestFactory::create('GET', '/');
-        }
-
-        return new Basicis($request ?? ServerRequestFactory::create('GET', '/'), $options);
+        return new Basicis($serverRequest, $options);
     }
 
     /**
@@ -317,13 +316,20 @@ class Basicis implements RequestHandlerInterface
             if ($middlewareObj === null && ($middleware instanceof MiddlewareInterface)) {
                 $middlewareObj = $middleware;
             }
-            $filtedsMiddlewares[] = $middlewareObj;
 
-            if (($requireKey && !is_string($key))) {
+            if ($requireKey && is_string($key) && !empty($key)) {
+                $filtedsMiddlewares[$key] = $middlewareObj;
+            }
+            
+            if ($requireKey && !is_string($key) | empty($key)) {
                 throw new InvalidArgumentException(
                     "Unidentified key or Psr\Http\Server\MiddlewareInterface instance."
                 );
                 unset($filtedsMiddlewares[$key]);
+            }
+
+            if (!$requireKey) {
+                $filtedsMiddlewares[] = $middlewareObj;
             }
         }
         return $filtedsMiddlewares;
@@ -370,7 +376,7 @@ class Basicis implements RequestHandlerInterface
     public function setRouteMiddlewares(array $middlewares = []) : Basicis
     {
         try {
-            $this->middlewares['route'] = $this->filterMiddlewares($middlewares);
+            $this->middlewares['route'] = $this->filterMiddlewares($middlewares, true);
         } catch (\Exception $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
@@ -516,13 +522,12 @@ class Basicis implements RequestHandlerInterface
         //Handle all middlewares
         $app = $this;
         return function ($request, $response, $next = null) use ($app) {
-            $middlewares = $app->getMiddlewares("route");
             $pipeLineArray = [];
-            if ($request->getAttribute('route') instanceof Route) {
-                $routeList = $request->getAttribute("route")->getMiddlewares();
-                foreach ($middlewares as $key => $middleware) {
-                    if (!key_exists($key, $routeList)) {
-                        $pipeLineArray[] = $middleware;
+
+            if ($request->getAttribute('route', null) instanceof Route) {
+                foreach ($request->getAttribute("route")->getMiddlewares() as $middleware) {
+                    if (array_key_exists($middleware, $app->getMiddlewares("route"))) {
+                        $pipeLineArray[] = $app->getMiddlewares("route")[$middleware];
                     }
                 }
             }
@@ -1074,17 +1079,11 @@ class Basicis implements RequestHandlerInterface
      * @param string $authClass
      * @return Auth|null
      */
-    public function auth(string $authClass = null) : ?Auth
+    public function auth() : ?Auth
     {
-        if ($authClass === null) {
-            $authClass = "";
-        }
-
-        if (class_exists($authClass)) {
-            $intefaces = class_implements($authClass);
-            if (in_array("Basicis\Auth\AuthInterface", $intefaces) &&
-                in_array("Basicis\Model\ModelInterface", $intefaces)) {
-                return $authClass::getUser($this->getRequest());
+        foreach ($this->getRequest()->getAttributes() as $key => $attribute) {
+            if ($attribute instanceof AuthInterface) {
+                return $attribute;
             }
         }
         return null;
@@ -1391,7 +1390,8 @@ class Basicis implements RequestHandlerInterface
                 if ($controller instanceof Controller &&
                     method_exists($controller, $callback["method"])
                 ) {
-                    $request->withAttribute("action", $callback["method"]);
+                    $request->withAttribute("action", $callback["method"])
+                            ->withAttribute("app", $this);
                     return $controller($request, $response, $next);
                 }
             } catch (InvalidArgumentException $e) {
@@ -1564,7 +1564,7 @@ class Basicis implements RequestHandlerInterface
 
             if (is_string($callback)) {
                 try {
-                    $response = $this->controller($callback, $request, $response);
+                    return $this->controller($request, $response, $next);
                 } catch (\Exception $e) {
                     (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
                 }

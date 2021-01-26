@@ -136,7 +136,7 @@ class AuthTest extends TestCase
                     ->save();
         $token = (new Token($this->appKey, "Basics Core | Test"))->create($this->auth);
         $request = ServerRequestFactory::create("get", "/");
-        $request->withHeader("authorization", "Bearer ". $token)
+        $request->withHeader("authorization", $token)
                 ->withAttribute("appKey", $this->appKey);
 
         $user = Auth::getUser($request);

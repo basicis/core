@@ -7,6 +7,7 @@ use Basicis\Http\Server\RequestHandler;
 use Basicis\Model\Model;
 use Basicis\Model\Models;
 use Basicis\Core\Annotations;
+use Basicis\Exceptions\InvalidArgumentException;
 use Basicis\Basicis as App;
 
 /**
@@ -20,25 +21,6 @@ use Basicis\Basicis as App;
  */
 abstract class Controller extends RequestHandler implements ControllerInterface
 {
-    /**
-     * Function __invoke
-     * Default method
-     *
-     * @param ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param callable $next
-     * @param object|array|null $args
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
-    ) : ResponseInterface {
-        return $this->handle($request, $response, $next, $args);
-    }
-
     /**
      * Function handle
      * Default method
@@ -55,7 +37,25 @@ abstract class Controller extends RequestHandler implements ControllerInterface
         ResponseInterface $response,
         callable $next = null
     ) : ResponseInterface {
-        //
+        $args = (object) $request->getAttribute("route")->getArguments();
+        $action = $request->getAttribute("action");
+        $request->withoutAttribute("action")
+                ->withoutAttribute("route");
+        $actionResponse = null;
+        $actionResponse = $this->$action($request->getAttribute("app"), $args);
+
+        if ($actionResponse instanceof ResponseInterface) {
+            return $next($request, $actionResponse);
+        }
+
+        if (!$actionResponse instanceof ResponseInterface) {
+            $type = gettype($actionResponse);
+            throw new InvalidArgumentException(
+                "Controller must return an instance of ResponseInterface $type given.",
+                4
+            );
+        }
+        return $next($request, $response);
     }
 
     /**

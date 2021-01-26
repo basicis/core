@@ -120,7 +120,7 @@ class BasicisTest extends TestCase
         $middlewares = $this->app->getMiddlewares();
         $this->assertEquals([new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["before"]);
         $this->assertEquals([new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["after"]);
-        $this->assertEquals([new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["route"]);
+        $this->assertEquals(["example" => new \Basicis\Http\Server\ExampleMiddleware()], $middlewares["route"]);
     }
 
     /**
@@ -245,10 +245,10 @@ class BasicisTest extends TestCase
     public function testAuth()
     {
         //Setup Test, setting appKey
-        $this->app->setKey("test-app-key-here");
+        $appKey = "test-app-key-here";
 
         //Creating a instanceof Token and a instanceof Auth (user)
-        $tokenObj = new Token($this->app->getKey(), "Test Iss", "+10 minutes", "now");
+        $tokenObj = new Token($appKey, "Test Iss", "+10 minutes", "now");
         $user = new Auth();
 
         //Setting Auth (user) params
@@ -259,13 +259,18 @@ class BasicisTest extends TestCase
         //Setting this string token to a instanceof ServerRequestInterface in the Basicis App
         //In the actual operation of the application,
         //it must reach the same via http header in the format 'Authorization: Bearer <You-access-token-here>'
-        $this->app->setRequest($this->app->request()->withHeader("authorization", "Bearer ".$tokenString));
-        
+        $this->app->getRequest()->withHeader("authorization", $tokenString);
+        $header = $this->app->getRequest()->getHeaderLine("authorization");
+
         //Exec tests assertions
         $this->assertEquals(null, $this->app->auth());
-        $this->assertInstanceOf(Auth::class, $this->app->auth("Basicis\Auth\Auth"));
-        $this->assertEquals(true, $user->delete()); //delete test user
-        $this->assertEquals(null, Auth::all()); //check if all is removed
+        $this->assertTrue(str_starts_with($header, "Authorization:"));
+        $this->assertEquals(3, count(explode(".", $header)));
+
+        $this->app->getRequest()->withAttribute("auth", $user);
+        $this->assertInstanceOf(Auth::class, $this->app->auth());
+        $this->assertTrue($user->delete()); //delete test user
+        $this->assertNull(Auth::all()); //check if all is removed
     }
 
 

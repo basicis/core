@@ -153,7 +153,7 @@ class Message implements MessageInterface
     * empty array.
     *
     * @param string $name Case-insensitive header field name.
-    * @return string[] An array of string values as provided for the given
+    * @return array|string[] An array of string values as provided for the given
     *    header. If the header does not appear in the message, this method MUST
     *    return an empty array.
     */
@@ -195,7 +195,7 @@ class Message implements MessageInterface
      *
      * Retrieves all message header lines values in one array of string
      *
-     * @return string[]
+     * @return array|string[]
      */
     public function getHeaderLines() : array
     {
@@ -249,7 +249,7 @@ class Message implements MessageInterface
     {
         if (count($headers) >= 1) {
             foreach ($headers as $key => $value) {
-                if (preg_match('/^[a-zA-Z-]{0,}$/', $key)) {
+                if (preg_match('/^[a-zA-Z-_]{0,}$/', $key)) {
                     $this->withOutHeader(strtolower($key));
                     if (is_array($value)) {
                         foreach ($value as $item_value) {
@@ -259,7 +259,7 @@ class Message implements MessageInterface
                         $this->withAddedHeader(strtolower($key), $value);
                     }
                 } else {
-                    throw new InvalidArgumentException("Invalid header key:$key . An string [a-zA-Z] was expected.");
+                    throw new InvalidArgumentException("Invalid header key: $key . An string [a-zA-Z-_] was expected.");
                 }
             }
         } else {

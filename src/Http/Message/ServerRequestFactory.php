@@ -36,7 +36,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         return new ServerRequest($uri, $method, $serverParams);
     }
 
-     /**
+    /**
      * Function create
      * Create a new server request.
      * Note that server-params are taken precisely as given - no parsing/processing
@@ -57,48 +57,161 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         return (new ServerRequestFactory())->createServerRequest($method, $uri, $serverParams);
     }
 
-
-    public function createFromGlobals(array $globals = [], array $serverParams = []) : ServerRequestInterface
+    /**
+     * Function createFromArray
+     * Create a instance of ServerRequestInterface object
+     * @param array $params
+     *
+     * @return ServerRequestInterface
+     */
+    public static function createFromArray(array $params = []) : ServerRequestInterface
     {
-        $options = [
-            "server" => [
-                "REQUEST_METHOD" => "GET",
-                "SERVER_PROTOCOL" => "http",
-                "HTTP_HOST" => "0.0.0.0",
-                "REQUEST_URI" => "/",
-                "SERVER_PORT" => null
-            ],
-            "files" => [],
-            "cookie" => [],
-            "env" => []
+        $serverParams = self::extractServerParams($params);
+        $requestParams = self::extractRequestParams($params);
+
+        $serverParams["cache"] = $params["cache"] ?? false;
+        $serverParams["files"] = $params["files"] ?? [];
+        $serverParams["cookie"] = $params["cookie"] ?? [];
+        $serverParams["headers"] = self::extractHeadersParams($params);
+        $serverParams["headers"] = self::extractRemoteParams($params);
+        
+        $request = (new ServerRequest(
+            (new Uri())
+            ->withHost($requestParams["host"] ?? "localhost")
+            ->withPort($serverParams["port"] ?? null)
+            ->withPath($requestParams["uri"]),
+            $requestParams["method"] ?? "GET",
+            $serverParams
+        ));
+
+        foreach (self::extractAppParams($params) as $name => $value) {
+            $request->withAttribute("app".ucfirst($name), $value);
+        }
+
+        foreach (self::extractDBParams($params) as $name => $value) {
+            $request->withAttribute("db".ucfirst($name), $value);
+        }
+
+        $defaultToken =  [
+            "iss" => $request->getAttribute("appDescription", ""),
+            "expiration" => "+30 minutes",
+            "nobefore" => "now",
         ];
 
-        foreach ($globals as $global => $value) {
-            if (key_exists($global, $options)) {
-                $options[$global] = array_merge($options[$global], $value);
-            }
+        if (isset($params["token"])) {
+            $defaultToken = array_merge($params["token"], $defaultToken);
         }
-        
-        //Creating ServerRequest and Uri into this
-        return self::create(
-            $options["server"]["REQUEST_METHOD"],
-            (new Uri())
-            ->withScheme(explode("/", $options["server"]["SERVER_PROTOCOL"])[0] ?? "http")
-            ->withHost($options["server"]["HTTP_HOST"] ?? "localhost")
-            ->withPort($options["server"]["SERVER_PORT"] ?? null)
-            ->withPath($options["server"]["REQUEST_URI"]),
-            $serverParams
-        )
-        ->withHeaders(getallheaders())
-        ->withUploadedFiles($options["files"])
-        ->withCookieParams($_COOKIE);
+
+        foreach ($defaultToken as $name => $value) {
+            $request->withAttribute("token".ucfirst($name), $value);
+        }
+        return $request;
     }
 
-
-    public function filterSeverParams(array $serverParams = []) : array
+    /**
+     * Function extractParams
+     * Extract Params from array and replace keys starts
+     * @param array $params
+     * @param array $replace
+     *
+     * @return array
+     */
+    private static function extractParams(array &$params = [], $replace = []) : array
     {
-        foreach ($serverParams as $key => $param) {
-            var_dump($param, $key);
+        $returnParams = [];
+        foreach ($params as $name => $value) {
+            $name = strtolower($name);
+            if (is_array($value)) {
+                foreach ($value as $vk => $vv) {
+                    foreach ($replace as $rk => $rvalue) {
+                        if (str_starts_with($vk, $rvalue)) {
+                            $returnParams[strtolower(str_replace($replace, "", $vk))] = $vv;
+                            unset($params[$name][$vk]);
+                        }
+                    }
+                }
+            }
+            if (!is_array($value)) {
+                foreach ($replace as $rk => $rvalue) {
+                    if (str_starts_with($vk, $rvalue)) {
+                        $returnParams[strtolower(str_replace($replace, "", $name))] = $value;
+                        unset($params[$name]);
+                    }
+                }
+            }
         }
+        return  $returnParams;
+    }
+
+    /**
+     * Function extractServerParams
+     * Extract server params and return a array
+     * @param array $params
+     *
+     * @return array
+     */
+    private static function extractServerParams(array &$params = []) : array
+    {
+        return self::extractParams($params, ["SERVER_", "DOCUMENT_", "SCRIPT_", "PHP_"]);
+    }
+
+    /**
+     * Function extractServerParams
+     * Extract server params and return a array
+     * @param array $params
+     *
+     * @return array
+     */
+    private static function extractRequestParams(array &$params = []) : array
+    {
+        return self::extractParams($params, ["REQUEST_"]);
+    }
+
+    /**
+     * Function extractRemoteParams
+     * Extract remote params and return a array
+     * @param array $params
+     *
+     * @return array
+     */
+    private static function extractRemoteParams(array &$params = []) : array
+    {
+        return self::extractParams($params, ["REMOTE_"]);
+    }
+
+    /**
+     * Function extractHeadersParams
+     * Extract Headers params and return a array
+     * @param array $params
+     *
+     * @return array
+     */
+    private static function extractHeadersParams(array &$params = []) : array
+    {
+        return self::extractParams($params, ["HTTP_"]);
+    }
+
+    /**
+     * Function extractAppParams
+     * Extract app params and return a array
+     * @param array $params
+     *
+     * @return array
+     */
+    private static function extractAppParams(array &$params = []) : array
+    {
+        return self::extractParams($params, ["APP_"]);
+    }
+
+    /**
+     * Function extractDBParams
+     * Extract database params and return a array
+     * @param array $params
+     *
+     * @return array
+     */
+    private static function extractDBParams(array &$params = []) : array
+    {
+        return self::extractParams($params, ["DB_", "DATABASE_"]);
     }
 }
