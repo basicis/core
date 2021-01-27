@@ -2,7 +2,8 @@
 
 ControllerInterface, all controller classes implements from this
 
-
+## Implements:
+Basicis\Http\Server\RequestHandlerInterface
 
 
 
@@ -18,8 +19,10 @@ Creates a model of the specified class|
 Delete a model of the specified class|
 |[find](#controllerinterfacefind)|Function find
 Find one a model item of the specified class|
-|[index](#controllerinterfaceindex)|Function index
+|[handle](#controllerinterfacehandle)|Function handle
 Default method|
+|[index](#controllerinterfaceindex)|Function index
+Default method index|
 |[update](#controllerinterfaceupdate)|Function update
 Update a model of the specified class|
 
@@ -140,6 +143,36 @@ Find one a model item of the specified class
 <hr />
 
 
+### ControllerInterface::handle  
+
+**Description**
+
+```php
+public handle (\ServerRequestInterface $request, \ResponseInterface $response, callable $next, object|array|null $args)
+```
+
+Function handle
+Default method 
+
+ 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+* `(object|array|null) $args`
+
+**Return Values**
+
+`\ResponseInterface`
+
+
+
+
+<hr />
+
+
 ### ControllerInterface::index  
 
 **Description**
@@ -149,7 +182,7 @@ public index (\Basicis\Basicis $app, object $args)
 ```
 
 Function index
-Default method 
+Default method index 
 
  
 

@@ -4,9 +4,11 @@ Controller Class - Controller implements ControllerInterface,
 all controller classes extend from this
 
 ## Implements:
-Basicis\Controller\ControllerInterface
+Basicis\Http\Server\RequestHandlerInterface, Basicis\Controller\ControllerInterface
 
+## Extend:
 
+Basicis\Http\Server\RequestHandler
 
 ## Methods
 
@@ -29,6 +31,14 @@ Default method|
 |[update](#controllerupdate)|Function update
 Update a model of the specified class|
 
+## Inherited methods
+
+| Name | Description |
+|------|-------------|
+|__invoke|Function handle
+Handles a request and produces a response.|
+|handle|Function handle
+Handles a request and produces a response.|
 
 
 

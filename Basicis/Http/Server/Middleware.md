@@ -8,30 +8,81 @@ by acting on the request, generating the response, or forwarding the
 request to a subsequent middleware and possibly acting on its response.  
 
 ## Implements:
-Psr\Http\Server\RequestHandlerInterface, Psr\Http\Server\MiddlewareInterface
+Basicis\Http\Server\MiddlewareInterface
 
-## Extend:
 
-Basicis\Http\Server\RequestHandler
 
 ## Methods
 
 | Name | Description |
 |------|-------------|
+|[__invoke](#middleware__invoke)|Function process
+Process an incoming server request a alias to process method|
+|[pipeLine](#middlewarepipeline)|Funtion setPipeLine
+Handle all middlewares|
 |[process](#middlewareprocess)|Function process
 Process an incoming server request.|
-|[run](#middlewarerun)|Function run
-Run process han$handlers pool|
 
-## Inherited methods
 
-| Name | Description |
-|------|-------------|
-|__construct|Function __construct
-Receives a instance of Basicis\Basicis $app as argument|
-|handle|Function handle
-Handles a request and produces a response.|
 
+
+### Middleware::__invoke  
+
+**Description**
+
+```php
+public __invoke (\ServerRequestInterface $request, \ResponseInterface $response, \MiddlewareInterface|null $next)
+```
+
+Function process
+Process an incoming server request a alias to process method 
+
+ 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(\MiddlewareInterface|null) $next`
+
+**Return Values**
+
+`\ResponseInterface`
+
+
+
+
+<hr />
+
+
+### Middleware::pipeLine  
+
+**Description**
+
+```php
+public static pipeLine (array $middlewares, \ServerRequestInterface $request, \ResponseInterface $response, callable $next)
+```
+
+Funtion setPipeLine
+Handle all middlewares 
+
+ 
+
+**Parameters**
+
+* `(array) $middlewares`
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+
+**Return Values**
+
+`\PipeLine`
+
+
+
+
+<hr />
 
 
 ### Middleware::process  
@@ -39,7 +90,7 @@ Handles a request and produces a response.|
 **Description**
 
 ```php
-public process (void)
+public process (\ServerRequestInterface $request, \ResponseInterface $response, callable|null $next)
 ```
 
 Function process
@@ -47,40 +98,29 @@ Process an incoming server request.
 
 Processes an incoming server request in order to produce a response.  
 If unable to produce the response itself, it may delegate to the provided  
-request handler to do so. 
+request $next handler to do so.  
+  
+```php  
+ //Perform here all persoal code implementation and return $next  
+ retrun $next($request);  
+```  
+  
+```php  
+   //Or receive um ResponseInterface from $next and procces you ResponseInterface  
+   $response = $next($request);  
+   ...  
+   retrun $response;  
+``` 
 
 **Parameters**
 
-`This function has no parameters.`
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable|null) $next`
 
 **Return Values**
 
-`void`
-
-
-<hr />
-
-
-### Middleware::run  
-
-**Description**
-
-```php
-public run (void)
-```
-
-Function run
-Run process han$handlers pool 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
-
-**Return Values**
-
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 

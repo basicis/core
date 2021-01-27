@@ -83,7 +83,7 @@ Get route arguments
 
 **Return Values**
 
-`object|null`
+`array`
 
 
 
@@ -110,7 +110,7 @@ Get route callback if this is a Closure, else return null
 
 **Return Values**
 
-`\Closure|null`
+`\Closure|string|null`
 
 
 

@@ -66,6 +66,8 @@ Retrieve server parameters.|
 Retrieve normalized file upload data.|
 |[withAttribute](#serverrequestwithattribute)|Function withAttribute
 Return an instance with the specified derived request attribute.|
+|[withAttributes](#serverrequestwithattributes)|Function withAttributes
+Return an instance with the specified derived request attribute.|
 |[withCookieParams](#serverrequestwithcookieparams)|Function withCookieParams
 Return an instance with the specified cookies.|
 |[withParsedBody](#serverrequestwithparsedbody)|Function withParsedBody
@@ -395,6 +397,38 @@ updated attribute.
 : The attribute name.  
 * `(mixed) $value`
 : The value of the attribute.  
+
+**Return Values**
+
+`static`
+
+
+
+
+<hr />
+
+
+### ServerRequest::withAttributes  
+
+**Description**
+
+```php
+public withAttributes (array $attributes)
+```
+
+Function withAttributes
+Return an instance with the specified derived request attribute. 
+
+This method allows setting a single derived request attribute as  
+described in getAttributes().  
+This method MUST be implemented in such a way as to retain the  
+immutability of the message, and MUST return an instance that has the  
+updated attribute. 
+
+**Parameters**
+
+* `(array) $attributes`
+: The attribute name.  
 
 **Return Values**
 

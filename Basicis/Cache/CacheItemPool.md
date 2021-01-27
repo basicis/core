@@ -47,6 +47,8 @@ Persists a cache item immediately.|
 Sets a cache item to be persisted later.|
 |[serialize](#cacheitempoolserialize)|Function serialize
 Serialize this pool|
+|[setFile](#cacheitempoolsetfile)|Function setFile
+Set this cache pool file|
 |[unserialize](#cacheitempoolunserialize)|Function unserialize
 Unserialize this pool|
 |[withItem](#cacheitempoolwithitem)|Function withItem
@@ -492,6 +494,33 @@ public serialize (void)
 
 Function serialize
 Serialize this pool 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`string`
+
+
+
+
+<hr />
+
+
+### CacheItemPool::setFile  
+
+**Description**
+
+```php
+public setFile (void)
+```
+
+Function setFile
+Set this cache pool file 
 
  
 

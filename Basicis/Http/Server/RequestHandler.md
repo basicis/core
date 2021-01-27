@@ -7,7 +7,7 @@ An HTTP request handler process an HTTP request in order to produce an
 HTTP response.  
 
 ## Implements:
-Psr\Http\Server\RequestHandlerInterface
+Basicis\Http\Server\RequestHandlerInterface
 
 
 
@@ -15,34 +15,39 @@ Psr\Http\Server\RequestHandlerInterface
 
 | Name | Description |
 |------|-------------|
-|[__construct](#requesthandler__construct)|Function __construct
-Receives a instance of Basicis\Basicis $app as argument|
+|[__invoke](#requesthandler__invoke)|Function handle
+Handles a request and produces a response.|
 |[handle](#requesthandlerhandle)|Function handle
 Handles a request and produces a response.|
 
 
 
 
-### RequestHandler::__construct  
+### RequestHandler::__invoke  
 
 **Description**
 
 ```php
-public __construct (\Basicis\Basicis $app)
+public __invoke (\ServerRequestInterface $request, \ResponseInterface $response, callable $next)
 ```
 
-Function __construct
-Receives a instance of Basicis\Basicis $app as argument 
+Function handle
+Handles a request and produces a response. 
 
- 
+May call other collaborating code to generate the response. 
 
 **Parameters**
 
-* `(\Basicis\Basicis) $app`
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+: null  
 
 **Return Values**
 
-`void`
+`\ResponseInterface`
+
+
 
 
 <hr />
@@ -53,7 +58,7 @@ Receives a instance of Basicis\Basicis $app as argument
 **Description**
 
 ```php
-public handle (\Psr\Http\Message\ServerRequestInterface $request)
+public handle (\ServerRequestInterface $request, \ResponseInterface $response, callable $next)
 ```
 
 Function handle
@@ -63,11 +68,14 @@ May call other collaborating code to generate the response.
 
 **Parameters**
 
-* `(\Psr\Http\Message\ServerRequestInterface) $request`
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+: null  
 
 **Return Values**
 
-`\Psr\Http\Message\ResponseInterface`
+`\ResponseInterface`
 
 
 

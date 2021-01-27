@@ -23,7 +23,7 @@ Get role permission ID|
 |[getRoleName](#authgetrolename)|Function getRoleName
 Get role permission Name|
 |[getUser](#authgetuser)|Function getUser
-Get a Auth User by token and appKey|
+Get a Auth User by ServerRequestInterface|
 |[getUsername](#authgetusername)|Function getUsername
 Get Auth username|
 |[login](#authlogin)|Function function
@@ -192,17 +192,18 @@ Get role permission Name
 **Description**
 
 ```php
-public static getUser (string $token)
+public static getUser (\ServerRequestInterface $request, string|null $authClass)
 ```
 
 Function getUser
-Get a Auth User by token and appKey 
+Get a Auth User by ServerRequestInterface 
 
  
 
 **Parameters**
 
-* `(string) $token`
+* `(\ServerRequestInterface) $request`
+* `(string|null) $authClass`
 
 **Return Values**
 

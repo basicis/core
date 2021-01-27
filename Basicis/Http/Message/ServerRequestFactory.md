@@ -13,6 +13,8 @@ Psr\Http\Message\ServerRequestFactoryInterface
 |------|-------------|
 |[create](#serverrequestfactorycreate)|Function create
 Create a new server request.|
+|[createFromArray](#serverrequestfactorycreatefromarray)|Function createFromArray
+Create a instance of ServerRequestInterface object|
 |[createServerRequest](#serverrequestfactorycreateserverrequest)|Function createServerRequest
 Create a new server request.|
 
@@ -24,7 +26,7 @@ Create a new server request.|
 **Description**
 
 ```php
-public static create (string $method, \UriInterface|string $uri, array $serverParams)
+public static create (string $method, \UriInterface|string $uri, array $params)
 ```
 
 Function create
@@ -42,9 +44,36 @@ determine the HTTP method or URI, which must be provided explicitly.
 : The URI associated with the request. If  
 the value is a string, the factory MUST create a UriInterface  
 instance based on it.  
-* `(array) $serverParams`
+* `(array) $params`
 : Array of SAPI parameters with which to seed  
 the generated request instance.  
+
+**Return Values**
+
+`\ServerRequestInterface`
+
+
+
+
+<hr />
+
+
+### ServerRequestFactory::createFromArray  
+
+**Description**
+
+```php
+public static createFromArray (array $params)
+```
+
+Function createFromArray
+Create a instance of ServerRequestInterface object 
+
+ 
+
+**Parameters**
+
+* `(array) $params`
 
 **Return Values**
 

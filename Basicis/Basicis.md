@@ -3,19 +3,23 @@
 Basicis\Basicis - Main class Basicis framework
 
 ## Implements:
-Psr\Http\Server\RequestHandlerInterface
+Basicis\Http\Server\RequestHandlerInterface
 
-## Extend:
 
-Basicis\Http\Server\RequestHandler
 
 ## Methods
 
 | Name | Description |
 |------|-------------|
+|[__construct](#basicis__construct)|Function __construct
+Construct a instanceof Basicis\Basicis lovingly named $app|
+|[__invoke](#basicis__invoke)|Function runAndResponse
+Run app pipe line and return a instance of ResponseInterface|
 |[auth](#basicisauth)|Function auth
 Get the app Auth/User by authorization token, it is receive a class Basicis\Auth\AuthInterface|
 |[cache](#basiciscache)|Function cache|
+|[cacheIsEnabled](#basiciscacheisenabled)|Function cacheIsEnabled
+Check if app cache is enabled and return boolean|
 |[clientFileDownload](#basicisclientfiledownload)|Function clientFileDownload
 Send a file in the body of the http response to the client|
 |[clientFileUpload](#basicisclientfileupload)|Function clientFileUpload
@@ -28,18 +32,16 @@ Instantiate a Basicis\Controller\Controller object and execute the defined metho
 Create a instanceof Basicis\Basicis and return it is|
 |[enableCache](#basicisenablecache)|Function enableCache
 Enable application cache $enable true|
-|[extractData](#basicisextractdata)|Function extractData
-Extract data on ServerRequest and/or Route url params|
-|[getAppDescription](#basicisgetappdescription)|Function getAppDescription
-Getting App description string|
-|[getAppKey](#basicisgetappkey)|Function getAppKey
-Getting hash appKey|
+|[error](#basiciserror)|Function error
+Return a view error reporting html or json|
+|[extractCallbackToArray](#basicisextractcallbacktoarray)|Function extractCallbackToArray
+Extract and return a array with controller name/class and method or null|
 |[getController](#basicisgetcontroller)|Function getController
 Get a controller by classname|
+|[getDescription](#basicisgetdescription)|Function getDescription
+Getting App description string|
 |[getMiddlewares](#basicisgetmiddlewares)|Function getMiddlewares
 Getting middlewares by type ['before', 'route', 'after' or null to all].|
-|[getMode](#basicisgetmode)|Function getMode
-Getting App operation Mode, development "dev" ou production "production"|
 |[getRequest](#basicisgetrequest)|Function getRequest
 Get current server request of app|
 |[getResourceInput](#basicisgetresourceinput)|Function getResourceInput
@@ -52,8 +54,8 @@ Get current response of app|
 Get requested Route on router engine instance according to servervrequest.|
 |[getRouter](#basicisgetrouter)|Function getRouter
 Get the app Router engine instance|
-|[getTimezone](#basicisgettimezone)|Function getTimezone
-Getting App Timezone, default "America/Recife"|
+|[handle](#basicishandle)|handle function
+Handles the callback function returned by routing engineering and executes it, this return a ResponseInterface|
 |[handleError](#basicishandleerror)|Function handleError
 Returns a template view with errors occurred during the execution of the application according to http response|
 |[input](#basicisinput)|Function input
@@ -66,6 +68,8 @@ Load enviroment variables for use from app|
 Open a Stream Resource in Recording mode and write a text in it, sending headers|
 |[path](#basicispath)|Function path
 Return app project root path|
+|[pipeLine](#basicispipeline)|Function pipeLine
+Run set and middlewares levels pipeline and return a instanceof ResponseInterface|
 |[redirect](#basicisredirect)|Function redirect
 Redirect a Server Request with url, method and optional array of data|
 |[request](#basicisrequest)|Function request
@@ -74,20 +78,14 @@ Set and/or get current server request of app|
 Set and/or get current server response of app|
 |[run](#basicisrun)|Function run
 Finally execute the app instance passed as parameters to standard input and output for php application.|
-|[runAndResponse](#basicisrunandresponse)|Function runAndResponse
-Run app pipe line and return a instance of ResponseInterface|
 |[setAfterMiddlewares](#basicissetaftermiddlewares)|Function setAfterMiddlewares
 Setting after middlewares These are executed in the order they were defined.|
-|[setAppDescription](#basicissetappdescription)|Function setAppDescription
-Setting App description string|
-|[setAppKey](#basicissetappkey)|Function setAppKey
-Setting hash appKey|
 |[setBeforeMiddlewares](#basicissetbeforemiddlewares)|Function setBeforeMiddlewares
 Setting before middlewares for app These are executed in the order they were defined.|
 |[setControllers](#basicissetcontrollers)|Function setControllers
 Setting all controller for app|
-|[setMode](#basicissetmode)|Function setMode
-Setting App operation Mode, development ["dev" or null] ou production ["production" or "prod"]|
+|[setMiddlewares](#basicissetmiddlewares)|Function setMiddlewares
+Set all middlewares for the app at once|
 |[setRequest](#basicissetrequest)|Function setRequest
 Set current server request of app|
 |[setRequestByArray](#basicissetrequestbyarray)|Function setRequestByArray
@@ -100,14 +98,12 @@ Set app default resource output|
 Get current response of app|
 |[setRoute](#basicissetroute)|Function setRoute
 Set a new route in the app router object|
-|[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setMiddlewares
+|[setRouteMiddlewares](#basicissetroutemiddlewares)|Function setRouteMiddlewares
 Setting route middlewares for app|
 |[setRoutesByAnnotations](#basicissetroutesbyannotations)|Function setRoutesByAnnotations
 Receives a class as an argument, and works with the comment blocks as @Route|
 |[setRoutesByControllers](#basicissetroutesbycontrollers)|Function setRoutesByControllers
 Receives a array of Controller[] with classnames like this '[App\ExampleController, ...]'|
-|[setTimezone](#basicissettimezone)|Function setTimezone
-Setting app timezone|
 |[setViewFilters](#basicissetviewfilters)|Function setViewFilters
 Setting filters functions for use into template|
 |[view](#basicisview)|Function view
@@ -115,15 +111,61 @@ Set a template name, optional data and a optional path for write in the http res
 |[write](#basiciswrite)|Function write
 Set a string and status code for write in the http response|
 
-## Inherited methods
 
-| Name | Description |
-|------|-------------|
-|__construct|Function __construct
-Receives a instance of Basicis\Basicis $app as argument|
-|handle|Function handle
-Handles a request and produces a response.|
 
+
+### Basicis::__construct  
+
+**Description**
+
+```php
+public __construct (\ServerRequestInterface $request)
+```
+
+Function __construct
+Construct a instanceof Basicis\Basicis lovingly named $app 
+
+ 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+
+**Return Values**
+
+`void`
+
+
+<hr />
+
+
+### Basicis::__invoke  
+
+**Description**
+
+```php
+public __invoke (\ServerRequestInterface $request, \ResponseInterface $response, callable $next)
+```
+
+Function runAndResponse
+Run app pipe line and return a instance of ResponseInterface 
+
+ 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+
+**Return Values**
+
+`\ResponseInterface`
+
+
+
+
+<hr />
 
 
 ### Basicis::auth  
@@ -171,7 +213,34 @@ Get the app CacheItemPool engine instance
 
 **Return Values**
 
-`\CacheItemPool`
+`\CacheItemPool|null`
+
+
+
+
+<hr />
+
+
+### Basicis::cacheIsEnabled  
+
+**Description**
+
+```php
+public cacheIsEnabled (void)
+```
+
+Function cacheIsEnabled
+Check if app cache is enabled and return boolean 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`bool`
 
 
 
@@ -269,7 +338,7 @@ Instantiate a Closure object and execute
 **Description**
 
 ```php
-public controller (string $callback, string|int|array|object|null $args)
+public controller (\ServerRequestInterface $request, \ResponseInterface $response, string $callback)
 ```
 
 Function controller
@@ -287,8 +356,9 @@ The key for the controller or class name must be separated from the method name 
 
 **Parameters**
 
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
 * `(string) $callback`
-* `(string|int|array|object|null) $args`
 
 **Return Values**
 
@@ -305,7 +375,7 @@ The key for the controller or class name must be separated from the method name 
 **Description**
 
 ```php
-public static createApp (\ServerRequestInterface $request, array $options)
+public static createApp (\ServerRequestInterface|array $request)
 ```
 
 Function createApp Factory
@@ -315,8 +385,7 @@ Create a instanceof Basicis\Basicis and return it is
 
 **Parameters**
 
-* `(\ServerRequestInterface) $request`
-* `(array) $options`
+* `(\ServerRequestInterface|array) $request`
 
 **Return Values**
 
@@ -356,27 +425,27 @@ Enable application cache $enable true
 <hr />
 
 
-### Basicis::extractData  
+### Basicis::error  
 
 **Description**
 
 ```php
-public static extractData (\ServerRequestInterface $request, \Route $route)
+public error (int $code, string $message)
 ```
 
-Function extractData
-Extract data on ServerRequest and/or Route url params 
+Function error
+Return a view error reporting html or json 
 
  
 
 **Parameters**
 
-* `(\ServerRequestInterface) $request`
-* `(\Route) $route`
+* `(int) $code`
+* `(string) $message`
 
 **Return Values**
 
-`array`
+`\Psr\Http\Message\ResponseInterface`
 
 
 
@@ -384,53 +453,26 @@ Extract data on ServerRequest and/or Route url params
 <hr />
 
 
-### Basicis::getAppDescription  
+### Basicis::extractCallbackToArray  
 
 **Description**
 
 ```php
-public getAppDescription (void)
+public extractCallbackToArray (string $callback)
 ```
 
-Function getAppDescription
-Getting App description string 
+Function extractCallbackToArray
+Extract and return a array with controller name/class and method or null 
 
  
 
 **Parameters**
 
-`This function has no parameters.`
+* `(string) $callback`
 
 **Return Values**
 
-`string`
-
-
-
-
-<hr />
-
-
-### Basicis::getAppKey  
-
-**Description**
-
-```php
-public getAppKey (void)
-```
-
-Function getAppKey
-Getting hash appKey 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
-
-**Return Values**
-
-`string`
+`array|null`
 
 
 
@@ -466,6 +508,33 @@ Get a controller by classname
 <hr />
 
 
+### Basicis::getDescription  
+
+**Description**
+
+```php
+public getDescription (string $descriptionDefault)
+```
+
+Function getDescription
+Getting App description string 
+
+ 
+
+**Parameters**
+
+* `(string) $descriptionDefault`
+
+**Return Values**
+
+`string`
+
+
+
+
+<hr />
+
+
 ### Basicis::getMiddlewares  
 
 **Description**
@@ -487,33 +556,6 @@ This return a array with especifieds middleware type or all if $type argument is
 **Return Values**
 
 `array`
-
-
-
-
-<hr />
-
-
-### Basicis::getMode  
-
-**Description**
-
-```php
-public getMode (void)
-```
-
-Function getMode
-Getting App operation Mode, development "dev" ou production "production" 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
-
-**Return Values**
-
-`string`
 
 
 
@@ -683,28 +725,36 @@ Get the app Router engine instance
 <hr />
 
 
-### Basicis::getTimezone  
+### Basicis::handle  
 
 **Description**
 
 ```php
-public getTimezone (void)
+public handle (\ServerRequestInterface $request, \ResponseInterface $response, callable $next)
 ```
 
-Function getTimezone
-Getting App Timezone, default "America/Recife" 
+handle function
+Handles the callback function returned by routing engineering and executes it, this return a ResponseInterface 
 
  
 
 **Parameters**
 
-`This function has no parameters.`
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
 
 **Return Values**
 
-`string`
+`\ResponseInterface`
 
 
+
+
+**Throws Exceptions**
+
+
+`\InvalidArgumentException`
 
 
 <hr />
@@ -715,7 +765,7 @@ Getting App Timezone, default "America/Recife"
 **Description**
 
 ```php
-public handleError (string $message)
+public handleError (string $name)
 ```
 
 Function handleError
@@ -725,11 +775,11 @@ Returns a template view with errors occurred during the execution of the applica
 
 **Parameters**
 
-* `(string) $message`
+* `(string) $name`
 
 **Return Values**
 
-`\Basicis`
+`\ResponseInterface`
 
 
 
@@ -832,7 +882,7 @@ Load enviroment variables for use from app
 **Description**
 
 ```php
-public static output (\ServerRequestInterface $request, \ResponseInterface $response, string $resourceFileName)
+public static output (\ResponseInterface $response, string $resourceFileName)
 ```
 
 Function output
@@ -842,7 +892,6 @@ Open a Stream Resource in Recording mode and write a text in it, sending headers
 
 **Parameters**
 
-* `(\ServerRequestInterface) $request`
 * `(\ResponseInterface) $response`
 * `(string) $resourceFileName`
 
@@ -850,7 +899,7 @@ Open a Stream Resource in Recording mode and write a text in it, sending headers
 
 `int`
 
-
+> size of stream writed content or "0"
 
 
 <hr />
@@ -876,6 +925,35 @@ Return app project root path
 **Return Values**
 
 `string`
+
+
+
+
+<hr />
+
+
+### Basicis::pipeLine  
+
+**Description**
+
+```php
+public pipeLine (\ServerRequestInterface $request, \ResponseInterface|null $response, callable $next)
+```
+
+Function pipeLine
+Run set and middlewares levels pipeline and return a instanceof ResponseInterface 
+
+ 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface|null) $response`
+* `(callable) $next`
+
+**Return Values**
+
+`\ResponseInterface`
 
 
 
@@ -944,7 +1022,7 @@ Set and/or get current server request of app
 **Description**
 
 ```php
-public response (int $code, string $reasonPhrase)
+public response (int|\ResponseInterface $code, string $reasonPhrase)
 ```
 
 Function response
@@ -954,7 +1032,7 @@ Set and/or get current server response of app
 
 **Parameters**
 
-* `(int) $code`
+* `(int|\ResponseInterface) $code`
 * `(string) $reasonPhrase`
 
 **Return Values**
@@ -983,40 +1061,13 @@ By definition the values ​​are respectively "php://input" for input and "php
 **Parameters**
 
 * `(string) $inputResource`
-: = "php://input"  
+: "php://input"  
 * `(string) $outputResource`
-: = "php://output"  
+: "php://output"  
 
 **Return Values**
 
 `int`
-
-
-
-
-<hr />
-
-
-### Basicis::runAndResponse  
-
-**Description**
-
-```php
-public runAndResponse (void)
-```
-
-Function runAndResponse
-Run app pipe line and return a instance of ResponseInterface 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
-
-**Return Values**
-
-`\ResponseInterface`
 
 
 
@@ -1053,60 +1104,6 @@ if the ResponseInterface returned contains status codes greater than 200 or less
 **Return Values**
 
 `void`
-
-
-
-
-<hr />
-
-
-### Basicis::setAppDescription  
-
-**Description**
-
-```php
-public setAppDescription (string $description)
-```
-
-Function setAppDescription
-Setting App description string 
-
- 
-
-**Parameters**
-
-* `(string) $description`
-
-**Return Values**
-
-`\Basicis`
-
-
-
-
-<hr />
-
-
-### Basicis::setAppKey  
-
-**Description**
-
-```php
-public setAppKey (string $appKey)
-```
-
-Function setAppKey
-Setting hash appKey 
-
- 
-
-**Parameters**
-
-* `(string) $appKey`
-
-**Return Values**
-
-`\Basicis`
 
 
 
@@ -1191,30 +1188,48 @@ $app->controller("example@functionName", $args = [object, array or null]);
 <hr />
 
 
-### Basicis::setMode  
+### Basicis::setMiddlewares  
 
 **Description**
 
 ```php
-public setMode (string $mode)
+public setMiddlewares (void)
 ```
 
-Function setMode
-Setting App operation Mode, development ["dev" or null] ou production ["production" or "prod"] 
+Function setMiddlewares
+Set all middlewares for the app at once 
 
- 
+- Setting into config/app-config.php file  
+  
+```php  
+ $app->setMiddlewares(  
+     [  
+         //key no is required  
+         "App\\Middlewares\\BeforeExample",  
+         //...  
+     ],  
+     [  
+         //only here, key is required  
+         "guest" => "App\\Middlewares\\Guest",  
+         "auth" => "App\\Middlewares\\Auth",  
+         "example" => "App\\Middlewares\\Example",  
+         //...  
+     ],  
+     [  
+        //key no is required  
+        "App\\Middlewares\\AfterExample",  
+        //...  
+     ]  
+ );  
+``` 
 
 **Parameters**
 
-* `(string) $mode`
-: ["dev", "production", "prod" or null]  
-Default value "dev" == Development Mode  
+`This function has no parameters.`
 
 **Return Values**
 
-`\Basicis`
-
-
+`void`
 
 
 <hr />
@@ -1225,7 +1240,7 @@ Default value "dev" == Development Mode
 **Description**
 
 ```php
-public setRequest (\ServerRequestinterface $request)
+public setRequest (\ServerRequestInterface $request)
 ```
 
 Function setRequest
@@ -1235,7 +1250,7 @@ Set current server request of app
 
 **Parameters**
 
-* `(\ServerRequestinterface) $request`
+* `(\ServerRequestInterface) $request`
 
 **Return Values**
 
@@ -1398,7 +1413,7 @@ Set a new route in the app router object
 public setRouteMiddlewares (array $middlewares)
 ```
 
-Function setMiddlewares
+Function setRouteMiddlewares
 Setting route middlewares for app 
 
 - Setting into config/app-config.php file  
@@ -1488,34 +1503,6 @@ Receives a array of Controller[] with classnames like this '[App\ExampleControll
 **Parameters**
 
 * `(array|\Controller[]) $controllers`
-
-**Return Values**
-
-`\Basicis`
-
-
-
-
-<hr />
-
-
-### Basicis::setTimezone  
-
-**Description**
-
-```php
-public setTimezone (string $timezone)
-```
-
-Function setTimezone
-Setting app timezone 
-
- 
-
-**Parameters**
-
-* `(string) $timezone`
-: "America/Recife" if this is null  
 
 **Return Values**
 

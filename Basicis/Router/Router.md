@@ -11,6 +11,8 @@ Router Class
 | Name | Description |
 |------|-------------|
 |[__construct](#router__construct)|Function __constructs|
+|[__invoke](#router__invoke)|Function __invoke
+Handles a request and produces a response.|
 |[extractArgId](#routerextractargid)|Function extractArgId
 Extract a argument id/name of route name  part|
 |[extractArgRegex](#routerextractargregex)|Function extractArgRegex
@@ -29,6 +31,8 @@ Get a ResponseInterface Object or router run|
 Get route requested|
 |[getRoutes](#routergetroutes)|Function getRoutes
 Get a array with all routes into instance of router|
+|[handle](#routerhandle)|Function __invoke
+Handles a request and produces a response.|
 |[hasRoute](#routerhasroute)|Function hasRoute
 Check if route match exists for name and method|
 |[setRequest](#routersetrequest)|Function getResponse
@@ -46,7 +50,7 @@ Receives a class as an argument, and works with the comment blocks as @Route|
 **Description**
 
 ```php
-public __construct (\ServerRequestInterface|null $request)
+public __construct (void)
 ```
 
 Function __constructs 
@@ -55,11 +59,41 @@ Function __constructs
 
 **Parameters**
 
-* `(\ServerRequestInterface|null) $request`
+`This function has no parameters.`
 
 **Return Values**
 
 `void`
+
+
+
+
+<hr />
+
+
+### Router::__invoke  
+
+**Description**
+
+```php
+public __invoke (\ServerRequestInterface $request, \ResponseInterface $response, callable $next)
+```
+
+Function __invoke
+Handles a request and produces a response. 
+
+May call other collaborating code to generate the response. 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+: null  
+
+**Return Values**
+
+`\ResponseInterface`
 
 
 
@@ -307,6 +341,36 @@ Get a array with all routes into instance of router
 **Return Values**
 
 `array|\Route[]`
+
+
+
+
+<hr />
+
+
+### Router::handle  
+
+**Description**
+
+```php
+public handle (\ServerRequestInterface $request, \ResponseInterface $response, callable $next)
+```
+
+Function __invoke
+Handles a request and produces a response. 
+
+May call other collaborating code to generate the response. 
+
+**Parameters**
+
+* `(\ServerRequestInterface) $request`
+* `(\ResponseInterface) $response`
+* `(callable) $next`
+: null  
+
+**Return Values**
+
+`\ResponseInterface`
 
 
 

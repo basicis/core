@@ -93,7 +93,7 @@ empty array.
 
 **Return Values**
 
-`string[]`
+`array|string[]`
 
 > An array of string values as provided for the given  
 header. If the header does not appear in the message, this method MUST  
@@ -159,7 +159,7 @@ Retrieves all message header lines values in one array of string
 
 **Return Values**
 
-`string[]`
+`array|string[]`
 
 
 
@@ -308,7 +308,7 @@ Pass an line to the current header, if the parameter $rewrite === false
 
 The value of the line will be added to the header with the same key,  
 otherwise the value of the current header will be replaced.  
-$rewrite default:true 
+$rewrite true 
 
 **Parameters**
 
