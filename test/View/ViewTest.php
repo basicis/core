@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Twig\TwigFunction;
 use Basicis\View\View;
 use Basicis\Exceptions\InvalidArgumentException;
+use Basicis\Basicis as App;
 
 /**
  * Class ViewTest
@@ -25,7 +26,7 @@ class ViewTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-        $this->view = new View(["./templates/"]);
+        $this->view = new View([App::path()."storage/templates/"]);
     }
 
     /**
