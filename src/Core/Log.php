@@ -256,7 +256,8 @@ class Log implements LoggerInterface
             $writed = $stream->write(json_encode($jsonObj));
         }
         $stream->close();
-        
+        error_log($message, str_replace(".json", ".log", $filename));
+        error_log($message, 0);
         return $writed;
     }
 
