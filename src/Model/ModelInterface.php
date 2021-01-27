@@ -8,7 +8,6 @@ use \Doctrine\ORM\EntityManager;
  */
 interface ModelInterface
 {
-
     public function save() : Model;
     public function delete(): Bool;
     public function getCreated() : \DateTime;

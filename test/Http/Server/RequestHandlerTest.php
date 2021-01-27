@@ -4,10 +4,12 @@ namespace Test\Http\Server;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Basicis\Http\Server\RequestHandler;
-use Basicis\Basicis as App;
+use Basicis\Http\Server\ExampleRequestHandler;
+use Basicis\Http\Message\ServerRequestFactory;
+use Basicis\Http\Message\ResponseFactory;
 
 /**
- * ClassTest\Http\Server\RequestHandlerTest
+ * Class Test\Http\Server\RequestHandlerTest
  *
  */
 class RequestHandlerTest extends TestCase
@@ -15,16 +17,9 @@ class RequestHandlerTest extends TestCase
     /**
      * $handler variable
      *
-     * @var RequestHandler
+     * @var ExampleRequestHandler
      */
     private $handler;
-
-    /**
-     * $app variable
-     *
-     * @var App
-     */
-    private $app;
 
     /**
      * Function __construct
@@ -32,8 +27,7 @@ class RequestHandlerTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-        $this->app = App::createApp();
-        $this->handler = new RequestHandler($this->app);
+        $this->handler = new ExampleRequestHandler();
     }
 
     /**
@@ -46,13 +40,21 @@ class RequestHandlerTest extends TestCase
         $this->assertInstanceOf(RequestHandler::class, $this->handler);
     }
 
+
     /**
-     * Function testHandler
+     * Function testHandle
      *
      * @return void
      */
-    public function testHandler()
+    public function testHandle()
     {
-        $this->assertInstanceOf(ResponseInterface::class, $this->handler->handle($this->app->getRequest()));
+        //Basicis\Http\Server\ExampleRequestHandler
+        $this->assertInstanceOf(
+            ResponseInterface::class,
+            $this->handler->handle(
+                ServerRequestFactory::create("get", "/"),
+                ResponseFactory::create()
+            )
+        );
     }
 }

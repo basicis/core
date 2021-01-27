@@ -4,6 +4,8 @@ namespace Basicis\Http\Message;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Basicis\Exceptions\InvalidArgumentException;
+use Basicis\Router\Route;
+use Basicis\Router\Router;
 
 /**
  * Representation of an incoming, server-side HTTP request.
@@ -53,6 +55,13 @@ class ServerRequest extends Request implements ServerRequestInterface
 {
 
     /**
+     * $serverParams variable
+     *
+     * @var array
+     */
+    private $serverParams = [];
+
+    /**
      * $cookies variable
      *
      * @var array
@@ -65,6 +74,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * @var array
      */
     private $queryParams = [];
+    
 
     /**
      * $uploadedFiles variable
@@ -97,6 +107,29 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function __construct($uri = "/", string $method = 'GET', array $serverParams = [])
     {
         parent::__construct($uri, $method);
+        $this->serverParams = $serverParams;
+
+        if (isset($serverParams["protocol"])) {
+            $protocol = explode("/", $serverParams["protocol"]);
+            $this->getUri()->withScheme($protocol[0] ?? "http");
+            $this->withProtocolVersion($protocol[1] ?? "1.2");
+        }
+
+        if (isset($serverParams["cookie"])) {
+            $this->withCookieParams($serverParams["cookie"] ?? []);
+        }
+
+        if (isset($serverParams["headers"])) {
+            $this->withHeaders($serverParams["headers"]);
+        }
+
+        if (isset($serverParams["files"])) {
+            $this->withUploadedFiles($serverParams["files"]);
+        }
+
+        if (isset($serverParams["cache"])) {
+            $this->withAttribute("appCache", $serverParams["cache"]);
+        }
     }
 
     /**
@@ -111,15 +144,20 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function getServerParams() : array
     {
-        return  [
-            "host" => $this->getUri()->getHost(),
-            "port" => $this->getUri()->getPort(),
-            "method" => $this->getMethod(),
-            "scheme" =>  $this->getUri()->getScheme(),
-            "path" => $this->getUri()->getPath(),
-            "query" => $this->getQueryParamsByUri(),
-            "files" => $this->getUploadedFiles(),
-        ];
+        return  array_merge(
+            $this->serverParams,
+            [
+                "uri" => $this->getUri(),
+                "host" => $this->getUri()->getHost(),
+                "port" => $this->getUri()->getPort(),
+                "method" => $this->getMethod(),
+                "scheme" =>  $this->getUri()->getScheme(),
+                "path" => $this->getUri()->getPath(),
+                "query" => $this->getQueryParamsByUri(),
+                "files" => $this->getUploadedFiles(),
+                "body" => $this->getParsedBody()
+            ]
+        );
     }
 
     /**
@@ -383,6 +421,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
 
+
     /**
      * Function withAttribute
      * Return an instance with the specified derived request attribute.
@@ -405,6 +444,28 @@ class ServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
+     * Function withAttributes
+     * Return an instance with the specified derived request attribute.
+     *
+     * This method allows setting a single derived request attribute as
+     * described in getAttributes().
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated attribute.
+     *
+     * @see    getAttributes()
+     * @param  array $attributes  The attribute name.
+     * @return static
+     */
+    public function withAttributes(array $attributes) : ServerRequest
+    {
+        foreach ($attributes as $name => $value) {
+            $this->withAttribute($name, $value);
+        }
+        return $this;
+    }
+
+    /**
      * Return an instance that removes the specified derived request attribute.
      *
      * This method allows removing a single derived request attribute as
@@ -414,7 +475,7 @@ class ServerRequest extends Request implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that removes
      * the attribute.
      *
-     * @see    getAttributes()
+     * @see    getAttributes()`
      * @param  string $name The attribute name.
      * @return static
      */

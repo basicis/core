@@ -8,7 +8,6 @@ use Basicis\Cache\InvalidArgumentException;
 use Basicis\Exceptions\RuntimeException;
 use Basicis\Cache\CacheItem;
 use Basicis\Http\Message\StreamFactory;
-use Basicis\Basicis as App;
 
 /**
  * CacheItemPool generates CacheItemInterface objects.
@@ -51,25 +50,7 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function __construct(string $cacheFile = null)
     {
-        $this->cacheFile = $cacheFile;
-        if ($cacheFile === null) {
-            $this->cacheFile = App::path()."cache/app";
-        }
-
-        $path = pathinfo($this->cacheFile, PATHINFO_DIRNAME);
-        if (!is_dir($path)) {
-            mkdir($path, 0775, true);
-        }
-
-        if (!file_exists($this->cacheFile)) {
-            touch($this->cacheFile);
-        }
-
-        if (file_exists($this->cacheFile)) {
-            $this->stream = (new StreamFactory)->createStreamFromFile($this->cacheFile, "w+");
-            $this->load();
-            $this->checkExpiredItems();
-        }
+        return $this->setFile($cacheFile);
     }
 
 
@@ -363,6 +344,33 @@ class CacheItemPool implements CacheItemPoolInterface
     public function getFile() : string
     {
         return $this->cacheFile;
+    }
+
+    /**
+     * Function setFile
+     * Set this cache pool file
+     * @return string
+     */
+    public function setFile(string $cacheFile = null) : CacheItemPool
+    {
+        if ($cacheFile !== null) {
+            $path = pathinfo($cacheFile, PATHINFO_DIRNAME);
+            if (!is_dir($path)) {
+                mkdir($path, 0775, true);
+            }
+
+            if (!file_exists($cacheFile)) {
+                touch($cacheFile);
+            }
+
+            if (file_exists($cacheFile)) {
+                $this->stream = (new StreamFactory)->createStreamFromFile($cacheFile, "w+");
+                $this->load();
+                $this->checkExpiredItems();
+            }
+            $this->cacheFile = $cacheFile;
+        }
+        return $this;
     }
 
     /**

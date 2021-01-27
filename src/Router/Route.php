@@ -31,7 +31,7 @@ class Route
      * $args variable
      * @var string
      */
-    private $args;
+    private $args = [];
 
     /**
      * $name middlewares
@@ -76,14 +76,14 @@ class Route
     /**
      * Function getCallback
      * Get route callback if this is a Closure, else return null
-     * @return \Closure|null
+     * @return \Closure|string|null
      */
-    public function getCallback() : ?\Closure
+    public function getCallback()
     {
-        return !is_string($this->callback) ? $this->callback : null;
+        return $this->callback;
     }
 
-
+    //Todo Remove
     /**
     * Function getCallbackString
     * Get route callback if this is a string, else return null
@@ -139,11 +139,11 @@ class Route
     /**
      * Function getArguments
      * Get route arguments
-     * @return object|null
+     * @return array
      */
-    public function getArguments() : ?object
+    public function getArguments() : array
     {
-        return (object) $this->args ?? null;
+        return $this->args;
     }
 
     /**

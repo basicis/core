@@ -80,8 +80,7 @@ class Request extends Message implements RequestInterface
      */
     public function __construct(string $target = '/', string $method = 'GET', array ...$options)
     {
-        $this->withMethod($method);
-        $this->withUri(new Uri($target));
+        $this->withMethod($method)->withRequestTarget($target);
 
         foreach ($options as $key => $value) {
             if (strtolower($key) === 'version') {
@@ -172,7 +171,6 @@ class Request extends Message implements RequestInterface
         if (!in_array(strtoupper($method), self::VALID_METHODS)) {
             throw new InvalidArgumentException("Invalid or unsupported Method.");
         }
-        
         $this->method = strtoupper($method);
         return $this;
     }

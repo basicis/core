@@ -2,6 +2,7 @@
 namespace Basicis\Auth;
 
 use Basicis\Basicis as App;
+use Basicis\Model\ModelInterface;
 
 /**
  * AuthInterface, all Auth classes implements from this
@@ -12,7 +13,7 @@ use Basicis\Basicis as App;
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Auth/AuthInterface.php
  */
-interface AuthInterface
+interface AuthInterface extends ModelInterface
 {
     /**
      * Function getId
@@ -24,14 +25,35 @@ interface AuthInterface
     /**
      * Function getUsername
      * Return self username
-     * @return string
+     * @return string|null
      */
     public function getUsername() : ?string;
 
     /**
+     * Function setUsername
+     * Return a instance of ModelInterface
+     * @return AuthInterface
+     */
+    public function setUsername(string $username) : AuthInterface;
+
+    /**
+     * Function getEmail
+     * Return self email
+     * @return string|null
+     */
+    public function getEmail() : ?string;
+
+    /**
+     * Function setEmail
+     * Return a instance of ModelInterface
+     * @return AuthInterface
+     */
+    public function setEmail(string $email) : AuthInterface;
+
+    /**
      * Function getRole
      * Return self role
-     * @return int
+     * @return int|null
      */
     public function getRole() : int;
 
@@ -42,6 +64,16 @@ interface AuthInterface
      * @return string|null
      */
     public function getRoleName() : ?string;
+
+
+     /**
+     * Function setRole
+     * Set role permission ID includes is Default roles permissions IDs 'DEFAULT_ROLES' or optional > 5
+     * @param int $roleId
+     * @return AuthInterface
+     */
+    public function setRole(int $roleId) : AuthInterface;
+
 
     /**
      * Function checkPass

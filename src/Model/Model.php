@@ -61,7 +61,7 @@ abstract class Model implements ModelInterface
         if (($data !== null) && is_array($data)) {
             foreach ($data as $key => $prop) {
                 if (property_exists(get_called_class(), $key)) {
-                    $method = 'set'.str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+                    $method = 'set'.ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
                     $this->$method($prop);
                 }
             }
@@ -181,7 +181,6 @@ abstract class Model implements ModelInterface
         if ($manager instanceof EntityManager) {
             try {
                 $this->setUpdated();
-                
                 if ($this->getId() === null) {
                     $manager->persist($this);
                 }
@@ -189,7 +188,7 @@ abstract class Model implements ModelInterface
                 if ($this->getId() !== null) {
                     $manager->persist($manager->merge($this));
                 }
-
+                //$manager->persist($this);
                 $manager->flush();
             } catch (\Exception $e) {
                 (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
@@ -326,10 +325,16 @@ abstract class Model implements ModelInterface
      */
     public static function allToArray() : ?array
     {
-        $entities = self::all();
+        $entities = null;
         if ($entities !== null) {
-            foreach (self::all() as $key => $entity) {
-                $entities[$key] = $entity->__toArray();
+            try {
+                $entities = [];
+                foreach (self::all() as $key => $entity) {
+                    $entities[$key] = $entity->__toArray();
+                }
+            } catch (\Exception $e) {
+                throw $e;
+                return null;
             }
         }
         return $entities;
@@ -345,9 +350,8 @@ abstract class Model implements ModelInterface
      */
     public static function exists(array $findBy) : bool
     {
-        $model = get_called_class();
-        $example = self::findOneBy($findBy);
-        if ($example instanceof $model) {
+        $model = self::findOneBy($findBy);
+        if ($model !== null) {
             return true;
         }
         return false;

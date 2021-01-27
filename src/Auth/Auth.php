@@ -1,6 +1,7 @@
 <?php
 namespace Basicis\Auth;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Basicis\Model\Model;
 use Basicis\Core\Validator;
@@ -34,8 +35,15 @@ class Auth extends Model implements AuthInterface
     ];
 
     /**
+     * $protecteds variable
+     * Protecteds propreties
+     * @var array
+     */
+    protected $protecteds = ["pass"];
+
+    /**
      * $username variable
-     * @ORM\Column(name="username", length=300, unique=true)
+     * @ORM\Column(name="username", length=300, unique=true, nullable=true)
      * @var string
      */
     protected $username;
@@ -61,14 +69,6 @@ class Auth extends Model implements AuthInterface
      * @var int
      */
     protected $role;
-
-
-    /**
-     * $protecteds variable
-     *
-     * @var array
-     */
-    protected $protecteds = ["pass"];
 
 
     /**
@@ -105,6 +105,23 @@ class Auth extends Model implements AuthInterface
     }
 
 
+    /**
+     * Function setEmail
+     * Set Auth email
+     * @param string $email
+     * @return Auth
+     */
+    public function setEmail(string $email) : Auth
+    {
+        if (Validator::validate($email, "email")) {
+            $this->email = $email;
+
+            if ($this->getUsername() === null) {
+                $this->setUsername($email);
+            }
+        }
+        return $this;
+    }
 
     /**
      * Function getEmail
@@ -116,23 +133,6 @@ class Auth extends Model implements AuthInterface
         return $this->email;
     }
 
-
-    /**
-     * Function setEmail
-     * Set Auth email
-     * @param string $email
-     * @return Auth
-     */
-    public function setEmail(string $email) : Auth
-    {
-        if (Validator::validate($email, "email")) {
-            $this->email = $email;
-            if ($this->getUsername() === null) {
-                $this->setUsername($email);
-            }
-        }
-        return $this;
-    }
 
 
     /**
@@ -236,20 +236,30 @@ class Auth extends Model implements AuthInterface
 
 
     /**
-     * Function getUser
-     * Get a Auth User by token and appKey
-     * @param string $token
-     * @return Auth|null
-     */
-    public static function getUser(string $token, string $appKey) : ?Auth
+      * Function getUser
+      * Get a Auth User by ServerRequestInterface
+      *
+      * @param ServerRequestInterface $request
+      * @param string|null $authClass
+      *
+      * @return Auth|null
+      */
+    public static function getUser(ServerRequestInterface $request, string $authClass = null) : ?Auth
     {
-        $tokenObj = new Token($appKey);
-        if ($tokenObj->check($token)) {
-            $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
-            if ($user === null) {
-                $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+        if ($authClass === null) {
+            $authClass = self::class;
+        }
+
+        if (new $authClass instanceof AuthInterface && isset($request->getHeader('authorization')[0])) {
+            $token = $request->getHeader('authorization')[0];
+            $tokenObj = new Token($request->getAttribute("appKey"));
+            if ($tokenObj->check($token)) {
+                $user = $authClass::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
+                if ($user === null) {
+                    $user = $authClass::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+                }
+                return $user;
             }
-            return $user;
         }
         return null;
     }

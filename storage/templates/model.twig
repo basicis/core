@@ -24,12 +24,13 @@ class {{class}} extends Model
 {
     /**
      * $protecteds variable
+     * Protecteds propreties
      * @var array
      */
-    protected $protecteds = [];
+    protected $protecteds = ["protectedVar"];
 
     /**
-      * @ORM\Column(type="string")
+      * @ORM\Column(name="name" type="string")
       * @ORM\GeneratedValue
       * @var string $name
       */
@@ -41,6 +42,14 @@ class {{class}} extends Model
      * @var string
      */
     protected $email;
+
+
+    /**
+     * $protectedVar variable
+     * @ORM\Column(name="protectedVar", length=300)
+     * @var string
+     */
+    protected $protectedVar;
 
     /**
      * Function getName

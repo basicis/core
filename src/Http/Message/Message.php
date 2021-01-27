@@ -153,7 +153,7 @@ class Message implements MessageInterface
     * empty array.
     *
     * @param string $name Case-insensitive header field name.
-    * @return string[] An array of string values as provided for the given
+    * @return array|string[] An array of string values as provided for the given
     *    header. If the header does not appear in the message, this method MUST
     *    return an empty array.
     */
@@ -185,7 +185,11 @@ class Message implements MessageInterface
     public function getHeaderLine($name) : string
     {
         if (count($this->getHeader($name)) >= 1) {
-            return $this->normalizeHeaderKey($name).": ". implode('; ', $this->getHeader($name)) ;
+            $line = $this->normalizeHeaderKey($name);
+            if ($name !== "") {
+                $line .= ": ";
+            }
+            return $line.implode('; ', $this->getHeader($name)) ;
         }
         return '';
     }
@@ -195,14 +199,14 @@ class Message implements MessageInterface
      *
      * Retrieves all message header lines values in one array of string
      *
-     * @return string[]
+     * @return array|string[]
      */
     public function getHeaderLines() : array
     {
         $lines = [];
         foreach ($this->getHeaders() as $name => $value) {
             if (count($this->getHeader($name)) >= 1) {
-                $lines[] = $this->normalizeHeaderKey($name).":". implode(';', $this->getHeader($name)) ;
+                $lines[] = $this->normalizeHeaderKey($name);
             }
         }
         return $lines;
@@ -247,23 +251,19 @@ class Message implements MessageInterface
      */
     public function withHeaders(array $headers) : Message
     {
-        if (count($headers) >= 1) {
-            foreach ($headers as $key => $value) {
-                if (preg_match('/^[a-zA-Z-]{0,}$/', $key)) {
-                    $this->withOutHeader(strtolower($key));
-                    if (is_array($value)) {
-                        foreach ($value as $item_value) {
-                            $this->withAddedHeader(strtolower($key), $item_value);
-                        }
-                    } else {
-                        $this->withAddedHeader(strtolower($key), $value);
+        foreach ($headers as $key => $value) {
+            if (preg_match('/^[a-zA-Z-_]{0,}$/', $key)) {
+                $this->withOutHeader(strtolower($key));
+                if (is_array($value)) {
+                    foreach ($value as $item_value) {
+                        $this->withAddedHeader(strtolower($key), $item_value);
                     }
                 } else {
-                    throw new InvalidArgumentException("Invalid header key:$key . An string [a-zA-Z] was expected.");
+                    $this->withAddedHeader(strtolower($key), $value);
                 }
+            } else {
+                throw new InvalidArgumentException("Invalid header key: $key . An string [a-zA-Z-_] was expected.");
             }
-        } else {
-            throw new InvalidArgumentException("Invalid headers. An array was expected.");
         }
         return $this;
     }
@@ -395,7 +395,7 @@ class Message implements MessageInterface
      *
      * The value of the line will be added to the header with the same key,
      * otherwise the value of the current header will be replaced.
-     * $rewrite default:true
+     * $rewrite true
      *
      * @param array $headers
      * @param boolean $rewrite = true
@@ -407,19 +407,19 @@ class Message implements MessageInterface
         if (isset($line[1])) {
             $name = strtolower(trim($line[0]));
             $value = trim($line[1]);
+            if ($rewrite === true) {
+                return $this->withHeader($name, $value);
+            }
+            return $this->withAddedHeader($name, $value);
+        }
+
+        if (preg_match("#HTTP/[0-9\.]+\s+([0-9]+)#", $header, $out)) {
             if ($rewrite) {
-                $this->withHeader($name, $value);
-            } else {
-                $this->withAddedHeader($name, $value);
+                return $this->withHeader("", $header)
+                            ->withStatus(intval($out[1]));
             }
-        } else {
-            if (preg_match("#HTTP/[0-9\.]+\s+([0-9]+)#", $header, $out)) {
-                if ($rewrite) {
-                    $this->withHeader('reponse_code', intval($out[1]));
-                } else {
-                    $this->withAddedHeader('reponse_code', intval($out[1]));
-                }
-            }
+            return $this->withAddedHeader("", $header)
+                        ->withStatus(intval($out[1]));
         }
         return $this;
     }

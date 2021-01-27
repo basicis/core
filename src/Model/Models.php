@@ -1,6 +1,8 @@
 <?php
 namespace Basicis\Model;
 
+use Basicis\Exceptions\InvalidArgumentException;
+
 /**
  * Models class
  *
@@ -82,9 +84,14 @@ class Models
      * @param string $class
      *
      * @return bool
+     * @throws InvalidArgumentException If classname is null
      */
-    public static function isModel(string $class) : bool
+    public static function isModel($class) : bool
     {
-        return class_exists($class) && get_parent_class($class) === "Basicis\Model\Model";
+        if ($class === null) {
+            throw new InvalidArgumentException("The class name must be of type string, null passed", 0);
+            return false;
+        }
+        return class_exists($class) && is_subclass_of($class, "Basicis\Model\Model");
     }
 }

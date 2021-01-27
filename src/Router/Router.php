@@ -3,6 +3,7 @@ namespace Basicis\Router;
 
 use Basicis\Core\Validator;
 use Basicis\Http\Message\ResponseFactory;
+use Basicis\Http\Server\RequestHandler;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Basicis\Exceptions\BasicisException;
@@ -24,45 +25,70 @@ class Router
      */
     private $routes;
 
-
-
     /**
      * $method variable
      * @var string
      */
     private $method;
 
-
-
-    /**
-     * $path variable
-     * @var string
-     */
-    private $path;
-
-    
-    /**
-     * $response variable
-     * @var ResponseInterface
-     */
-    private $response;
-
-
-
     /**
      * Function __constructs
-     * @param ServerRequestInterface|null $request
+     *
      * @return void
      */
-    public function __construct(ServerRequestInterface $request = null)
+    public function __construct()
     {
         $this->routes = [];
-        if ($request !== null) {
-            return $this->setRequest($request);
-        }
     }
 
+    /**
+    * Function __invoke
+    * Handles a request and produces a response.
+    * May call other collaborating code to generate the response.
+    *
+    * @param ServerRequestInterface $request
+    * @param ResponseInterface $response
+    * @param callable $next null
+    * @return ResponseInterface
+    */
+    public function __invoke(
+        ServerRequestInterface &$request,
+        ResponseInterface $response,
+        callable $next = null
+    ) : ResponseInterface {
+        return $this->handle($request, $response, $next);
+    }
 
+    /**
+    * Function __invoke
+    * Handles a request and produces a response.
+    * May call other collaborating code to generate the response.
+    *
+    * @param ServerRequestInterface $request
+    * @param ResponseInterface $response
+    * @param callable $next null
+    * @return ResponseInterface
+    */
+    public function handle(
+        ServerRequestInterface &$request,
+        ResponseInterface $response,
+        callable $next = null
+    ) : ResponseInterface {
+        $route = $this->setRequest($request)->getRoute();
+        if ($route instanceof Route) {
+            $response->withStatus(200);
+            $request->withAttribute("route", $route);
+        }
+
+        if ($route === null) {
+            $response->withStatus(404, "Page or end-point not found!");
+        }
+
+        if ($next !== null) {
+            return $next($request, $response);
+        }
+        return $response;
+    }
 
     /**
     * Function setRoute
@@ -85,7 +111,6 @@ class Router
         return $this;
     }
 
-
     /**
      * Function setRouteByAnnotation
      * Receives a class as an argument, and works with the comment blocks as @Route
@@ -98,9 +123,8 @@ class Router
         $url = "/";
         $method = "GET";
         $middlewares = null;
-        $route = str_replace("@", '', $annotation);
-        $routeArray = explode('","', str_replace([" ", "@Route(", ")"], [""], $annotation));
-       
+    
+        $routeArray = explode('","', str_replace([" ", "@Route(", ")", "]"], [""], $annotation));
         if (isset($routeArray[0])) {
             $url = explode(',', str_replace('"', "", $routeArray[0]));
         }
@@ -117,7 +141,6 @@ class Router
         return $this;
     }
 
-
     /**
      * Function getRoute
      * Get route requested
@@ -130,16 +153,11 @@ class Router
         $routes = $this->findByName($this->url);
         $routes = $routes ? $routes : $this->findByRegex($this->url);
 
-        if ($routes &&  (count($routes) == 1)) {
-            $this->response = ResponseFactory::create(200);
+        if ($routes && (count($routes) === 1)) {
             return $routes[0];
         }
-
-        $this->response = ResponseFactory::create(404, "Page or end-point not found!");
         return null;
     }
-
-
 
     /**
      * Function getRoutes
@@ -150,8 +168,6 @@ class Router
     {
         return $this->routes;
     }
-
-
 
    /**
     * Function hasRoute
@@ -169,7 +185,6 @@ class Router
         }
         return false;
     }
-
 
     /**
      * Function getResponse
@@ -193,8 +208,6 @@ class Router
         return $this;
     }
 
-
-    
     /**
      * Function findByRegex
      * Find a route by regular expression
@@ -253,7 +266,6 @@ class Router
         return null;
     }
 
-
     /**
      * Function findByName
      * Find a route by name/url
@@ -281,7 +293,6 @@ class Router
         }
         return $routes;
     }
-
 
     /**
      * Function findByMethod
@@ -312,8 +323,6 @@ class Router
         return $return;
     }
 
-
-
     /**
      * Function findByCount
      * Find all routes by count spaces bar "/"
@@ -342,8 +351,6 @@ class Router
         return $return;
     }
 
-
-
     /**
      * Function extractArgRegex
      * Extract a argument regex of route name part
@@ -356,8 +363,6 @@ class Router
         $explode = explode('}', $routeNamePart);
         return (count($explode) > 1) ? substr($explode[1], 1) : null;
     }
-
-
 
     /**
      * Function extractArgId

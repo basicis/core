@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Basicis\Router\Router;
 use Basicis\Router\Route;
 use Basicis\Http\Message\ServerRequestFactory;
+use Basicis\Http\Message\ResponseFactory;
 use Basicis\Basicis as App;
 
  /**
@@ -34,7 +35,11 @@ class RouterTest extends TestCase
     public function __construct()
     {
         parent::__construct();
-        $this->router = new Router(ServerRequestFactory::create("GET", "/"));
+        $request = ServerRequestFactory::create("GET", "/");
+        $response = ResponseFactory::create();
+
+        $this->router = new Router();
+        $this->router->setRequest(ServerRequestFactory::create("GET", "/"));
 
         $this->router->setRoute("/", "GET", function () {
             return true;
