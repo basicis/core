@@ -185,7 +185,11 @@ class Message implements MessageInterface
     public function getHeaderLine($name) : string
     {
         if (count($this->getHeader($name)) >= 1) {
-            return $this->normalizeHeaderKey($name).": ". implode('; ', $this->getHeader($name)) ;
+            $line = $this->normalizeHeaderKey($name);
+            if ($name !== "") {
+                $line .= ": ";
+            }
+            return $line.implode('; ', $this->getHeader($name)) ;
         }
         return '';
     }
@@ -202,7 +206,7 @@ class Message implements MessageInterface
         $lines = [];
         foreach ($this->getHeaders() as $name => $value) {
             if (count($this->getHeader($name)) >= 1) {
-                $lines[] = $this->normalizeHeaderKey($name).":". implode(';', $this->getHeader($name)) ;
+                $lines[] = $this->normalizeHeaderKey($name);
             }
         }
         return $lines;
@@ -247,23 +251,19 @@ class Message implements MessageInterface
      */
     public function withHeaders(array $headers) : Message
     {
-        if (count($headers) >= 1) {
-            foreach ($headers as $key => $value) {
-                if (preg_match('/^[a-zA-Z-_]{0,}$/', $key)) {
-                    $this->withOutHeader(strtolower($key));
-                    if (is_array($value)) {
-                        foreach ($value as $item_value) {
-                            $this->withAddedHeader(strtolower($key), $item_value);
-                        }
-                    } else {
-                        $this->withAddedHeader(strtolower($key), $value);
+        foreach ($headers as $key => $value) {
+            if (preg_match('/^[a-zA-Z-_]{0,}$/', $key)) {
+                $this->withOutHeader(strtolower($key));
+                if (is_array($value)) {
+                    foreach ($value as $item_value) {
+                        $this->withAddedHeader(strtolower($key), $item_value);
                     }
                 } else {
-                    throw new InvalidArgumentException("Invalid header key: $key . An string [a-zA-Z-_] was expected.");
+                    $this->withAddedHeader(strtolower($key), $value);
                 }
+            } else {
+                throw new InvalidArgumentException("Invalid header key: $key . An string [a-zA-Z-_] was expected.");
             }
-        } else {
-            throw new InvalidArgumentException("Invalid headers. An array was expected.");
         }
         return $this;
     }

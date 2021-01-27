@@ -236,20 +236,27 @@ class Auth extends Model implements AuthInterface
 
 
     /**
-     * Function getUser
-     * Get a Auth User by ServerRequestInterface
-     * @param ServerRequestInterface $request
-     * @return Auth|null
-     */
-    public static function getUser(ServerRequestInterface $request) : ?Auth
+      * Function getUser
+      * Get a Auth User by ServerRequestInterface
+      *
+      * @param ServerRequestInterface $request
+      * @param string|null $authClass
+      *
+      * @return Auth|null
+      */
+    public static function getUser(ServerRequestInterface $request, string $authClass = null) : ?Auth
     {
-        if (isset($request->getHeader('authorization')[0])) {
+        if ($authClass === null) {
+            $authClass = self::class;
+        }
+
+        if (new $authClass instanceof AuthInterface && isset($request->getHeader('authorization')[0])) {
             $token = $request->getHeader('authorization')[0];
             $tokenObj = new Token($request->getAttribute("appKey"));
             if ($tokenObj->check($token)) {
-                $user = self::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
+                $user = $authClass::findOneBy(["id" => $tokenObj->decode($token)->usr->id]);
                 if ($user === null) {
-                    $user = self::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
+                    $user = $authClass::findOneBy(["username" => $tokenObj->decode($token)->usr->username]);
                 }
                 return $user;
             }

@@ -78,21 +78,6 @@ class Router
         if ($route instanceof Route) {
             $response->withStatus(200);
             $request->withAttribute("route", $route);
-
-            //Handle all middlewares
-            /*$pipeLine = [];
-            if (empty($middlewares) && $request->getAttribute("route") !== null) {
-                $routeList = $request->getAttribute("route")->getMiddlewares();
-                $middlewares = $this->getMiddlewares("route");
-
-                foreach ($middlewares as $key => $middleware) {
-                    if (key_exists($key, $routeList)) {
-                        $pipeLine[] = $middleware;
-                    }
-                }
-            }
-            return Middleware::pipeLine($pipeLine);
-            */
         }
 
         if ($route === null) {
@@ -138,9 +123,8 @@ class Router
         $url = "/";
         $method = "GET";
         $middlewares = null;
-        $route = str_replace("@", '', $annotation);
-        $routeArray = explode('","', str_replace([" ", "@Route(", ")"], [""], $annotation));
-       
+    
+        $routeArray = explode('","', str_replace([" ", "@Route(", ")", "]"], [""], $annotation));
         if (isset($routeArray[0])) {
             $url = explode(',', str_replace('"', "", $routeArray[0]));
         }

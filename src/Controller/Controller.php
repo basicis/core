@@ -41,9 +41,8 @@ abstract class Controller extends RequestHandler implements ControllerInterface
         $action = $request->getAttribute("action");
         $request->withoutAttribute("action")
                 ->withoutAttribute("route");
-        $actionResponse = null;
         $actionResponse = $this->$action($request->getAttribute("app"), $args);
-
+        
         if ($actionResponse instanceof ResponseInterface) {
             return $next($request, $actionResponse);
         }

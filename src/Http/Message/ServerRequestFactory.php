@@ -47,44 +47,32 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      * @param UriInterface|string $uri The URI associated with the request. If
      *     the value is a string, the factory MUST create a UriInterface
      *     instance based on it.
-     * @param array $serverParams Array of SAPI parameters with which to seed
+     * @param array $params Array of SAPI parameters with which to seed
      *     the generated request instance.
      *
      * @return ServerRequestInterface
      */
-    public static function create(string $method, $uri, array $serverParams = []): ServerRequestInterface
+    public static function create(string $method, $uri, array $params = []): ServerRequestInterface
     {
-        return (new ServerRequestFactory())->createServerRequest($method, $uri, $serverParams);
-    }
-
-    /**
-     * Function createFromArray
-     * Create a instance of ServerRequestInterface object
-     * @param array $params
-     *
-     * @return ServerRequestInterface
-     */
-    public static function createFromArray(array $params = []) : ServerRequestInterface
-    {
-        $serverParams = self::extractServerParams($params);
-        $requestParams = self::extractRequestParams($params);
-
-        $serverParams["cache"] = $params["cache"] ?? false;
-        $serverParams["files"] = $params["files"] ?? [];
-        $serverParams["cookie"] = $params["cookie"] ?? [];
-        $serverParams["headers"] = self::extractHeadersParams($params);
-        $serverParams["headers"] = self::extractRemoteParams($params);
+        $request = (new ServerRequestFactory())->createServerRequest(
+            $method,
+            $uri,
+            array_merge(
+                self::extractServerParams($params),
+                [
+                    "cache" => $params["cache"] ?? false,
+                    "files" => $params["files"] ?? [],
+                    "cookie" => $params["cookie"] ?? [],
+                    "headers" => self::extractHeadersParams($params),
+                    "remote" => self::extractRemoteParams($params)
+                ]
+            )
+        );
         
-        $request = (new ServerRequest(
-            (new Uri())
-            ->withHost($requestParams["host"] ?? "localhost")
-            ->withPort($serverParams["port"] ?? null)
-            ->withPath($requestParams["uri"]),
-            $requestParams["method"] ?? "GET",
-            $serverParams
-        ));
-
         foreach (self::extractAppParams($params) as $name => $value) {
+            if (strtolower($name) === "key") {
+                $value = md5($value);
+            }
             $request->withAttribute("app".ucfirst($name), $value);
         }
 
@@ -109,6 +97,28 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
     }
 
     /**
+     * Function createFromArray
+     * Create a instance of ServerRequestInterface object
+     * @param array $params
+     *
+     * @return ServerRequestInterface
+     */
+    public static function createFromArray(array $params = []) : ServerRequestInterface
+    {
+        $serverParams = self::extractServerParams($params);
+        $requestParams = self::extractRequestParams($params);
+        
+        return self::create(
+            $requestParams["method"] ?? "GET",
+            (new Uri())
+            ->withHost($requestParams["host"] ?? "localhost")
+            ->withPort($serverParams["port"] ?? null)
+            ->withPath($requestParams["uri"]),
+            $params
+        );
+    }
+
+    /**
      * Function extractParams
      * Extract Params from array and replace keys starts
      * @param array $params
@@ -116,7 +126,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractParams(array &$params = [], $replace = []) : array
+    private static function extractParams(array $params = [], $replace = []) : array
     {
         $returnParams = [];
         foreach ($params as $name => $value) {
@@ -150,7 +160,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractServerParams(array &$params = []) : array
+    private static function extractServerParams(array $params = []) : array
     {
         return self::extractParams($params, ["SERVER_", "DOCUMENT_", "SCRIPT_", "PHP_"]);
     }
@@ -162,7 +172,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractRequestParams(array &$params = []) : array
+    private static function extractRequestParams(array $params = []) : array
     {
         return self::extractParams($params, ["REQUEST_"]);
     }
@@ -174,7 +184,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractRemoteParams(array &$params = []) : array
+    private static function extractRemoteParams(array $params = []) : array
     {
         return self::extractParams($params, ["REMOTE_"]);
     }
@@ -186,7 +196,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractHeadersParams(array &$params = []) : array
+    private static function extractHeadersParams(array $params = []) : array
     {
         return self::extractParams($params, ["HTTP_"]);
     }
@@ -198,7 +208,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractAppParams(array &$params = []) : array
+    private static function extractAppParams(array $params = []) : array
     {
         return self::extractParams($params, ["APP_"]);
     }
@@ -210,7 +220,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @return array
      */
-    private static function extractDBParams(array &$params = []) : array
+    private static function extractDBParams(array $params = []) : array
     {
         return self::extractParams($params, ["DB_", "DATABASE_"]);
     }

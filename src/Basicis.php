@@ -143,12 +143,25 @@ class Basicis implements RequestHandlerInterface
      * Construct a instanceof Basicis\Basicis lovingly named $app
      *
      * @param ServerRequestInterface $request
-     * @param array $options Acceptables options [mode=string, timezone=string, appDescription=string, appKey=string]
      */
-    public function __construct(ServerRequestInterface $request, array $options = [])
+    public function __construct(ServerRequestInterface $request)
     {
+        if (in_array($request->getAttribute("appEnv", "dev"), ["development", "dev"])) {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+        }
+        
+        date_default_timezone_set(
+            $request->getAttribute(
+                "appTimezone",
+                date_default_timezone_get()
+            )
+        );
+        
+        $this->enableCache($request->getAttribute("appCache", false));
+
         $this->router = new Router();
-        $this->setRequest($request)->setOptions($options);
+        $this->setRequest($request);
     }
 
     /**
@@ -156,54 +169,19 @@ class Basicis implements RequestHandlerInterface
      * Create a instanceof Basicis\Basicis and return it is
      *
      * @param  ServerRequestInterface|array $request
-     * @param  array $options
      * @return Basicis
      */
-    public static function createApp($request = null, array $options = []) : Basicis
+    public static function createApp($request = null) : Basicis
     {
         $serverRequest = ServerRequestFactory::create('GET', '/');
-
         if ($request instanceof ServerRequestInterface) {
             $serverRequest = $request;
         }
     
         if (is_array($request)) {
-            $serverRequest = ServerRequestFactory::createFromArray(array_merge($request, $options));
+            $serverRequest = ServerRequestFactory::createFromArray(array_merge($request));
         }
-        return new Basicis($serverRequest, $options);
-    }
-
-    /**
-     * Function setOptions
-     * Setting app options
-     * @param array $options
-     *
-     * @return Basicis
-     */
-    public function setOptions(array $options = []) : Basicis
-    {
-        $this->setDescription($options["description"] ?? $this->getDescription());
-        $this->setKey($options["key"] ?? $this->generateAppKey());
-        $this->setMode($options["mode"] ?? "dev");
-        $this->setTimezone($options["timezone"] ?? null);
-        $this->setTokenOptions($options["token"] ?? []);
-        return $this;
-    }
-
-    /**
-     * Function setTokenOptions
-     * Setting app token options
-     * @param array $options
-     *
-     * @return Basicis
-     */
-    public function setTokenOptions(array $options = []) : Basicis
-    {
-        $this->getRequest()
-        ->withAttribute("tokenIss", $options["iss"] ?? $this->getDescription())
-        ->withAttribute("tokenExpiration", $options["expiration"] ?? "+30 minutes")
-        ->withAttribute("tokenNoBefore", $options["nobefore"] ?? "now");
-        return $this;
+        return new Basicis($serverRequest);
     }
 
     /**
@@ -600,19 +578,6 @@ class Basicis implements RequestHandlerInterface
     }
 
     /**
-      * Function getEnv
-      * Get a array of enviroment variables
-      *
-      * @param string $name
-      *
-      * @return mixed|null
-      */
-    public function getEnv(string $name, $default = null)
-    {
-        return $this->getRequest()->getAttribute($name, $default);
-    }
-
-    /**
      * Function getResourceInput
      * Get app default resource input
      *
@@ -670,22 +635,6 @@ class Basicis implements RequestHandlerInterface
     }
 
     /**
-     * Function setDescription
-     * Setting App description string
-     *
-     * @param string $description
-     * @return Basicis
-     */
-    public function setDescription(string $description = null) : Basicis
-    {
-        $this->getRequest()->withAttribute(
-            "appDescription",
-            $description ?? $this->getRequest()->getAttribute("appDescription")
-        );
-        return $this;
-    }
-
-    /**
      * Function getDescription
      * Getting App description string
      *
@@ -696,78 +645,6 @@ class Basicis implements RequestHandlerInterface
     public function getDescription() : String
     {
         return $this->getRequest()->getAttribute("appDescription", "This is a Basicis framework App!");
-    }
-
-    /**
-     * Function setMode
-     * Setting App operation Mode, development ["dev" or null] ou production ["production" or "prod"]
-     *
-     * @param string $mode ["dev", "production", "prod" or null]
-     * Default value "dev" == Development Mode
-     * @return Basicis
-     */
-    public function setMode(string $mode = "dev") : Basicis
-    {
-        if (in_array($mode, ["production", "prod"])) {
-            $mode = "production";
-        } else {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-            $mode = "dev";
-        }
-
-        $this->request()->withAttribute("appMode", $mode);
-        return $this;
-    }
-
-    /**
-     * Function getMode
-     * Getting App operation Mode, development "dev" ou production "production"
-     *
-     * @return String
-     */
-    public function getMode() : String
-    {
-        return $this->getRequest()->getAttribute("appMode", "dev");
-    }
-
-    /**
-     * Function getKey
-     * Getting hash appKey
-     *
-     * @return String
-     */
-    public function getKey() : String
-    {
-        return $this->getRequest()->getAttribute("appKey") ?? $this->generateAppKey();
-    }
-
-    /**
-     * Function setKey
-     * Setting hash appKey
-     *
-     * @param string $appKey
-     * @return Basicis
-     */
-    public function setKey(string $appKey = null) : Basicis
-    {
-        $this->getRequest()->withAttribute("appKey", md5($appKey) ?? $this->generateAppKey());
-        return $this;
-    }
-
-    /**
-     * Function generateAppKey
-     * Setting hash appKey
-     *
-     * @param string $appKey
-     * @return string
-     */
-    public function generateAppKey() : string
-    {
-        if ($this->getRequest()->getAttribute("appKey") === null) {
-            $this->getRequest()->withAttribute("appKey", md5("default-app-key"));
-        }
-        return $this->getRequest()->getAttribute("appKey");
     }
 
     /**
@@ -793,12 +670,12 @@ class Basicis implements RequestHandlerInterface
      *
      * @return Basicis
      */
-    public function enableCache(bool $enable = true, string $cacheFile = null)  : Basicis
+    public function enableCache(bool $enable = true, string $cacheFile = "cache/app")  : Basicis
     {
         if ($enable) {
-            $this->cache = new CacheItemPool($cacheFile);
+            $this->cache = new CacheItemPool(self::path().$cacheFile);
         }
-        $this->getRequest()->withAttribute("cacheEnable", $enable);
+        $this->getRequest()->withAttribute("appCache", $enable);
         return $this;
     }
 
@@ -810,34 +687,7 @@ class Basicis implements RequestHandlerInterface
      */
     public function cacheIsEnabled() : bool
     {
-        return  $this->getRequest()->getAttribute("cacheEnable", false);
-    }
-
-    /**
-     * Function setTimezone
-     * Setting app timezone
-     *
-     * @param string $timezone "America/Recife" if this is null
-     * @return Basicis
-     */
-    public function setTimezone(string $timezone = null) : Basicis
-    {
-        $timezone = isset($timezone) ? $timezone : date_default_timezone_get();
-        date_default_timezone_set($timezone);
-        $this->getRequest()->withAttribute("appTimezone", $timezone ?? $this->getTimezone());
-        return $this;
-    }
-
-    /**
-     * Function getTimezone
-     * Getting App Timezone, default timezone is returned if this in null "America/Recife"
-     * @param string $default "America/Recife"
-     *
-     * @return String
-     */
-    public function getTimezone(string $default = "America/Recife") : String
-    {
-        return  $this->getRequest()->getAttribute("appTimezone", $default);
+        return $this->getRequest()->getAttribute("appCache", false);
     }
 
     /**
@@ -1212,8 +1062,9 @@ class Basicis implements RequestHandlerInterface
      */
     public function error(int $code, string $message = null) : ResponseInterface
     {
-        $this->getResponse()->withStatus($code, $message);
-        if (str_starts_with($this->getHeaderLine("Content-Type"), "text/html")) {
+        $response = ResponseFactory::create($code, $message);
+        $conteType = $response->getHeaderLine("Content-Type");
+        if (str_starts_with($conteType, "text/html") | $conteType === "") {
             return $this->view(
                 "error",
                 [
@@ -1223,17 +1074,18 @@ class Basicis implements RequestHandlerInterface
                         $message
                     )
                 ]
-            );
+            )->withStatus($code, $message);
         }
 
-        if (str_starts_with($this->getHeaderLine("Content-Type"), "application/json")) {
+        if (str_starts_with($conteType, "application/json")) {
             return $this->json([
                 "error" => [
                     "code" => $code,
                     "message" => $message
                 ]
-            ]);
+            ])->withStatus($code, $message);
         }
+        return $response->withStatus($code, $message);
     }
 
     /**
@@ -1478,10 +1330,12 @@ class Basicis implements RequestHandlerInterface
         if (file_exists($resourceFileName) | $resourceFileName === "php://output") {
             $stream = (new StreamFactory())->createStreamFromFile($resourceFileName, 'rw');
             $size = 0;
-
             if ($stream->isWritable()) {
-                foreach ($response->getHeaders() as $name => $value) {
-                    header($response->getHeaderLine($name), true);
+                header($response->getHeaderLine(""), true);
+                $response->withoutHeader("");
+
+                foreach ($response->getHeaderLines() as $line) {
+                    header($response->getHeaderLine($line), true);
                 }
                 $size = $stream->write($response->getBody());
                 $response->getBody()->close();
@@ -1494,38 +1348,19 @@ class Basicis implements RequestHandlerInterface
     }
 
     /**
-     * Function handleError
-     * Returns a template view with errors occurred during the execution of the application according to http response
-     *
-     * @param string $message
-     *
-     * @return ResponseInterface
-     */
-
-     /**
       * Function handleError
       * Returns a template view with errors occurred during the execution of the application according to http response
-      *
+      * @param string $name
       * @return ResponseInterface
       */
-    public function handleError() : \Closure
+    public function handleError(string $message = null) : \Closure
     {
         $app = $this;
         return function ($request, $response, $next = null) use ($app) {
             if ($response->getStatusCode() > 307) {
-                return $this->view(
-                    "error",
-                    [
-                        "message" => $message ?? sprintf(
-                            "%s | %s",
-                            $response->getStatusCode(),
-                            $response->getReasonPhrase()
-                        ),
-                        "request" => $request
-                    ]
-                )->withStatus(
+                return $this->error(
                     $response->getStatusCode(),
-                    $response->getReasonPhrase()
+                    $message ?? $response->getReasonPhrase()
                 );
             }
 
@@ -1537,14 +1372,16 @@ class Basicis implements RequestHandlerInterface
     }
    
     /**
-     * handle function
-     * Handles the callback function returned by routing engineering and executes it, this return a ResponseInterface
-     *
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
-     * @return ResponseInterface
-     */
+      * handle function
+      * Handles the callback function returned by routing engineering and executes it, this return a ResponseInterface
+      *
+      * @param ServerRequestInterface $request
+      * @param ResponseInterface $response
+      * @param callable $next
+      *
+      * @return ResponseInterface
+      * @throws InvalidArgumentException
+      */
     public function handle(
         ServerRequestInterface $request,
         ResponseInterface $response,
@@ -1558,15 +1395,15 @@ class Basicis implements RequestHandlerInterface
                 try {
                     $response =  $this->closure($callback, $request, $response);
                 } catch (\Exception $e) {
-                    (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
+                    throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
                 }
             }
 
             if (is_string($callback)) {
                 try {
-                    return $this->controller($request, $response, $next);
+                    $response = $this->controller($request, $response);
                 } catch (\Exception $e) {
-                    (new InvalidArgumentException($e->getMessage(), $e->getCode(), $e))->log();
+                    throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
                 }
             }
         }
@@ -1589,27 +1426,27 @@ class Basicis implements RequestHandlerInterface
      */
     public function redirect(string $url = "/", $method = "GET", array $data = []) : ResponseInterface
     {
-        //$body = $this->getRequest()->getParsedBody();
-        $body = null;
-        if ($body !== null) {
-            $data = array_merge($data, $body);
-        }
-
-        return $this->pipeLine()(
-            $this->getRequest()
-            ->withParsedBody($data)
-            ->withMethod($method)
-            ->withUri(
-                $this->getRequest()
-                ->getUri()
-                ->withPath($url)
-            ),
-            $this->getResponse()->withStatus(307)
-        );
+        return $this->pipeLine(
+            $this->getRequest()->withMethod($method)->withRequestTarget($url)
+            ->withParsedBody(array_merge($data, $this->getRequest()->getParsedBody() ?? [])),
+            $this->getResponse()
+        )->withStatus(307);
     }
 
-    public function pipeLine() : PipeLine
-    {
+    /**
+      * Function pipeLine
+      * Run set and middlewares levels pipeline and return a instanceof ResponseInterface
+      *
+      * @param ServerRequestInterface $request
+      * @param ResponseInterface|null $response
+      * @param callable $next
+      *
+      * @return ResponseInterface
+      */
+    public function pipeLine(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ) : ResponseInterface {
         //Start app pipeline with
         $pipeLine = new PipeLine();
         
@@ -1619,20 +1456,40 @@ class Basicis implements RequestHandlerInterface
         $pipeLine->add($this->getRouter());
         //Add handler router middlewares
         $pipeLine->add($this->handleRouteMiddlewares());
-        //Add handler app core
-        $pipeLine->add($this);
+
+        $response = $pipeLine($request, $response);
+        $pipeLine->reset();
+
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() <= 307) {
+            //Add handler app core
+            $pipeLine->add($this);
+        }
+
         //Add handler after middlewares
         $pipeLine->add($this->handleAfterMiddlewares());
         //Handle errors if it`s exists
         $pipeLine->add($this->handleError());
 
-        //Run pipeline and return a instanceo of ResponseInterface
-        return $pipeLine;
+        //Return a instanceo of PipeLine
+        return $pipeLine($request, $response)->withHeader(
+            "",
+            sprintf(
+                "%s/%s %s %s",
+                strtoupper($request->getUri()->getScheme()),
+                $request->getProtocolVersion(),
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            )
+        );
     }
 
     /**
      * Function runAndResponse
      * Run app pipe line and return a instance of ResponseInterface
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $next
      *
      * @return ResponseInterface
      */
@@ -1651,16 +1508,19 @@ class Basicis implements RequestHandlerInterface
      *
      * By definition the values ​​are respectively "php://input" for input and "php://output" for output.
      *
-     * @param string $inputResource = "php://input"
-     * @param string $outputResource = "php://output"
+     * @param string $inputResource "php://input"
+     * @param string $outputResource "php://output"
      * @return int
      */
     public function run() : int
     {
-        //Get request body
-        $request = $this->getRequest()->withParsedBody(self::input($this->getResourceInput()));
-        
         //Run app pipe line and return a instance of ResponseInterface
-        return self::output($this->pipeLine()($request, $this->getResponse()), $this->getResourceOutput());
+        $response = $this->pipeLine(
+            $this->getRequest()->withParsedBody(self::input($this->getResourceInput())),
+            $this->getResponse()
+        );
+    
+        //Return user output by is default php://output
+        return self::output($response, $this->getResourceOutput());
     }
 }

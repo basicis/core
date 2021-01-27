@@ -124,36 +124,6 @@ class BasicisTest extends TestCase
     }
 
     /**
-     * Function testSetMode
-     *
-     * @return void
-     */
-    public function testSetMode()
-    {
-        $this->assertInstanceOf(App::class, $this->app->setMode("dev"));
-    }
-
-    /**
-     * Function testSetTimezone
-     *
-     * @return void
-     */
-    public function testSetAndGetModeAndTimezone()
-    {
-        //App Mode Production
-        $this->assertInstanceOf(App::class, $this->app->setMode("production"));
-        $this->assertEquals("production", $this->app->getMode());
-
-        //App Mode Development
-        $this->assertInstanceOf(App::class, $this->app->setMode('dev'));
-        $this->assertEquals("dev", $this->app->getMode());
-
-        //App Timezone
-        $this->assertInstanceOf(App::class, $this->app->setTimezone("America/Recife"));
-        $this->assertEquals("America/Recife", $this->app->getTimezone());
-    }
-
-    /**
      * Function testSetRequest
      *
      * @return void

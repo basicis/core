@@ -322,7 +322,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified scheme.
      * @throws InvalidArgumentException for invalid or unsupported schemes.
      */
-    public function withScheme($scheme) : ?Uri
+    public function withScheme($scheme) : Uri
     {
         if (in_array(strtolower($scheme), self::VALID_SCHEMES)) {
             $this->scheme = strtolower($scheme);
