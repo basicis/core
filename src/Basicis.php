@@ -1464,7 +1464,7 @@ class Basicis implements RequestHandlerInterface
             //Add handler app core
             $pipeLine->add($this);
         }
-
+     
         //Add handler after middlewares
         $pipeLine->add($this->handleAfterMiddlewares());
         //Handle errors if it`s exists

@@ -3,7 +3,7 @@ namespace Test\Auth;
 
 use PHPUnit\Framework\TestCase;
 use Basicis\Auth\Token;
-use Basicis\Auth\Auth as User;
+use Basicis\Auth\User;
 
 /**
  * Class TokenTest

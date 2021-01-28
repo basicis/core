@@ -37,7 +37,11 @@ abstract class Controller extends RequestHandler implements ControllerInterface
         ResponseInterface $response,
         callable $next = null
     ) : ResponseInterface {
-        $args = (object) $request->getAttribute("route")->getArguments();
+        $args = (object) array_merge(
+            $request->getAttribute("route")->getArguments(),
+            $request->getParsedBody() ?? []
+        );
+
         $action = $request->getAttribute("action");
         $request->withoutAttribute("action")
                 ->withoutAttribute("route");
@@ -91,8 +95,8 @@ abstract class Controller extends RequestHandler implements ControllerInterface
             $model = new $class((array) $args);
             if ($model instanceof $class) {
                 $model->save();
-                if ($class::exists(["id" => $model->getId()])) {
-                    return $app->json($model->__toArray(), 201);
+                if ($class::exists($uniqueColumns)) {
+                    return $app->json($model->__toArray())->withStatus(201);
                 }
             }
             return $app->json(null, 400);
@@ -132,7 +136,7 @@ abstract class Controller extends RequestHandler implements ControllerInterface
                 }
                 return $app->json(null, 400);
             } catch (\Exception $e) {
-                return $app->json(null, 500);
+                return $app->json($e->getMessage(), 500);
             }
         }
         return $app->json("Annotation @Model or argument 'id' no is defined.", 500);
@@ -152,12 +156,12 @@ abstract class Controller extends RequestHandler implements ControllerInterface
     {
         $class = $this->getModelByAnnotation();
         if ($class !== null && isset($args->id)) {
-            $uniqueColumns = self::extractUniqueColumns($class, (array) $args);
-            if (!$class::exists($uniqueColumns)) {
+            $findBy = ["id" => $args->id];
+            if (!$class::exists($findBy)) {
                 return $app->json(null, 404);
             }
 
-            $model = $class::findOneBy($uniqueColumns);
+            $model = $class::findOneBy($findBy);
             $statusCode = 400;
 
             if ($model !== null && $model instanceof Model) {
@@ -185,7 +189,6 @@ abstract class Controller extends RequestHandler implements ControllerInterface
     public function find(App $app, object $args = null) : ResponseInterface
     {
         $class = $this->getModelByAnnotation();
-        $model = null;
         if ($class !== null && class_exists($class)) {
             $model = $class::findOneBy((array) $args);
             if ($model instanceof $class) {
@@ -207,18 +210,17 @@ abstract class Controller extends RequestHandler implements ControllerInterface
     public function all(App $app, object $args = null) : ResponseInterface
     {
         $class = $this->getModelByAnnotation();
-        $models = null;
         if ($class !== null && class_exists($class)) {
-            $models = new Models($class);
-            if ($models !== null && $models->getArray() !== null) {
-                return $app->json($models->getArray(), 200);
+            $models = $class::allToArray();
+            if ($models !== null) {
+                return $app->json($models, 200);
             }
         }
         return $app->getResponse()->withStatus(404);
     }
 
     /**
-     * Undocumented function
+     * Function getModelByAnnotation
      * Get annotations model class
      * @return string|null
      */

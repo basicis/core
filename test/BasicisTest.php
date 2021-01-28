@@ -191,7 +191,6 @@ class BasicisTest extends TestCase
         $this->assertInstanceOf(Router::class, $this->app->getRouter());
     }
 
-
     /**
      * Function testGetRoute
      *
@@ -206,43 +205,6 @@ class BasicisTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $this->app->getRoute());
     }
-
-    /**
-     * Function testAuth
-     *
-     * @return void
-     */
-    public function testAuth()
-    {
-        //Setup Test, setting appKey
-        $appKey = "test-app-key-here";
-
-        //Creating a instanceof Token and a instanceof Auth (user)
-        $tokenObj = new Token($appKey, "Test Iss", "+10 minutes", "now");
-        $user = new Auth();
-
-        //Setting Auth (user) params
-        $user->setEmail("user@test.com")->setRole(5)->setPass("1234")->save();
-        //Creating a string token, with $user obj as params
-        $tokenString = $tokenObj->create($user);
-
-        //Setting this string token to a instanceof ServerRequestInterface in the Basicis App
-        //In the actual operation of the application,
-        //it must reach the same via http header in the format 'Authorization: Bearer <You-access-token-here>'
-        $this->app->getRequest()->withHeader("authorization", $tokenString);
-        $header = $this->app->getRequest()->getHeaderLine("authorization");
-
-        //Exec tests assertions
-        $this->assertEquals(null, $this->app->auth());
-        $this->assertTrue(str_starts_with($header, "Authorization:"));
-        $this->assertEquals(3, count(explode(".", $header)));
-
-        $this->app->getRequest()->withAttribute("auth", $user);
-        $this->assertInstanceOf(Auth::class, $this->app->auth());
-        $this->assertTrue($user->delete()); //delete test user
-        $this->assertNull(Auth::all()); //check if all is removed
-    }
-
 
     /**
      * Function testRunAndResponse

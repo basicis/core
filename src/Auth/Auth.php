@@ -4,7 +4,6 @@ namespace Basicis\Auth;
 use Psr\Http\Message\ServerRequestInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Basicis\Model\Model;
-use Basicis\Core\Validator;
 
 /**
  * Auth Class
@@ -14,10 +13,9 @@ use Basicis\Core\Validator;
  * @author   Messias Dias <https://github.com/messiasdias> <messiasdias.ti@gmail.com>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     https://github.com/basicis/core/blob/master/src/Basicis/Auth/Auth.php
- * @ORM\Entity
- * @ORM\Table(name="Auth")
+ *
  */
-class Auth extends Model implements AuthInterface
+class Auth
 {
 
     /**
@@ -35,177 +33,10 @@ class Auth extends Model implements AuthInterface
     ];
 
     /**
-     * $protecteds variable
-     * Protecteds propreties
-     * @var array
-     */
-    protected $protecteds = ["pass"];
-
-    /**
-     * $username variable
-     * @ORM\Column(name="username", length=300, unique=true, nullable=true)
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * $email variable
-     * @ORM\Column(name="email", length=300, unique=true)
-     * @var string
-     */
-    protected $email;
-
-    /**
-     * $pass variable
-     * @ORM\Column(name="pass", length=60)
-     * @var string
-     */
-    protected $pass;
-
-
-    /**
-     * $role variable
-     * @ORM\Column(name="role", type="integer")
-     * @var int
-     */
-    protected $role;
-
-
-    /**
-     * Function __construct
-     * Run parent Basicis\Model\Model::__construct method with $data [array|int(id)] as argument
-     * @param array|int $data
-     */
-    public function __construct($data = null)
-    {
-        parent::__construct($data);
-    }
-
-    /**
-     * Function getUsername
-     * Get Auth username
-     * @return string|null
-     */
-    public function getUsername() : ?string
-    {
-        return $this->username;
-    }
-
-
-    /**
-     * Function setUsername
-     * Set Auth username
-     * @param string $username
-     * @return Auth
-     */
-    public function setUsername(string $username) : Auth
-    {
-        $this->username = $username;
-        return $this;
-    }
-
-
-    /**
-     * Function setEmail
-     * Set Auth email
-     * @param string $email
-     * @return Auth
-     */
-    public function setEmail(string $email) : Auth
-    {
-        if (Validator::validate($email, "email")) {
-            $this->email = $email;
-
-            if ($this->getUsername() === null) {
-                $this->setUsername($email);
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * Function getEmail
-     * Get Auth email
-     * @return string|null
-     */
-    public function getEmail() : ?string
-    {
-        return $this->email;
-    }
-
-
-
-    /**
-     * Function setPass
-     * Set Auth password key
-     * @param string $passKey
-     * @return Auth
-     */
-    public function setPass(string $passKey) : Auth
-    {
-        $this->pass = password_hash($passKey, PASSWORD_BCRYPT);
-        return $this;
-    }
-
-
-
-    /**
-     * Function checkPass
-     * Check Auth password key
-     * @param string $passKey
-     * @return bool
-     */
-    public function checkPass(string $passKey) : bool
-    {
-        return password_verify($passKey, $this->pass);
-    }
-
-
-
-    /**
-     * Function getRole
-     * Get role permission ID
-     * @return int
-     */
-    public function getRole() : int
-    {
-        return $this->role !== null ? $this->role : 5;
-    }
-
-
-    /**
-     * Function getRoleName
-     * Get role permission Name
-     * @return string|null
-     */
-    public function getRoleName() : ?string
-    {
-        if (array_key_exists($this->getRole(), self::DEFAULT_ROLES)) {
-            return self::DEFAULT_ROLES[$this->getRole()];
-        }
-        return null;
-    }
-
-
-    /**
-     * Function setRole
-     * Set role permission ID includes is Default roles permissions IDs 'DEFAULT_ROLES' or optional > 5
-     * @param int $roleId
-     * @return Auth
-     */
-    public function setRole(int $roleId) : Auth
-    {
-        if (array_key_exists($roleId, self::DEFAULT_ROLES) | (int) $roleId > 5) {
-            $this->role = $roleId;
-        }
-        return $this;
-    }
-
-
-    /**
      * Function function
      * Check  Auth User and return a string token of on success or null in error case
-     * @param string $username - Auth username
+     * @param ServerRequestInterface $request
+     * @param array $findBy - Array find user by arguments
      * @param string $passKey - Auth password key
      * @param string $appKey - Basicis AppKey
      * @param string $expiration - Expires at specified monent
@@ -213,22 +44,16 @@ class Auth extends Model implements AuthInterface
      * @return string|null
      */
     public static function login(
-        string $username,
-        string $passKey,
-        string $appKey,
-        string $iss = "",
-        string $expiration = "+30 minutes",
-        string $nobefore = "now"
+        ServerRequestInterface $request,
+        AuthInterface $user
     ) : ?string {
-
-        $user = self::findOneBy(['username' => $username]);
-        if ($user === null) {
-            $user = self::findOneBy(['email' => $username]);
-        }
-
-        $entityClass = get_called_class();
-        if (($user instanceof $entityClass) && $user->checkPass($passKey)) {
-            $token = new Token($appKey, $iss, $expiration, $nobefore);
+        if ($user instanceof AuthInterface) {
+            $token = new Token(
+                $request->getAttribute("appKey"),
+                $request->getAttribute("tokenIss"),
+                $request->getAttribute("tokenExpiration"),
+                $request->getAttribute("tokenNobefore")
+            );
             return $token->create($user);
         }
         return null;
@@ -242,9 +67,9 @@ class Auth extends Model implements AuthInterface
       * @param ServerRequestInterface $request
       * @param string|null $authClass
       *
-      * @return Auth|null
+      * @return AuthInterface|null
       */
-    public static function getUser(ServerRequestInterface $request, string $authClass = null) : ?Auth
+    public static function getUser(ServerRequestInterface $request, string $authClass = null) : ?AuthInterface
     {
         if ($authClass === null) {
             $authClass = self::class;

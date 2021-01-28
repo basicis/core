@@ -12,7 +12,6 @@ use Basicis\Core\Log;
 
 /**
  * Model class
- *
  * @ORM\MappedSuperclass
  * @category Basicis
  * @package  Basicis
@@ -188,7 +187,6 @@ abstract class Model implements ModelInterface
                 if ($this->getId() !== null) {
                     $manager->persist($manager->merge($this));
                 }
-                //$manager->persist($this);
                 $manager->flush();
             } catch (\Exception $e) {
                 (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
@@ -326,16 +324,14 @@ abstract class Model implements ModelInterface
     public static function allToArray() : ?array
     {
         $entities = null;
-        if ($entities !== null) {
-            try {
-                $entities = [];
-                foreach (self::all() as $key => $entity) {
-                    $entities[$key] = $entity->__toArray();
-                }
-            } catch (\Exception $e) {
-                throw $e;
-                return null;
+        try {
+            $entities = [];
+            foreach (self::all() as $key => $entity) {
+                $entities[$key] = $entity->__toArray();
             }
+        } catch (\Exception $e) {
+            throw $e;
+            return null;
         }
         return $entities;
     }
