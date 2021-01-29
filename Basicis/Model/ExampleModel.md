@@ -45,8 +45,18 @@ Return entity ID (unique on system identification)|
 Get a instance of Doctrine ORM EntityManager an return this, or null|
 |getPropertyAnnotation|Function getPropertyAnnotation
 Get a array with property annotations data by prop and tag names, default tag `Column`|
+|getProtecteds|Function getProtecteds
+Get protecteds properties|
+|getTableName|Function getTableName
+Get entity table name|
 |getUpdated|Function getUpdated
 Return entity updated timestamp|
+|paginate|Function paginate
+Paginate entity search with start offset (0) and total, this is ten (10) by default|
+|query|Function query
+Execute a sql query string|
+|removeProtecteds|Function removeProtecteds
+Get Entity Data as Array, without the propreties defined in the array property $protecteds|
 |save|Function save
 Save data of this entity to database, use for create or update entities|
 |setCreated|Function setCreated

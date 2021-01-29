@@ -38,8 +38,18 @@ Return entity ID (unique on system identification)|
 Get a instance of Doctrine ORM EntityManager an return this, or null|
 |[getPropertyAnnotation](#modelgetpropertyannotation)|Function getPropertyAnnotation
 Get a array with property annotations data by prop and tag names, default tag `Column`|
+|[getProtecteds](#modelgetprotecteds)|Function getProtecteds
+Get protecteds properties|
+|[getTableName](#modelgettablename)|Function getTableName
+Get entity table name|
 |[getUpdated](#modelgetupdated)|Function getUpdated
 Return entity updated timestamp|
+|[paginate](#modelpaginate)|Function paginate
+Paginate entity search with start offset (0) and total, this is ten (10) by default|
+|[query](#modelquery)|Function query
+Execute a sql query string|
+|[removeProtecteds](#modelremoveprotecteds)|Function removeProtecteds
+Get Entity Data as Array, without the propreties defined in the array property $protecteds|
 |[save](#modelsave)|Function save
 Save data of this entity to database, use for create or update entities|
 |[setCreated](#modelsetcreated)|Function setCreated
@@ -147,7 +157,7 @@ Find all entities
 
 **Return Values**
 
-`array|null`
+`array`
 
 
 
@@ -426,6 +436,60 @@ Get a array with property annotations data by prop and tag names, default tag `C
 <hr />
 
 
+### Model::getProtecteds  
+
+**Description**
+
+```php
+public getProtecteds (void)
+```
+
+Function getProtecteds
+Get protecteds properties 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`array`
+
+
+
+
+<hr />
+
+
+### Model::getTableName  
+
+**Description**
+
+```php
+public static getTableName (void)
+```
+
+Function getTableName
+Get entity table name 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`string`
+
+
+
+
+<hr />
+
+
 ### Model::getUpdated  
 
 **Description**
@@ -446,6 +510,90 @@ Return entity updated timestamp
 **Return Values**
 
 `\DateTime`
+
+
+
+
+<hr />
+
+
+### Model::paginate  
+
+**Description**
+
+```php
+public static paginate (int $limit, int $offset, array $protecteds)
+```
+
+Function paginate
+Paginate entity search with start offset (0) and total, this is ten (10) by default 
+
+ 
+
+**Parameters**
+
+* `(int) $limit`
+* `(int) $offset`
+* `(array) $protecteds`
+
+**Return Values**
+
+`array`
+
+
+
+
+<hr />
+
+
+### Model::query  
+
+**Description**
+
+```php
+public static query (string $sql, array $protecteds)
+```
+
+Function query
+Execute a sql query string 
+
+ 
+
+**Parameters**
+
+* `(string) $sql`
+* `(array) $protecteds`
+
+**Return Values**
+
+`array|null`
+
+
+
+
+<hr />
+
+
+### Model::removeProtecteds  
+
+**Description**
+
+```php
+public static removeProtecteds (void)
+```
+
+Function removeProtecteds
+Get Entity Data as Array, without the propreties defined in the array property $protecteds 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+`array`
 
 
 

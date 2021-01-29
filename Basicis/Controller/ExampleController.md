@@ -31,7 +31,7 @@ Delete a model of the specified class|
 Extract Unique Columns of model class and return these as array|
 |find|Function find
 Find one a model item of the specified class|
-|getModelByAnnotation|Undocumented function
+|getModelByAnnotation|Function getModelByAnnotation
 Get annotations model class|
 |handle|Function handle
 Default method|

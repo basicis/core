@@ -24,7 +24,7 @@ Delete a model of the specified class|
 Extract Unique Columns of model class and return these as array|
 |[find](#controllerfind)|Function find
 Find one a model item of the specified class|
-|[getModelByAnnotation](#controllergetmodelbyannotation)|Undocumented function
+|[getModelByAnnotation](#controllergetmodelbyannotation)|Function getModelByAnnotation
 Get annotations model class|
 |[index](#controllerindex)|Function index
 Default method|
@@ -192,7 +192,7 @@ Find one a model item of the specified class
 public getModelByAnnotation (void)
 ```
 
-Undocumented function
+Function getModelByAnnotation
 Get annotations model class 
 
  
