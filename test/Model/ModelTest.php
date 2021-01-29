@@ -3,7 +3,6 @@ namespace Test\Model;
 
 use PHPUnit\Framework\TestCase;
 use Basicis\Model\Model;
-use Basicis\Model\Models;
 use Basicis\Model\ExampleModel;
 
 /**
@@ -85,19 +84,5 @@ class ModelTest extends TestCase
     {
         $this->assertEquals(true, is_array($this->model->__toArray()));
         $this->assertEquals(true, is_string($this->model->__toString()));
-    }
-
-
-    /**
-     * Function testArrayAndJson
-     * @return void
-     */
-    public function testModels()
-    {
-        $models = new Models(get_class($this->model));
-        $this->assertEquals(true, is_array($models->getAll()));
-
-        $models = new Models(get_class($this->model), ["id" => 1]);
-        $this->assertEquals(true, is_array($models->getArray()));
     }
 }

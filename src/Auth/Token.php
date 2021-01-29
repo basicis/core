@@ -102,7 +102,8 @@ class Token
             "usr" => [
                 "id" => $user->getId(),
                 "username" => $user->getUsername(),
-                "role" => $user->getRole()
+                "role" => $user->getRole(),
+                "class" => get_class($user)
             ]
         );
 

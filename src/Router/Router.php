@@ -83,7 +83,7 @@ class Router
         if ($route === null) {
             $response->withStatus(404, "Page or end-point not found!");
         }
-
+    
         if ($next !== null) {
             return $next($request, $response);
         }
@@ -152,7 +152,6 @@ class Router
     {
         $routes = $this->findByName($this->url);
         $routes = $routes ? $routes : $this->findByRegex($this->url);
-
         if ($routes && (count($routes) === 1)) {
             return $routes[0];
         }
