@@ -64,15 +64,16 @@ class View
         $explode = explode($delimiter, strtolower($name));
         $template = $explode[0];
         $content = glob($path.$explode[0].'.*');
-            
+       
         if (count($content) >= 1) {
             $template = str_replace($path, '', $content[0]);
         }
         unset($content);
 
-        $content = glob($path . $explode[1] .'.*');
+        $included = trim($explode[1]);
+        $content = glob($path . $included .'.*');
         if (count($content) >= 1) {
-            $data[$explode[1]] = str_replace($path, '', $content[0]);
+            $data[$included] = str_replace($path, '', $content[0]);
         }
 
         if (count($explode) > 2) {
@@ -85,7 +86,6 @@ class View
                 $i++;
             }
         }
-
         return $template;
     }
 

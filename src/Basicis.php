@@ -982,16 +982,16 @@ class Basicis implements RequestHandlerInterface
     {
         $arrayToJson = [
             "meta" => [
-                "code" =>  $this->getResponse()->getStatusCode(),
-                "message" => $this->getResponse()->getReasonPhrase(),
-                "endpoint" => $this->getRequest()->getUri(),
-                "method" => $this->getRequest()->getMethod()
+                "code" =>  $this->response($statusCode)->getStatusCode(),
+                "message" => $this->response()->getReasonPhrase(),
+                "endpoint" => $this->request()->getUri(),
+                "method" => $this->request()->getMethod()
             ],
             "data" => $data
         ];
 
         return $this->write(json_encode($arrayToJson))
-                    ->withStatus($statusCode ?? $this->getResponse()->getStatusCode())
+                    ->withStatus($statusCode ?? $this->response()->getStatusCode())
                     ->withHeader("Content-Type", "application/json; charset=UTF-8");
     }
 
@@ -1165,7 +1165,7 @@ class Basicis implements RequestHandlerInterface
             }
 
             if ($file->isReadable()) {
-                return $this->response->withHeaders($headers)->withStatus(200)->withBody($file);
+                return $this->getResponse()->withHeaders($headers)->withStatus(200)->withBody($file);
             }
 
             $file->close();
@@ -1498,6 +1498,10 @@ class Basicis implements RequestHandlerInterface
         ResponseInterface $response,
         callable $next = null
     ) : ResponseInterface {
+        $this->request($request);
+        $this->response($response);
+        $request->withAttribute("app", $this);
+
         //Run pipeline and return a instanceo of ResponseInterface
         return $this->handle($request, $response, $next);
     }

@@ -44,21 +44,24 @@ class {{class}} extends Middleware
      *
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
-    {
+    public function process(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface {
         /**
          *
          * Process here all persoal middleware code implementation and return $next
          * ...
-         * retrun $next($request);
+         * retrun $next($request, $response);
          *
          * Or receive um ResponseInterface from $next and procces you ResponseInterface
          *
-         * $response = $next($request);
+         * $response = $next($request, $response);
          * ...
          * retrun $response;
          */
 
-        retrun $next($request);
+        retrun $next($request, $response);
     }
 }
