@@ -3,6 +3,7 @@ namespace Basicis\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Basicis\Model\ModelInteface;
 use Basicis\Model\DataBase;
 use Basicis\Basicis as App;
@@ -21,6 +22,11 @@ use Basicis\Core\Log;
  */
 abstract class Model implements ModelInterface
 {
+    /**
+     * $protecteds variable
+     * @var array
+     */
+    protected $protecteds = [];
 
     /**
       * @ORM\Id
@@ -44,17 +50,11 @@ abstract class Model implements ModelInterface
      * */
     protected $updated;
 
+
     /**
-     * $protecteds variable
-     * @var array
+     * Function function
+     * @param array|int|null $data
      */
-    protected $protecteds = [];
-
-
-     /**
-      * Function function
-      * @param array|int|null $data
-      */
     public function __construct($data = null)
     {
         if (($data !== null) && is_array($data)) {
@@ -78,6 +78,16 @@ abstract class Model implements ModelInterface
     }
 
     /**
+     * Function getProtecteds
+     * Get protecteds properties
+     * @return array
+     */
+    public function getProtecteds() : array
+    {
+        return $this->protecteds;
+    }
+
+    /**
      * Function getId
      * Return entity ID (unique on system identification)
      * @return int|null
@@ -86,8 +96,6 @@ abstract class Model implements ModelInterface
     {
         return $this->id;
     }
-
-
 
     /**
      * Function setCreated
@@ -105,7 +113,6 @@ abstract class Model implements ModelInterface
         return $this;
     }
 
-
     /**
      * Function getCreated
      * Return entity created timestamp
@@ -115,7 +122,6 @@ abstract class Model implements ModelInterface
     {
         return $this->created;
     }
-
 
     /**
      * Function setUpdated
@@ -133,7 +139,6 @@ abstract class Model implements ModelInterface
         return $this;
     }
 
-
     /**
      * Function getUpdated
      * Return entity updated timestamp
@@ -143,7 +148,6 @@ abstract class Model implements ModelInterface
     {
         return $this->updated;
     }
-
 
     /**
      * Function getManager
@@ -166,8 +170,17 @@ abstract class Model implements ModelInterface
         }
         return null;
     }
-    
 
+    /**
+     * Function getTableName
+     * Get entity table name
+     * @return String
+     */
+    public static function getTableName() : String
+    {
+        return self::getManager()->getClassMetadata(get_called_class())->getTableName();
+    }
+    
     /**
      * Function save
      * Save data of this entity to database, use for create or update entities
@@ -195,7 +208,6 @@ abstract class Model implements ModelInterface
         return $this;
     }
 
-
     /**
      * Function delete
      * Remove data of this entity of database
@@ -217,19 +229,24 @@ abstract class Model implements ModelInterface
         return false;
     }
 
-
     /**
      * Function findBy
      * Find all entities by any column match
      * @param array $findBy
      * @return Array|Model[]|null
      */
-    public static function findBy(array $findBy = []) : ?Array
-    {
+    public static function findBy(
+        array $findBy = [],
+        array $options = array('id' => 'ASC'),
+        int $limit = 10,
+        int $offset = 0
+    ) : ?Array {
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
             try {
-                $entities = $manager->getRepository(get_called_class())->findBy($findBy);
+                $entities = $manager
+                            ->getRepository(get_called_class())
+                            ->findBy($findBy, $options, $limit, $offset);
             } catch (\Exception $e) {
                 (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
                 return null;
@@ -240,7 +257,6 @@ abstract class Model implements ModelInterface
         }
         return null;
     }
-
 
     /**
      * Function findOneBy
@@ -267,7 +283,6 @@ abstract class Model implements ModelInterface
         return null;
     }
 
-
     /**
      * Function find
      * Find a entity by id
@@ -293,13 +308,47 @@ abstract class Model implements ModelInterface
         return null;
     }
 
+    /**
+      * Function paginate
+      * Paginate entity search with start offset (0) and total, this is ten (10) by default
+      *
+      * @param int $limit
+      * @param int $offset
+      * @param array $protecteds
+      *
+      * @return array
+      */
+    public static function paginate(int $limit = 10, int $offset = 0, array $protecteds = []) : array
+    {
+        $sql = "SELECT * FROM ".self::getTableName()." ORDER BY id LIMIT ".$limit;
+        if ($offset > 0) {
+            $sql .= " OFFSET ".$offset;
+        }
+        return self::query($sql, $protecteds);
+    }
+
+    /**
+      * Function query
+      * Execute a sql query string
+      *
+      * @param string $sql
+      * @param array $protecteds
+      *
+      * @return array|null
+      */
+    public static function query(string $sql, $protecteds = []) : ?array
+    {
+        $statement = self::getManager()->getConnection()->prepare($sql);
+        $statement->execute();
+        return self::removeProtecteds($statement->fetchAll() ?? [], $protecteds);
+    }
 
     /**
      * Function all
      * Find all entities
-     * @return array|null
+     * @return array
      */
-    public static function all() : ?array
+    public static function all() : array
     {
         $manager = self::getManager();
         if ($manager instanceof EntityManager) {
@@ -307,13 +356,13 @@ abstract class Model implements ModelInterface
                 $entities = $manager->getRepository(\get_called_class())->findAll();
             } catch (\Exception $e) {
                 (new DataBaseException($e->getMessage(), $e->getCode(), $e))->log();
-                return null;
+                return [];
             }
             if (is_array($entities) && (count($entities) > 0)) {
                 return $entities;
             }
         }
-        return null;
+        return [];
     }
 
     /**
@@ -336,7 +385,6 @@ abstract class Model implements ModelInterface
         return $entities;
     }
 
-
     /**
      * Function exists
      * Check if a entity by any column match
@@ -353,6 +401,30 @@ abstract class Model implements ModelInterface
         return false;
     }
 
+    /**
+     * Function removeProtecteds
+     * Get Entity Data as Array, without the propreties defined in the array property $protecteds
+     * @return array
+     */
+    public static function removeProtecteds(array $models, array $protecteds = []) : array
+    {
+        foreach ($models as $i => $model) {
+            if (is_array($model)) {
+                foreach (array_keys((array) $model) as $key) {
+                    if (in_array($key, $protecteds)) {
+                        unset($models[$i][$key]);
+                    }
+                }
+            }
+
+            if (is_object($model)) {
+                if (in_array($i, $protecteds)) {
+                    unset($models[$i]);
+                }
+            }
+        }
+        return $models ?? [];
+    }
 
     /**
      * Function __toArray
@@ -364,16 +436,16 @@ abstract class Model implements ModelInterface
         $data = [];
         $props = \array_keys(\get_object_vars($this));
         foreach ($props as $prop) {
-            if (!in_array($prop, $this->protecteds) && ($prop !== "protecteds")) {
-                $data[$prop] = $this->$prop;
-                if ($prop instanceof Model) {
-                    $data[$prop] = $this->$prop->__toArray();
-                }
+            $data[$prop] = $this->$prop;
+            if ($prop instanceof Model) {
+                $data[$prop] = self::removeProtecteds(
+                    $this->$prop->__toArray(),
+                    $this->$prop->getProtecteds()
+                );
             }
         }
-        return $data;
+        return self::removeProtecteds($data, $this->getProtecteds()) ?? [];
     }
-
 
     /**
      * Function __toString

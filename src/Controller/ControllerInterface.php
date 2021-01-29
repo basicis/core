@@ -35,7 +35,6 @@ interface ControllerInterface extends RequestHandlerInterface
         callable $next = null
     ) : ResponseInterface;
 
-
     /**
     * Function index
     * Default method index
