@@ -1,4 +1,7 @@
+#!/usr/local/bin/php
 <?php
+echo "\nBasicis - Project install...\n";
+
 // App config files
 $configFiles = [
     "spath" => "vendor/basicis/core/config/",
@@ -15,15 +18,18 @@ foreach ($configFiles["files"] as $file) {
     $dst = $configFiles["dpath"].$file;
     if (!file_exists($dst)) {
         copy($src, $dst);
+        echo "* Copy file from $src to $dst\n";
     }
 }
 
 $dst = '.env.local';
 if (!file_exists($dst)) {
     copy('.env.example', $dst);
+    echo "* Copy file from .env.example to $dst\n";
 }
 
 if (!file_exists('maker')) {
     copy('vendor/basicis/core/bin/maker', 'maker');
     chmod('maker', 0775);
+    echo "* Copy file from vendor/basicis/core/bin/maker to maker\n";
 }

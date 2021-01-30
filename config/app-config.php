@@ -24,6 +24,9 @@ use Basicis\Http\Message\ServerRequestFactory;
 /** Loading Enviroment variables */
 Basicis::loadEnv();
 
+/** Create a symlink default from storage/assets to public/ as assets */
+Basicis::createSymLink();
+
 /**
  * $app variable
  * Create an instance of Basicis\Basicis and setting arguments
