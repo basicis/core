@@ -30,6 +30,8 @@ Instantiate a Closure object and execute|
 Instantiate a Basicis\Controller\Controller object and execute the defined method or the standard index method.|
 |[createApp](#basiciscreateapp)|Function createApp Factory
 Create a instanceof Basicis\Basicis and return it is|
+|[createSymLink](#basiciscreatesymlink)|Function createSymLink
+Create a symlink default from storage/assets to public/ as assets|
 |[enableCache](#basicisenablecache)|Function enableCache
 Enable application cache $enable true|
 |[error](#basiciserror)|Function error
@@ -390,6 +392,34 @@ Create a instanceof Basicis\Basicis and return it is
 **Return Values**
 
 `\Basicis`
+
+
+
+
+<hr />
+
+
+### Basicis::createSymLink  
+
+**Description**
+
+```php
+public static createSymLink (string $src, string $dst)
+```
+
+Function createSymLink
+Create a symlink default from storage/assets to public/ as assets 
+
+ 
+
+**Parameters**
+
+* `(string) $src`
+* `(string) $dst`
+
+**Return Values**
+
+`bool`
 
 
 
