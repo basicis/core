@@ -1,9 +1,12 @@
 <?php
 
 return (object) [
-    'rootNamespace' => 'Basicis | Core', 
+    'rootNamespace' => 'Basicis - Core', 
     'destDirectory' => 'docs',
     'format' => 'github',
+    files => [
+        'README.md',
+    ],
     'classes' => [
         /* Basicis\ */
         '\Basicis\Basicis',

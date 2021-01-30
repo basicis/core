@@ -1,4 +1,4 @@
-name: Run Unit and code Testing, Generate and deploy documentation 
+name: Run unit and code testing, build and deploy documentation 
 on:
   pull_request:
     branchs: 

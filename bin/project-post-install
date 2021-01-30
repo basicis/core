@@ -1,0 +1,15 @@
+#!/usr/local/bin/php
+<?php
+echo "\nnBasicis  - Project post install...\n";
+
+// App remove dir
+$removeDir = [
+    //".github",
+    ".git"
+];
+
+foreach ($removeDir as $dir) {
+  if (is_dir($dir) && !rmdir($dir)) {
+      echo "* Error on remove dir: $dir\n";
+  }
+}

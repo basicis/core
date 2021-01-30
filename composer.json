@@ -2,9 +2,9 @@
     "name": "basicis/core",
     "description": "Basicis PHP Framework - Core ©",
     "type": "library",
+    "license": "MIT",
     "version": "1.0.0",
     "minimum-stability": "stable",
-    "license": "MIT",
     "authors": [
         {
             "name": "Messias Dias",
@@ -76,8 +76,10 @@
         "platform-check": false
     },
     "bin": [
+        "bin/maker",
         "bin/server",
         "bin/project-install",
+        "bin/project-post-install",
         "bin/prepare-test"
     ]
 }
