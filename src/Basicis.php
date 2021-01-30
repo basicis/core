@@ -547,6 +547,31 @@ class Basicis implements RequestHandlerInterface
     }
 
     /**
+      * Function createSymLink
+      * Create a symlink default from storage/assets to public/ as assets
+      *
+      * @param string $src
+      * @param string $dst
+      *
+      * @return bool
+      */
+    public static function createSymLink(string $src = null, string $dst = null) : bool
+    {
+        if ($src === null) {
+            $src = self::path()."storage/assets/";
+        }
+
+        if ($dst === null) {
+            $dst = "assets";
+        }
+
+        if (!is_link($dst)) {
+            symlink($src, $dst);
+        }
+        return is_link($dst);
+    }
+
+    /**
      * Function loadEnv
      * Load enviroment variables for use from app
      *

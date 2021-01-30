@@ -21,7 +21,6 @@
 </p>
 
 
-## About
 Basicis is a library open source, which follows as [PSR's - PHP Standards Recommendations](https://www.php-fig.org/psr), focusing on web applications and rest api's.
 As the name says, it is made to be basic and direct.
 
@@ -155,8 +154,8 @@ if ($app instanceof Basicis\Basicis) {
 exit("Error on Start Basicis framework application!");
 ```
 
-## Docs
-Documentation [here](https://basicis.github.io/core/).
+## Documentation
+Link to Documentation [here](https://basicis.github.io/core/).
 
 ## License
 The Basicis Core library is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

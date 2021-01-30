@@ -36,7 +36,11 @@
         }
     },
     "scripts": {
-        "phpdoc": "vendor/bin/phpdoc-md -v",
+        "phpdoc": [
+            "rm -rf docs/",
+            "vendor/bin/phpdoc-md -v",
+            "php bin/doc-readme"
+        ],
         "doc": "@phpdoc",
         "dev-server": "bash bin/server",
         "dev:start": "@dev-server start",
@@ -78,6 +82,7 @@
     "bin": [
         "bin/maker",
         "bin/server",
+        "bin/doc-readme",
         "bin/project-install",
         "bin/project-post-install",
         "bin/prepare-test"
