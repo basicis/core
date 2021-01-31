@@ -3,7 +3,7 @@
     "description": "Basicis PHP Framework - Core ©",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "v1.0.0-alpha.2",
     "minimum-stability": "stable",
     "authors": [
         {
