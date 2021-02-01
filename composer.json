@@ -4,7 +4,6 @@
     "keywords": ["Basicis", "php", "lib", "library", "psr"],
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0.0",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "homepage": "https://basicis.github.io/core/",
