@@ -48,11 +48,6 @@
             "Basicis\\": "src/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.x-dev-master"
-        }
-    },
     "scripts": {
         "phpdoc": [
             "rm -rf docs/",
