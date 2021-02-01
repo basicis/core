@@ -1,8 +1,8 @@
 
 theme: jekyll-theme-cayman
-title: "Basicis - Core ©"
+title: "Basicis - Core"
 description: "As the name says, it is made to be basic and direct."
-logo: "https://raw.githubusercontent.com/basicis/core/master/storage/img/logo.png"
+logo: "https://github.com/basicis/core/blob/master/storage/img/logo.png"
 show_downloads: true
 staticman:
   branch: "gh-pages"

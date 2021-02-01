@@ -2,29 +2,20 @@
 <?php
 require_once "vendor/autoload.php";
 $path = __DIR__."/../";
-$replace = "/Link to Documentation /";
-$src = "README.md";
-$dst = "docs/README.md";
+$replace = "/Link to Documentation (.*)\n/";
+$src = $path."README.md";
+$dst = $path."docs/README.md";
+$logo = $path."storage/assets/img/logo.png";
+$copyDir = $path."docs/storage/assets/img/";
+
+if(file_exists($logo)) {
+    if(!is_dir($copyDir)) {
+        mkdir($copyDir, 0775, true); 
+    }
+    copy($logo, $copyDir."logo.png");
+}
 
 if (file_exists($src) && file_exists($dst)) {
-    $srcContent = str_replace(
-        [
-          "storage/img/logo.png",
-          //"# Docs",
-        ],
-        [
-          "https://raw.githubusercontent.com/basicis/core/master/storage/img/logo.png",
-          //""
-        ],
-        file_get_contents($src)
-    );
-
-    $dstContent = str_replace(
-        "# Basicis | Core \n",
-        "",
-        file_get_contents($dst)
-    );
-
-    file_put_contents($dst, preg_replace($replace, $dstContent, $srcContent));
+    file_put_contents($dst, preg_replace($replace, file_get_contents($dst), file_get_contents($src)));
     exit;
 }

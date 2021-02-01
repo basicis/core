@@ -1,9 +1,16 @@
 {
     "name": "basicis/core",
-    "description": "Basicis PHP Framework - Core ©",
+    "description": "Basicis PHP Framework - Core",
+    "keywords": ["Basicis", "php", "lib", "library", "psr"],
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "homepage": "https://basicis.github.io/core/",
+    "support": {
+        "issues": "https://github.com/basicis/core/issues",
+        "source": "https://github.com/basicis/core"
+    },
     "authors": [
         {
             "name": "Messias Dias",
@@ -11,7 +18,7 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.3|>=8.0",
         "psr/log": "^1.1",
         "psr/http-message": "^1.0",
         "psr/http-client": "^1.0",
@@ -23,15 +30,26 @@
         "katzien/php-mime-type": "^2.1",
         "firebase/php-jwt": "^5.0",
         "doctrine/orm": "^2.7",
-        "symfony/dotenv": "^5.2",
+        "symfony/dotenv": "^5.2"
+    },
+    "require-dev": {
         "clean/phpdoc-md": "~0.19.1",
         "phpunit/phpunit": "^9.2.6",
         "squizlabs/php_codesniffer": "3.*"
     },
     "autoload": {
         "psr-4": {
-            "Basicis\\": "src/",
-            "Test\\": "test/"
+            "Basicis\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Basicis\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-alpha"
         }
     },
     "scripts": {
