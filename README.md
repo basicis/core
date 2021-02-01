@@ -1,10 +1,3 @@
-
-# Basicis - Core
-
-<p align="center">
-    <img width="160" src="https://raw.githubusercontent.com/basicis/core/master/storage/img/logo.png"/>
-</p>
-
 <p align="center">
     <a title="Latest stable Version" href="https://packagist.org/packages/basicis/core" >
         <img src="https://poser.pugx.org/basicis/core/version" />
@@ -201,7 +194,6 @@ exit("Error on Start Basicis framework application!");
 * [Basicis\Router\Route](Basicis/Router/Route.md) 
 * [Basicis\Router\RouterFactory](Basicis/Router/RouterFactory.md) 
 * [Basicis\View\View](Basicis/View/View.md) 
-[here](https://basicis.github.io/core/).
 
 ## License
 The Basicis Core library is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
