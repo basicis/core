@@ -1,10 +1,3 @@
-
-# Basicis - Core
-
-<p align="center">
-    <img width="160" src="storage/img/logo.png"/>
-</p>
-
 <p align="center">
     <a title="Latest stable Version" href="https://packagist.org/packages/basicis/core" >
         <img src="https://poser.pugx.org/basicis/core/version" />
