@@ -1,12 +1,11 @@
 #!/usr/local/bin/php
 <?php
 require_once "vendor/autoload.php";
-$path = __DIR__."/../";
 $replace = "/Link to Documentation (.*)\n/";
-$src = $path."README.md";
-$dst = $path."docs/README.md";
-$logo = $path."storage/assets/img/logo.png";
-$copyDir = $path."docs/storage/assets/img/";
+$src = "README.md";
+$dst = "docs/README.md";
+$logo = "storage/assets/img/logo.png";
+$copyDir = "docs/storage/assets/img/";
 
 if(file_exists($logo)) {
     if(!is_dir($copyDir)) {

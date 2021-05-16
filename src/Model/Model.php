@@ -88,6 +88,20 @@ abstract class Model implements ModelInterface
     }
 
     /**
+     * Function setId
+     * Set entity ID (unique on system identification)
+     * @param int $id
+     * @return Model
+     */
+    public function setId(int $id = null) : Model
+    {
+        if ($id > 0) {
+            $this->id = $id;
+        }
+        return $this;
+    }
+
+    /**
      * Function getId
      * Return entity ID (unique on system identification)
      * @return int|null

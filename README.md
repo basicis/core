@@ -19,6 +19,10 @@ As the name says, it is made to be basic and direct.
 
 ## Get Started
 
+<p align="center">
+    <img width="80" src="https://raw.githubusercontent.com/basicis/core/master/storage/assets/img/logo.png"/>
+</p>
+
 Add library in to you project with Composer
 ```
 composer require basicis/core
@@ -41,11 +45,11 @@ APP_TIMEZONE='America/Recife'
 
 # For MySQL databases
 #DB_DRIVER="pdo_mysql"
-DB_HOST="127.0.0.1"
-DB_PORT=3306
-DB_NAME="dbname"
-DB_USER="user"
-DB_PASS="userpass"
+#DB_HOST="127.0.0.1"
+#DB_PORT=3306
+#DB_NAME="dbname"
+#DB_USER="user"
+#DB_PASS="userpass"
 #DATABASE_URL="${DB_DRIVER}://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
 # For Sqlite database
